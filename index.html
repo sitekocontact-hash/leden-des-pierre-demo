@@ -3,153 +3,494 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="L'Eden des Pierres — créations artisanales en pierres naturelles et perles, par Sonia.">
+<meta name="description" content="L'Eden des Pierres — bracelets et créations en pierres naturelles montés à la main, par Sonia.">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>L'Eden des Pierres</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Mrs+Saint+Delafield&display=swap">
 
 <style>
+  /* ============ Système de couleurs — parti pris nocturne assumé ============ */
   :root {
-    --ivory: #FAF7EF;
-    --ivory-deep: #F2EDE1;
-    --surface: #FFFFFF;
-    --ink: #23261C;
-    --ink-soft: #5A5F4E;
-    --forest: #445939;
-    --forest-deep: #2F3E27;
-    --sage: #8DA07E;
-    --gold: #C3A263;
-    --gold-line: #D9C293;
-    --gold-text: #8A6A2C;
-    --hairline: #E3DBC8;
+    --night: #080D08;
+    --night-2: #0C130C;
+    --bark: #111A11;
+    --moss: #18261A;
+    --sage: #9DBA8B;
+    --sage-dim: #7A9569;
+    --gold: #D2AC63;
+    --gold-soft: #EBD5A6;
+    --gold-deep: #8E7134;
+    --ivory: #F1EEE3;
+    --muted: #A6B29B;
 
-    --bg: var(--ivory);
-    --bg-alt: var(--ivory-deep);
-    --card: var(--surface);
-    --text: var(--ink);
-    --text-soft: var(--ink-soft);
-    --title: var(--forest);
-    --band: var(--forest-deep);
-    --band-text: #EFEADC;
-    --rule: var(--hairline);
-    --seal-leaf: var(--sage);
-    --seal-leaf-deep: var(--forest);
-    --seal-gold: var(--gold);
-    --shadow: 0 24px 60px -34px rgba(52, 60, 38, 0.45);
+    --glass: rgba(255, 255, 255, 0.042);
+    --glass-strong: rgba(255, 255, 255, 0.07);
+    --edge: rgba(210, 172, 99, 0.2);
+    --edge-soft: rgba(157, 186, 139, 0.14);
 
-    --measure: 62ch;
-    --radius-card: 22px;
-    --radius-pill: 999px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #12150D;
-      --bg-alt: #191D12;
-      --card: #1D2216;
-      --text: #ECE6D6;
-      --text-soft: #A8AE97;
-      --title: #C7D3B7;
-      --band: #0C0F08;
-      --band-text: #ECE6D6;
-      --rule: #2E3524;
-      --seal-leaf: #93A583;
-      --seal-leaf-deep: #B6C4A4;
-      --seal-gold: #CDAC6B;
-      --gold-text: #D3B478;
-      --gold-line: #6B5A34;
-      --shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  :root[data-theme="dark"] {
-    --bg: #12150D;
-    --bg-alt: #191D12;
-    --card: #1D2216;
-    --text: #ECE6D6;
-    --text-soft: #A8AE97;
-    --title: #C7D3B7;
-    --band: #0C0F08;
-    --band-text: #ECE6D6;
-    --rule: #2E3524;
-    --seal-leaf: #93A583;
-    --seal-leaf-deep: #B6C4A4;
-    --seal-gold: #CDAC6B;
-    --gold-text: #D3B478;
-    --gold-line: #6B5A34;
-    --shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.8);
+    --shell: min(1280px, 100% - 3rem);
+    --r-card: 20px;
+    --r-pill: 999px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   * { box-sizing: border-box; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--night);
+    color: var(--ivory);
     font-family: "Jost", "Avenir Next", "Segoe UI", sans-serif;
     font-weight: 300;
     font-size: 16.5px;
-    line-height: 1.7;
+    line-height: 1.72;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3 {
     font-family: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-    color: var(--title);
-    font-weight: 500;
-    line-height: 1.12;
-    text-wrap: balance;
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
     margin: 0;
-    letter-spacing: 0.005em;
+    text-wrap: balance;
+    color: var(--ivory);
   }
 
   p { margin: 0; }
   a { color: inherit; }
 
   :focus-visible {
-    outline: 2px solid var(--gold-text);
-    outline-offset: 3px;
-    border-radius: 4px;
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+    border-radius: 6px;
   }
 
-  .shell {
-    width: min(1240px, 100% - 3rem);
-    margin-inline: auto;
-  }
+  .shell { width: var(--shell); margin-inline: auto; }
 
   .script {
     font-family: "Mrs Saint Delafield", "Snell Roundhand", cursive;
-    color: var(--gold-text);
-    font-weight: 400;
-    line-height: 0.9;
+    color: var(--gold);
+    line-height: 0.92;
   }
 
   .kicker {
-    font-family: "Jost", sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--gold-text);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
   }
 
-  /* ---------- Sceau / logo ---------- */
+  .kicker::before {
+    content: "";
+    width: 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+
+  .lede {
+    font-size: clamp(1.1rem, 1.7vw, 1.32rem);
+    color: var(--ivory);
+    font-weight: 300;
+    max-width: 60ch;
+  }
+
+  .body-text { color: var(--muted); max-width: 62ch; }
+
+  /* ============ Décor animé de fond ============ */
+
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #16261A 0%, transparent 55%),
+      radial-gradient(90% 70% at 85% 110%, #1A2A18 0%, transparent 60%),
+      var(--night);
+  }
+
+  .mist {
+    position: fixed;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.5;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .mist-a {
+    width: 46vw; height: 46vw; left: -10vw; top: 4vh;
+    background: radial-gradient(circle, rgba(122, 149, 105, 0.4), transparent 68%);
+    animation: driftA 34s ease-in-out infinite;
+  }
+
+  .mist-b {
+    width: 38vw; height: 38vw; right: -8vw; top: 32vh;
+    background: radial-gradient(circle, rgba(210, 172, 99, 0.26), transparent 68%);
+    animation: driftB 44s ease-in-out infinite;
+  }
+
+  .mist-c {
+    width: 52vw; height: 52vw; left: 22vw; bottom: -18vh;
+    background: radial-gradient(circle, rgba(60, 104, 66, 0.34), transparent 70%);
+    animation: driftA 52s ease-in-out infinite reverse;
+  }
+
+  @keyframes driftA {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(6vw, -5vh, 0) scale(1.12); }
+  }
+
+  @keyframes driftB {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    50% { transform: translate3d(-7vw, 6vh, 0) scale(0.92); }
+  }
+
+  #dust {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .foliage {
+    position: absolute;
+    pointer-events: none;
+    color: var(--sage);
+    opacity: 0.13;
+    will-change: transform;
+  }
+
+  .foliage svg { display: block; width: 100%; height: auto; }
+
+  /* ============ Rideau d'ouverture ============ */
+
+  .curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    background: var(--night);
+    animation: curtain-lift 900ms var(--ease) 2050ms forwards;
+  }
+
+  @keyframes curtain-lift {
+    to { opacity: 0; visibility: hidden; pointer-events: none; }
+  }
+
+  .curtain .draw-seal { width: min(58vw, 320px); }
+
+  .draw-seal [data-draw] {
+    stroke-dasharray: var(--len, 600);
+    stroke-dashoffset: var(--len, 600);
+    animation: draw 1500ms var(--ease) forwards;
+    animation-delay: var(--dd, 0ms);
+  }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .draw-seal [data-pop] {
+    opacity: 0;
+    animation: pop 700ms var(--ease) forwards;
+    animation-delay: var(--dd, 400ms);
+  }
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .curtain-word {
+    position: absolute;
+    bottom: clamp(2rem, 8vh, 5rem);
+    font-size: 0.68rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0;
+    animation: fade-up 900ms var(--ease) 1200ms forwards;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ============ Barre de navigation ============ */
+
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--sage), var(--gold));
+    z-index: 60;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px);
+    background: linear-gradient(180deg, rgba(8, 13, 8, 0.82), rgba(8, 13, 8, 0.35));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .topbar-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: 76px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
+
+  .brand-mark { width: 40px; height: 40px; flex: none; }
+
+  .brand-name {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.16rem;
+    letter-spacing: 0.06em;
+  }
+
+  .brand-sub {
+    display: block;
+    font-size: 0.56rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 0.22rem;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.1rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-links a {
+    position: relative;
+    text-decoration: none;
+    padding-block: 0.4rem;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 1px; width: 100%;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: 100% 50%;
+    transition: transform 0.45s var(--ease);
+  }
+
+  .nav-links a:hover { color: var(--ivory); }
+  .nav-links a:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: "Jost", sans-serif;
+    font-size: 0.76rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.95rem 1.9rem;
+    border-radius: var(--r-pill);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease), border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, var(--gold), var(--gold-soft) 45%, var(--gold));
+    transition: transform 0.5s var(--ease);
+  }
+
+  .btn span { position: relative; z-index: 1; }
+
+  .btn-solid { color: #10180F; }
+  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -22px rgba(210, 172, 99, 0.9); }
+  .btn-solid:active { transform: translateY(0); }
+
+  .btn-ghost {
+    color: var(--ivory);
+    border-color: var(--edge);
+  }
+
+  .btn-ghost::before { transform: translateY(101%); }
+  .btn-ghost:hover { color: #10180F; border-color: transparent; }
+  .btn-ghost:hover::before { transform: translateY(0); }
+
+  .btn-sm { padding: 0.7rem 1.4rem; font-size: 0.7rem; }
+
+  .menu-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: var(--r-pill);
+    padding: 0.55rem 1.1rem;
+    color: var(--ivory);
+    font-family: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* ============ Héros ============ */
+
+  .hero {
+    position: relative;
+    padding-block: clamp(3rem, 7vw, 6rem) clamp(4rem, 9vw, 7rem);
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 6.4vw, 5.6rem);
+    margin-top: 1.8rem;
+  }
+
+  .hero h1 .line { display: block; overflow: hidden; }
+
+  .hero h1 .line > span {
+    display: block;
+    transform: translateY(105%);
+    animation: line-up 1s var(--ease) forwards;
+    animation-delay: calc(2150ms + var(--i, 0) * 130ms);
+  }
+
+  @keyframes line-up { to { transform: none; } }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    margin-top: 1.9rem;
+    max-width: 34ch;
+    color: var(--muted);
+    font-size: 1.06rem;
+    opacity: 0;
+    animation: fade-up 900ms var(--ease) 2650ms forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2.6rem;
+    opacity: 0;
+    animation: fade-up 900ms var(--ease) 2800ms forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 3.2rem;
+    padding-top: 1.7rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    opacity: 0;
+    animation: fade-up 900ms var(--ease) 2950ms forwards;
+  }
+
+  .hero-meta div { display: grid; gap: 0.15rem; }
+
+  .hero-meta b {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: var(--gold-soft);
+  }
+
+  .hero-meta span {
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Sceau du héros */
+
+  .hero-seal-wrap {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 460px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+
+  .halo {
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(210, 172, 99, 0.2), transparent 62%);
+    animation: breathe 7s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.75; }
+    50% { transform: scale(1.09); opacity: 1; }
+  }
+
+  .orbit {
+    position: absolute;
+    inset: 0;
+    animation: spin 46s linear infinite;
+  }
+
+  .orbit-rev { animation-duration: 68s; animation-direction: reverse; }
+
+  @keyframes spin { to { rotate: 360deg; } }
 
   .seal {
     position: relative;
     display: grid;
     place-items: center;
+    width: 86%;
     aspect-ratio: 1;
-    font-size: clamp(10px, 1.35vw, 15px);
+    font-size: clamp(9px, 1.15vw, 14px);
   }
 
-  .seal svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
+  .seal > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
   .seal-word {
     position: relative;
@@ -164,16 +505,15 @@
   .seal-word .eden {
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 3.05em;
-    font-weight: 600;
-    color: var(--seal-leaf-deep);
-    letter-spacing: 0.01em;
+    font-weight: 500;
+    color: var(--ivory);
     line-height: 0.9;
   }
 
   .seal-word .pierres {
     font-family: "Mrs Saint Delafield", cursive;
     font-size: 3.5em;
-    color: var(--seal-gold);
+    color: var(--gold);
     line-height: 0.8;
     margin-top: 0.1em;
   }
@@ -181,452 +521,317 @@
   .seal-rule {
     display: flex;
     align-items: center;
-    gap: 0.55em;
+    gap: 0.5em;
     margin-top: 0.7em;
-    color: var(--seal-gold);
+    color: var(--gold);
   }
 
-  .seal-rule i {
-    display: block;
-    width: 2.6em;
-    height: 1px;
-    background: currentColor;
-  }
-
-  .seal-rule b {
-    width: 0.42em;
-    height: 0.42em;
-    background: currentColor;
-    rotate: 45deg;
-  }
+  .seal-rule i { display: block; width: 2.4em; height: 1px; background: currentColor; }
+  .seal-rule b { width: 0.4em; height: 0.4em; background: currentColor; rotate: 45deg; }
 
   .seal-word .sonia {
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.35em;
-    letter-spacing: 0.22em;
-    color: var(--seal-leaf-deep);
+    font-size: 1.3em;
+    letter-spacing: 0.24em;
+    color: var(--sage);
     margin-top: 0.5em;
   }
 
-  /* ---------- Navigation ---------- */
+  /* ============ Bandeau défilant ============ */
 
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--rule);
+  .marquee {
+    border-block: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.015);
+    overflow: hidden;
+    padding-block: 1.1rem;
   }
 
-  .topbar-inner {
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    width: max-content;
+    animation: slide 38s linear infinite;
+  }
+
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  .marquee span {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    height: 72px;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-  }
-
-  .brand-mark {
-    width: 42px;
-    height: 42px;
-    flex: none;
-  }
-
-  .brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
-  }
-
-  .brand-text span:first-child {
+    gap: 3rem;
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.12rem;
-    font-weight: 600;
-    color: var(--title);
-    letter-spacing: 0.04em;
-  }
-
-  .brand-text span:last-child {
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
+    font-size: 1.15rem;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--gold-text);
-    margin-top: 0.28rem;
-  }
-
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-  }
-
-  .nav-links a {
-    text-decoration: none;
-    color: var(--text-soft);
-    padding-block: 0.35rem;
-    border-bottom: 1px solid transparent;
-    transition: color 0.25s ease, border-color 0.25s ease;
-  }
-
-  .nav-links a:hover {
-    color: var(--title);
-    border-color: var(--gold-line);
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    color: var(--muted);
     white-space: nowrap;
-    font-family: "Jost", sans-serif;
-    font-size: 0.82rem;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    text-decoration: none;
-    padding: 0.85rem 1.7rem;
-    border-radius: var(--radius-pill);
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
   }
 
-  .btn:active { transform: translateY(1px); }
-
-  .btn-solid {
-    background: var(--forest);
-    color: #F7F4EA;
+  .marquee span::after {
+    content: "";
+    width: 5px; height: 5px;
+    background: var(--gold);
+    rotate: 45deg;
   }
 
-  .btn-solid:hover { background: var(--forest-deep); }
+  /* ============ Sections ============ */
 
-  :root[data-theme="dark"] .btn-solid,
-  .btn-solid { color: #F7F4EA; }
+  section { position: relative; scroll-margin-top: 92px; }
 
-  .btn-ghost {
-    border-color: var(--gold-line);
-    color: var(--text);
-    background: transparent;
+  .pad { padding-block: clamp(4.5rem, 9vw, 8rem); }
+
+  .reveal { animation: rise 1s var(--ease) both; animation-delay: var(--d, 0ms); }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: none; }
   }
 
-  .btn-ghost:hover {
-    border-color: var(--gold-text);
-    color: var(--gold-text);
-  }
-
-  .btn-sm { padding: 0.62rem 1.3rem; font-size: 0.74rem; }
-
-  .menu-toggle {
-    display: none;
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-pill);
-    padding: 0.5rem 1rem;
-    color: var(--text);
-    font-family: inherit;
-    font-size: 0.74rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-
-  /* ---------- Hero ---------- */
-
-  .hero {
-    padding-block: clamp(3rem, 6vw, 5.5rem) clamp(3.5rem, 7vw, 6rem);
-  }
-
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: center;
-  }
-
-  .hero-copy { max-width: 34rem; }
-
-  .hero h1 {
-    font-size: clamp(2.6rem, 5.4vw, 4.15rem);
-    margin-top: 1.5rem;
-  }
-
-  .hero h1 em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--gold-text);
-    padding-bottom: 0.06em;
-  }
-
-  .hero-sub {
-    margin-top: 1.6rem;
-    max-width: 30rem;
-    color: var(--text-soft);
-    font-size: 1.06rem;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    margin-top: 2.4rem;
-  }
-
-  .hero-seal {
-    justify-self: center;
-    width: min(100%, 430px);
-  }
-
-  .hero-note {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin-top: 3rem;
-    padding-top: 1.6rem;
-    border-top: 1px solid var(--rule);
-    color: var(--text-soft);
-    font-size: 0.86rem;
-    letter-spacing: 0.02em;
-  }
-
-  .hero-note svg { flex: none; color: var(--gold-text); }
-
-  /* ---------- Sections communes ---------- */
-
-  section { scroll-margin-top: 90px; }
-
-  .band-soft { background: var(--bg-alt); }
-
-  .section-pad { padding-block: clamp(4rem, 8vw, 7rem); }
-
-  .lede {
-    font-size: clamp(1.18rem, 2vw, 1.4rem);
-    line-height: 1.62;
-    font-weight: 300;
-    color: var(--text);
-    max-width: var(--measure);
-  }
-
-  .body-text {
-    color: var(--text-soft);
-    max-width: var(--measure);
-  }
-
-  /* ---------- Histoire ---------- */
+  /* Histoire */
 
   .story-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     gap: clamp(2rem, 6vw, 5rem);
     align-items: start;
   }
 
-  .story-aside {
-    position: relative;
-    padding-left: 1.6rem;
-    border-left: 1px solid var(--gold-line);
-  }
+  .story-aside h2 { font-size: clamp(2.2rem, 3.8vw, 3.2rem); margin-top: 1.2rem; }
+  .story-aside .script { display: block; font-size: clamp(3rem, 5.6vw, 4.4rem); margin-top: 0.05em; }
 
-  .story-aside h2 {
-    font-size: clamp(2rem, 3.4vw, 2.7rem);
-  }
+  .story-body { display: grid; gap: 1.6rem; }
 
-  .story-aside .script {
-    display: block;
-    font-size: clamp(2.6rem, 5vw, 3.6rem);
-    margin-top: 0.1em;
-  }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.8rem; }
 
-  .story-body { display: grid; gap: 1.5rem; }
-
-  .story-figure {
-    margin-top: 2.6rem;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .mini-stone {
-    background: var(--card);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-card);
-    padding: 1.4rem 1.2rem;
-    display: grid;
+  .pill {
+    display: inline-flex;
+    align-items: center;
     gap: 0.55rem;
-    justify-items: start;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--edge-soft);
+    border-radius: var(--r-pill);
+    background: var(--glass);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
-  .mini-stone svg { width: 30px; height: 30px; color: var(--gold-text); }
-
-  .mini-stone strong {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: var(--title);
-    line-height: 1.2;
+  .pill i {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    rotate: 45deg;
+    display: block;
   }
 
-  .mini-stone span {
-    font-size: 0.86rem;
-    color: var(--text-soft);
-    line-height: 1.5;
-  }
+  /* Atelier interactif */
 
-  /* ---------- Sélection ---------- */
+  .atelier { overflow: hidden; }
 
-  .selection-grid {
+  .atelier-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
     gap: clamp(2.5rem, 6vw, 5rem);
     align-items: center;
   }
 
-  .selection-copy h2 {
-    font-size: clamp(2.1rem, 3.6vw, 3rem);
-    margin-top: 1.2rem;
-  }
+  .atelier h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1.2rem; }
+  .atelier p.body-text { margin-top: 1.4rem; }
 
-  .selection-copy p + p { margin-top: 1.2rem; }
-
-  .selection-list {
-    list-style: none;
-    margin: 2.2rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: 1.1rem;
-  }
-
-  .selection-list li {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 1rem;
-    align-items: baseline;
-    padding-bottom: 1.1rem;
-    border-bottom: 1px solid var(--rule);
-    color: var(--text-soft);
-    font-size: 0.98rem;
-  }
-
-  .selection-list li:last-child { border-bottom: none; padding-bottom: 0; }
-
-  .selection-list b {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 600;
-    font-size: 1.15rem;
-    color: var(--title);
-    white-space: nowrap;
-  }
-
-  .selection-visual {
+  .bracelet-stage {
     position: relative;
-    border-radius: var(--radius-card);
-    background:
-      radial-gradient(120% 90% at 25% 15%, color-mix(in srgb, var(--sage) 26%, transparent), transparent 62%),
-      radial-gradient(110% 80% at 80% 80%, color-mix(in srgb, var(--gold) 24%, transparent), transparent 60%),
-      var(--card);
-    border: 1px solid var(--rule);
-    padding: clamp(1.6rem, 3vw, 2.6rem);
     display: grid;
-    gap: 1.2rem;
-    box-shadow: var(--shadow);
+    place-items: center;
+    aspect-ratio: 1;
+    width: min(100%, 470px);
+    justify-self: center;
   }
 
-  .visual-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    align-items: end;
+  .bracelet-stage::after {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(210, 172, 99, 0.14), transparent 65%);
   }
 
-  .stone-chip {
+  .bracelet { position: relative; width: 100%; height: auto; }
+
+  #beads { animation: spin 90s linear infinite; transform-origin: 200px 200px; }
+
+  #beads circle { transition: fill 0.75s var(--ease); }
+
+  .bracelet-core {
+    position: absolute;
     display: grid;
     justify-items: center;
-    gap: 0.6rem;
+    gap: 0.35rem;
     text-align: center;
+    pointer-events: none;
   }
 
-  .stone-chip svg { width: 100%; max-width: 88px; height: auto; }
+  .bracelet-core .name {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    color: var(--ivory);
+  }
 
-  .stone-chip span {
-    font-size: 0.74rem;
-    letter-spacing: 0.14em;
+  .bracelet-core .note {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--text-soft);
+    color: var(--gold);
   }
 
-  .visual-caption {
-    border-top: 1px solid var(--rule);
-    padding-top: 1.1rem;
-    font-size: 0.88rem;
-    color: var(--text-soft);
-    text-align: center;
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 2.4rem;
   }
 
-  /* ---------- Collection ---------- */
+  .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: var(--r-pill);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: var(--glass);
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s var(--ease), background 0.3s ease;
+  }
+
+  .swatch em {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: block;
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.45), inset 0 3px 5px rgba(255, 255, 255, 0.28);
+  }
+
+  .swatch:hover { color: var(--ivory); border-color: var(--edge); transform: translateY(-2px); }
+
+  .swatch[aria-pressed="true"] {
+    color: #10180F;
+    background: linear-gradient(120deg, var(--gold), var(--gold-soft));
+    border-color: transparent;
+  }
+
+  .atelier-note {
+    margin-top: 1.6rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* Sélection */
+
+  .criteria {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-top: clamp(2rem, 4vw, 3.2rem);
+  }
+
+  .criterion {
+    padding: 1.7rem 1.5rem;
+    border-radius: var(--r-card);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: var(--glass);
+    display: grid;
+    gap: 0.7rem;
+    align-content: start;
+    transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s var(--ease);
+  }
+
+  .criterion:hover {
+    border-color: var(--edge);
+    background: var(--glass-strong);
+    transform: translateY(-4px);
+  }
+
+  .criterion b {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.45rem;
+    color: var(--gold-soft);
+  }
+
+  .criterion span { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+
+  /* Grille de pierres */
 
   .collection-head {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1.6rem;
     margin-bottom: clamp(2rem, 4vw, 3rem);
   }
 
-  .collection-head h2 { font-size: clamp(2.1rem, 3.6vw, 3rem); margin-top: 0.9rem; }
-  .collection-head p { color: var(--text-soft); max-width: 30rem; }
+  .collection-head h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
+  .collection-head p { color: var(--muted); max-width: 34ch; }
 
   .stone-grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1.4rem;
+    gap: 1.3rem;
   }
 
   .stone-card {
+    position: relative;
     grid-column: span 4;
-    background: var(--card);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-card);
-    padding: 1.8rem 1.6rem 1.6rem;
+    padding: 1.9rem 1.7rem;
+    border-radius: var(--r-card);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: var(--glass);
     display: grid;
-    gap: 1.1rem;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+    gap: 1rem;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: border-color 0.4s ease, background 0.4s ease, transform 0.5s var(--ease);
   }
 
-  .stone-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--gold-line);
-    box-shadow: var(--shadow);
+  .stone-card::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(210, 172, 99, 0.18), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
   }
 
-  .stone-card:nth-child(1) { grid-column: span 5; --d: 0ms; }
-  .stone-card:nth-child(2) { grid-column: span 4; --d: 70ms; }
-  .stone-card:nth-child(3) { grid-column: span 3; --d: 140ms; }
-  .stone-card:nth-child(4) { grid-column: span 3; --d: 60ms; }
-  .stone-card:nth-child(5) { grid-column: span 4; --d: 130ms; }
-  .stone-card:nth-child(6) { grid-column: span 5; --d: 200ms; }
+  .stone-card:hover { border-color: var(--edge); background: var(--glass-strong); }
+  .stone-card:hover::before { opacity: 1; }
 
-  .stone-art {
-    display: grid;
-    place-items: center;
-    padding-block: 0.4rem 0.2rem;
+  .stone-card:nth-child(1) { grid-column: span 5; }
+  .stone-card:nth-child(2) { grid-column: span 4; }
+  .stone-card:nth-child(3) { grid-column: span 3; }
+  .stone-card:nth-child(4) { grid-column: span 3; }
+  .stone-card:nth-child(5) { grid-column: span 4; }
+  .stone-card:nth-child(6) { grid-column: span 5; }
+
+  .stone-art { position: relative; display: grid; place-items: center; padding-block: 0.3rem; }
+  .stone-art svg { width: 92px; height: 92px; overflow: visible; }
+  .stone-art .glint { animation: glint 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  @keyframes glint {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.6; }
   }
-
-  .stone-art svg { width: 96px; height: 96px; }
 
   .stone-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -635,66 +840,52 @@
 
   .stone-card h3 small {
     font-family: "Jost", sans-serif;
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
+    font-size: 0.62rem;
+    font-weight: 300;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold-text);
-    font-weight: 400;
+    color: var(--gold);
   }
 
-  .stone-card p {
-    color: var(--text-soft);
-    font-size: 0.94rem;
-    line-height: 1.6;
-  }
+  .stone-card p { color: var(--muted); font-size: 0.94rem; line-height: 1.62; }
 
-  /* ---------- Bandeau déclaration ---------- */
+  /* Déclaration */
 
   .statement {
-    background: var(--band);
-    color: var(--band-text);
-    padding-block: clamp(4.5rem, 9vw, 7.5rem);
-    text-align: center;
     position: relative;
+    padding-block: clamp(5rem, 11vw, 9rem);
+    text-align: center;
     overflow: hidden;
   }
 
-  .statement-inner { position: relative; display: grid; justify-items: center; gap: 1.2rem; }
-
-  .statement .kicker { color: var(--gold-line); }
-
   .statement blockquote {
-    margin: 0;
+    margin: 1.4rem auto 0;
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: clamp(2rem, 4.4vw, 3.3rem);
-    line-height: 1.18;
-    max-width: 20ch;
-    color: var(--band-text);
-    text-wrap: balance;
+    font-size: clamp(2.1rem, 5vw, 3.9rem);
+    line-height: 1.14;
+    max-width: 18ch;
   }
 
-  .statement blockquote em {
-    font-style: italic;
-    color: var(--gold-line);
-  }
+  .statement blockquote em { font-style: italic; color: var(--gold); }
 
   .statement cite {
+    display: block;
+    margin-top: 1.8rem;
     font-style: normal;
-    font-size: 0.78rem;
-    letter-spacing: 0.24em;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--band-text) 62%, transparent);
+    color: var(--muted);
   }
 
-  .statement-glow {
-    position: absolute;
-    inset: -40% -10% auto;
-    height: 120%;
-    background: radial-gradient(48% 50% at 50% 40%, color-mix(in srgb, var(--gold) 22%, transparent), transparent 70%);
-    pointer-events: none;
+  .statement .kicker { justify-content: center; }
+  .statement .kicker::after {
+    content: "";
+    width: 34px; height: 1px;
+    background: linear-gradient(270deg, transparent, var(--gold));
   }
 
-  /* ---------- Sur mesure ---------- */
+  /* Sur mesure + contact */
 
   .custom-grid {
     display: grid;
@@ -703,99 +894,85 @@
     align-items: center;
   }
 
-  .custom-copy h2 { font-size: clamp(2.1rem, 3.6vw, 3rem); margin-top: 1rem; }
-  .custom-copy p { margin-top: 1.3rem; color: var(--text-soft); max-width: 34rem; }
+  .custom-copy h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
+  .custom-copy > p { margin-top: 1.4rem; color: var(--muted); max-width: 40ch; }
 
   .steps {
     counter-reset: step;
     list-style: none;
-    margin: 2.2rem 0 0;
+    margin: 2.4rem 0 0;
     padding: 0;
     display: grid;
-    gap: 1.4rem;
+    gap: 1.5rem;
   }
 
   .steps li {
     counter-increment: step;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 1.1rem;
+    gap: 1.2rem;
     align-items: start;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
+
+  .steps li:last-child { border-bottom: none; padding-bottom: 0; }
 
   .steps li::before {
     content: counter(step, decimal-leading-zero);
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
     letter-spacing: 0.1em;
-    color: var(--gold-text);
-    padding-top: 0.15rem;
+    color: var(--gold);
+    padding-top: 0.3rem;
   }
 
   .steps strong {
     display: block;
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: var(--title);
-    line-height: 1.25;
+    font-weight: 400;
+    font-size: 1.35rem;
+    color: var(--ivory);
   }
 
-  .steps span {
-    color: var(--text-soft);
-    font-size: 0.95rem;
-  }
+  .steps span { color: var(--muted); font-size: 0.94rem; }
 
   .contact-card {
-    background: var(--card);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-card);
-    padding: clamp(1.8rem, 3.5vw, 2.8rem);
+    position: relative;
+    border-radius: 26px;
+    border: 1px solid var(--edge);
+    background: linear-gradient(150deg, rgba(210, 172, 99, 0.09), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.03));
+    padding: clamp(2rem, 4vw, 3rem);
     display: grid;
-    gap: 1.4rem;
-    box-shadow: var(--shadow);
+    gap: 1.5rem;
+    overflow: hidden;
   }
 
-  .contact-card .seal { width: min(240px, 70%); justify-self: center; }
+  .contact-card .seal { width: min(230px, 68%); justify-self: center; }
 
-  .contact-card h3 {
-    font-size: 1.7rem;
-    text-align: center;
-  }
+  .contact-card h3 { font-size: 1.9rem; text-align: center; }
+  .contact-card > p { text-align: center; color: var(--muted); max-width: 30ch; margin-inline: auto; font-size: 0.95rem; }
 
-  .contact-card p {
-    text-align: center;
-    color: var(--text-soft);
-    font-size: 0.95rem;
-    max-width: 30ch;
-    margin-inline: auto;
-  }
-
-  .contact-actions {
-    display: grid;
-    gap: 0.7rem;
-    justify-items: stretch;
-  }
-
+  .contact-actions { display: grid; gap: 0.75rem; }
   .contact-actions .btn { width: 100%; }
 
   .contact-meta {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    border-top: 1px solid var(--rule);
-    padding-top: 1.2rem;
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
+    gap: 1.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-top: 1.3rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--text-soft);
+    color: var(--muted);
   }
 
-  /* ---------- Pied de page ---------- */
+  /* Pied de page */
 
   .site-foot {
-    border-top: 1px solid var(--rule);
-    padding-block: 2.6rem 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-block: 2.8rem 3.2rem;
   }
 
   .foot-inner {
@@ -803,109 +980,87 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
-    font-size: 0.82rem;
-    color: var(--text-soft);
+    gap: 1.6rem;
+    font-size: 0.8rem;
+    color: var(--muted);
   }
 
   .foot-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.4rem;
-    letter-spacing: 0.1em;
+    gap: 1.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    font-size: 0.74rem;
   }
 
-  .foot-links a { text-decoration: none; }
-  .foot-links a:hover { color: var(--gold-text); }
+  .foot-links a { text-decoration: none; transition: color 0.3s ease; }
+  .foot-links a:hover { color: var(--gold); }
 
   .demo-flag {
-    margin-top: 1.6rem;
+    margin-top: 1.8rem;
     font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    color: var(--text-soft);
-    opacity: 0.75;
+    color: var(--muted);
+    opacity: 0.7;
+    max-width: 70ch;
   }
 
-  /* ---------- Entrée ---------- */
-
-  .rise {
-    animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: var(--d, 0ms);
-  }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: none; }
-  }
-
-  .seal-float { animation: drift 9s ease-in-out infinite; }
-
-  @keyframes drift {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .twinkle { animation: twinkle 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  .twinkle-b { animation-delay: 1.4s; }
-  .twinkle-c { animation-delay: 2.7s; }
-
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.35; scale: 0.85; }
-    50% { opacity: 1; scale: 1.1; }
-  }
+  /* ============ Accessibilité mouvement ============ */
 
   @media (prefers-reduced-motion: reduce) {
-    .seal-float, .twinkle, .rise { animation: none; }
-    .stone-card { transition: none; }
+    .curtain { display: none; }
+    .mist, .halo, .orbit, #beads, .marquee-track, .stone-art .glint { animation: none !important; }
+    .hero h1 .line > span { transform: none; animation: none; }
+    .hero-sub, .hero-actions, .hero-meta, .curtain-word { opacity: 1; animation: none; }
+    .reveal { animation: none; opacity: 1; transform: none; }
+    .draw-seal [data-draw] { stroke-dashoffset: 0; animation: none; }
+    .draw-seal [data-pop] { opacity: 1; animation: none; }
+    .stone-card, .criterion, .btn, .swatch { transition: none; }
   }
 
-  /* ---------- Responsive ---------- */
+  /* ============ Responsive ============ */
 
-  @media (max-width: 1000px) {
+  @media (max-width: 1040px) {
     .nav-links { display: none; }
     .nav-links.is-open {
       display: grid;
       position: absolute;
-      top: 72px;
-      left: 0;
-      right: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--rule);
-      padding: 1.2rem 1.5rem 1.6rem;
-      gap: 1rem;
+      top: 76px; left: 0; right: 0;
+      gap: 1.1rem;
+      padding: 1.4rem 1.5rem 1.8rem;
+      background: rgba(8, 13, 8, 0.97);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
     .menu-toggle { display: inline-flex; }
-    .topbar-inner { position: relative; }
     .topbar .btn-solid { display: none; }
 
-    .hero-grid,
-    .story-grid,
-    .selection-grid,
-    .custom-grid { grid-template-columns: minmax(0, 1fr); }
-
-    .hero-grid { gap: 2.5rem; }
-    .hero-seal { order: -1; width: min(100%, 330px); }
-    .hero-copy { max-width: none; }
-    .story-aside { border-left: none; padding-left: 0; border-top: 1px solid var(--gold-line); padding-top: 1.4rem; }
-    .stone-card,
-    .stone-card:nth-child(n) { grid-column: span 6; }
+    .hero-grid, .story-grid, .atelier-grid, .custom-grid { grid-template-columns: minmax(0, 1fr); }
+    .hero-seal-wrap { order: -1; width: min(100%, 350px); }
+    .criteria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stone-card, .stone-card:nth-child(n) { grid-column: span 6; }
+    .story-aside { padding-bottom: 0.5rem; }
   }
 
   @media (max-width: 640px) {
-    .shell { width: min(100%, 100% - 2rem); }
-    .stone-card,
-    .stone-card:nth-child(n) { grid-column: span 12; }
-    .story-figure { grid-template-columns: minmax(0, 1fr); }
-    .visual-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+    :root { --shell: min(100%, 100% - 2rem); }
+    .criteria { grid-template-columns: minmax(0, 1fr); }
+    .stone-card, .stone-card:nth-child(n) { grid-column: span 12; }
+    .hero-meta { gap: 1.4rem; }
     .contact-meta { flex-direction: column; gap: 0.5rem; text-align: center; }
     .hero-actions .btn { flex: 1 1 100%; }
+    .foliage { display: none; }
   }
 </style>
 
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"></div>
+<div class="mist mist-a" aria-hidden="true"></div>
+<div class="mist mist-b" aria-hidden="true"></div>
+<div class="mist mist-c" aria-hidden="true"></div>
+<canvas id="dust" aria-hidden="true"></canvas>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <g id="leaf-shape">
@@ -916,42 +1071,34 @@
     </g>
 
     <symbol id="seal-decor" viewBox="0 0 240 240">
-      <g fill="none" stroke="var(--seal-gold)" stroke-width="1.3" stroke-linecap="round">
+      <g fill="none" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round">
         <path d="M11.8 149 A112 112 0 1 1 228.2 149"/>
-        <path d="M16.4 110.9 A104 104 0 0 1 210.1 68" opacity="0.75"/>
+        <path d="M16.4 110.9 A104 104 0 0 1 210.1 68" opacity="0.7"/>
         <path d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
-        <path d="M192.8 192.8 A103 103 0 0 1 111 222.6" opacity="0.7"/>
+        <path d="M192.8 192.8 A103 103 0 0 1 111 222.6" opacity="0.65"/>
       </g>
-
-      <g fill="var(--seal-gold)">
-        <circle cx="223.8" cy="78" r="2.6"/>
-        <circle cx="227.6" cy="89.1" r="2.2"/>
-        <circle cx="230.3" cy="100.5" r="1.9"/>
-        <circle cx="231.7" cy="112.2" r="1.5"/>
+      <g fill="var(--gold)">
+        <circle cx="223.8" cy="78" r="2.6"/><circle cx="227.6" cy="89.1" r="2.2"/>
+        <circle cx="230.3" cy="100.5" r="1.9"/><circle cx="231.7" cy="112.2" r="1.5"/>
         <circle cx="231.9" cy="123.9" r="1.2"/>
       </g>
-
-      <g fill="none" stroke="var(--seal-gold)" stroke-width="1.25" stroke-linejoin="round">
+      <g fill="none" stroke="var(--gold)" stroke-width="1.25" stroke-linejoin="round">
         <path d="M120 42 134 66 132 104 108 104 106 66Z"/>
-        <path d="M106 66H134M120 42V104" opacity="0.65"/>
+        <path d="M106 66H134M120 42V104" opacity="0.6"/>
         <path d="M92 74 104 92 100 110 82 110 80 92Z"/>
-        <path d="M80 92H104M92 74V110" opacity="0.6"/>
+        <path d="M80 92H104M92 74V110" opacity="0.55"/>
         <path d="M150 66 160 88 157 110 140 110 138 88Z"/>
-        <path d="M138 88H160M150 66V110" opacity="0.6"/>
+        <path d="M138 88H160M150 66V110" opacity="0.55"/>
       </g>
-
-      <g fill="var(--seal-gold)">
-        <use href="#sparkle-shape" transform="translate(170 62) scale(0.52)" class="twinkle"/>
-        <use href="#sparkle-shape" transform="translate(88 50) scale(0.34)" class="twinkle twinkle-b"/>
-        <use href="#sparkle-shape" transform="translate(176 98) scale(0.36)" class="twinkle twinkle-c"/>
-        <use href="#sparkle-shape" transform="translate(66 92) scale(0.26)" class="twinkle twinkle-b"/>
+      <g fill="var(--gold)">
+        <use href="#sparkle-shape" transform="translate(170 62) scale(0.5)" class="glint"/>
+        <use href="#sparkle-shape" transform="translate(88 50) scale(0.32)" class="glint"/>
+        <use href="#sparkle-shape" transform="translate(176 98) scale(0.34)" class="glint"/>
       </g>
-
-      <g stroke="var(--seal-leaf-deep)" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <g stroke="var(--sage-dim)" stroke-width="1.4" fill="none" stroke-linecap="round">
         <path d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48"/>
       </g>
-
-      <g fill="var(--seal-leaf)" stroke="var(--seal-leaf-deep)" stroke-width="0.9">
+      <g fill="var(--sage)" stroke="var(--sage-dim)" stroke-width="0.9" opacity="0.92">
         <use href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
         <use href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
         <use href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
@@ -965,28 +1112,24 @@
         <use href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
         <use href="#leaf-shape" transform="translate(78 49) rotate(-124) scale(-0.8 0.8)"/>
       </g>
-
-      <g fill="var(--seal-gold)">
-        <circle cx="67" cy="197" r="3.1"/>
-        <circle cx="53" cy="171" r="2.5"/>
-        <circle cx="45" cy="141" r="3.3"/>
-        <circle cx="46" cy="105" r="2.4"/>
-        <circle cx="61" cy="74" r="2.9"/>
-        <circle cx="82" cy="53" r="2.1"/>
+      <g fill="var(--gold)">
+        <circle cx="67" cy="197" r="3"/><circle cx="53" cy="171" r="2.4"/>
+        <circle cx="45" cy="141" r="3.2"/><circle cx="46" cy="105" r="2.3"/>
+        <circle cx="61" cy="74" r="2.8"/><circle cx="82" cy="53" r="2"/>
       </g>
     </symbol>
 
     <symbol id="mark-small" viewBox="0 0 240 240">
-      <g fill="none" stroke="var(--seal-gold)" stroke-width="5" stroke-linecap="round">
+      <g fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round">
         <path d="M22 154 A108 108 0 1 1 218 154"/>
         <path d="M198 190 A108 108 0 0 1 88 216"/>
       </g>
-      <g fill="none" stroke="var(--seal-gold)" stroke-width="5" stroke-linejoin="miter">
+      <g fill="none" stroke="var(--gold)" stroke-width="5">
         <path d="M132 48 156 88 152 168 112 168 108 88Z"/>
-        <path d="M108 88H156" opacity="0.55"/>
+        <path d="M108 88H156" opacity="0.5"/>
         <path d="M92 96 106 120 103 168 78 168 76 120Z"/>
       </g>
-      <g fill="var(--seal-leaf)" stroke="var(--seal-leaf-deep)" stroke-width="2.4">
+      <g fill="var(--sage)" stroke="var(--sage-dim)" stroke-width="2.4">
         <use href="#leaf-shape" transform="translate(66 196) rotate(-46) scale(1.35)"/>
         <use href="#leaf-shape" transform="translate(52 160) rotate(-134) scale(-1.35 1.35)"/>
         <use href="#leaf-shape" transform="translate(50 122) rotate(-58) scale(1.3)"/>
@@ -996,9 +1139,10 @@
     <symbol id="gem" viewBox="0 0 120 120">
       <path d="M60 8 100 40 84 108 36 108 20 40Z" fill="var(--stone-a)"/>
       <path d="M60 8 100 40 60 40Z" fill="var(--stone-b)"/>
-      <path d="M20 40 60 40 36 108Z" fill="#000" opacity="0.12"/>
-      <path d="M60 40 100 40 84 108Z" fill="#fff" opacity="0.14"/>
-      <g fill="none" stroke="var(--stone-line, rgba(255,255,255,0.55))" stroke-width="1.1">
+      <path d="M20 40 60 40 36 108Z" fill="#000" opacity="0.22"/>
+      <path d="M60 40 100 40 84 108Z" fill="#fff" opacity="0.13"/>
+      <path d="M60 8 100 40 60 40Z" fill="#fff" opacity="0.28" class="glint"/>
+      <g fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="1">
         <path d="M60 8 100 40 84 108 36 108 20 40Z"/>
         <path d="M20 40H100M60 8V108M20 40 36 108M100 40 84 108"/>
       </g>
@@ -1006,53 +1150,111 @@
   </defs>
 </svg>
 
+<div class="curtain" id="curtain">
+  <svg class="draw-seal" viewBox="0 0 240 240" aria-label="L'Eden des Pierres">
+    <g fill="none" stroke="#D2AC63" stroke-width="1.4" stroke-linecap="round">
+      <path data-draw style="--len:700;--dd:0ms" d="M11.8 149 A112 112 0 1 1 228.2 149"/>
+      <path data-draw style="--len:500;--dd:250ms" d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
+      <path data-draw style="--len:420;--dd:150ms" d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48" stroke="#7A9569"/>
+    </g>
+    <g fill="none" stroke="#D2AC63" stroke-width="1.3" stroke-linejoin="round">
+      <path data-draw style="--len:220;--dd:500ms" d="M120 42 134 66 132 104 108 104 106 66Z"/>
+      <path data-draw style="--len:180;--dd:640ms" d="M92 74 104 92 100 110 82 110 80 92Z"/>
+      <path data-draw style="--len:180;--dd:720ms" d="M150 66 160 88 157 110 140 110 138 88Z"/>
+    </g>
+    <g fill="#9DBA8B" stroke="#7A9569" stroke-width="0.9">
+      <use data-pop style="--dd:700ms" href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
+      <use data-pop style="--dd:760ms" href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
+      <use data-pop style="--dd:820ms" href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
+      <use data-pop style="--dd:880ms" href="#leaf-shape" transform="translate(48 163) rotate(-148) scale(-1 1)"/>
+      <use data-pop style="--dd:940ms" href="#leaf-shape" transform="translate(43 148) rotate(-48) scale(1.1)"/>
+      <use data-pop style="--dd:1000ms" href="#leaf-shape" transform="translate(41 132) rotate(-142) scale(-1 1)"/>
+      <use data-pop style="--dd:1060ms" href="#leaf-shape" transform="translate(40 116) rotate(-54) scale(1.05)"/>
+      <use data-pop style="--dd:1120ms" href="#leaf-shape" transform="translate(43 100) rotate(-136) scale(-0.95 0.95)"/>
+      <use data-pop style="--dd:1180ms" href="#leaf-shape" transform="translate(48 86) rotate(-60)"/>
+      <use data-pop style="--dd:1240ms" href="#leaf-shape" transform="translate(56 71) rotate(-130) scale(-0.9 0.9)"/>
+      <use data-pop style="--dd:1300ms" href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
+    </g>
+    <g fill="#D2AC63">
+      <use data-pop style="--dd:1350ms" href="#sparkle-shape" transform="translate(170 62) scale(0.5)"/>
+      <use data-pop style="--dd:1450ms" href="#sparkle-shape" transform="translate(88 50) scale(0.32)"/>
+      <use data-pop style="--dd:1550ms" href="#sparkle-shape" transform="translate(176 98) scale(0.34)"/>
+    </g>
+  </svg>
+  <p class="curtain-word">L'Eden des Pierres</p>
+</div>
+
 <header class="topbar">
   <div class="shell topbar-inner">
     <a class="brand" href="#accueil">
       <svg class="brand-mark" viewBox="0 0 240 240" aria-hidden="true"><use href="#mark-small"/></svg>
-      <span class="brand-text">
-        <span>L'Eden des Pierres</span>
-        <span>Sonia</span>
+      <span>
+        <span class="brand-name">L'Eden des Pierres</span>
+        <span class="brand-sub">Sonia</span>
       </span>
     </a>
 
     <nav class="nav-links" id="nav-links" aria-label="Navigation principale">
       <a href="#histoire">Histoire</a>
+      <a href="#atelier">Atelier</a>
       <a href="#selection">Sélection</a>
-      <a href="#collection">Pierres</a>
+      <a href="#pierres">Pierres</a>
       <a href="#sur-mesure">Sur mesure</a>
-      <a href="#contact">Contact</a>
     </nav>
 
     <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
-    <a class="btn btn-solid btn-sm" href="#contact">Me contacter</a>
+    <a class="btn btn-solid btn-sm" href="#contact"><span>Me contacter</span></a>
   </div>
 </header>
 
 <main id="accueil">
 
   <section class="hero">
+    <div class="foliage" data-depth="0.12" style="top:-4%;left:-6%;width:min(38vw,420px)" aria-hidden="true">
+      <svg viewBox="0 0 300 320" fill="currentColor">
+        <path d="M20 320C10 240 30 150 90 90c40-40 90-60 140-70-10 60-40 120-90 165-40 36-90 60-120 135Z" opacity=".55"/>
+        <path d="M60 320c0-70 20-140 70-190 30-30 70-50 110-60-20 60-60 110-110 150-40 32-60 60-70 100Z" opacity=".8"/>
+      </svg>
+    </div>
+    <div class="foliage" data-depth="-0.16" style="bottom:-12%;right:-8%;width:min(42vw,460px);transform:scaleX(-1)" aria-hidden="true">
+      <svg viewBox="0 0 300 320" fill="currentColor">
+        <path d="M20 320C10 240 30 150 90 90c40-40 90-60 140-70-10 60-40 120-90 165-40 36-90 60-120 135Z" opacity=".5"/>
+      </svg>
+    </div>
+
     <div class="shell hero-grid">
       <div class="hero-copy">
-        <p class="kicker">Créations en pierres naturelles &amp; perles</p>
-        <h1>Ici, les pierres ne sont pas simplement <em>belles</em>.</h1>
+        <p class="kicker">Bracelets en pierres naturelles</p>
+        <h1>
+          <span class="line" style="--i:0"><span>Ici, les pierres</span></span>
+          <span class="line" style="--i:1"><span>ne sont pas</span></span>
+          <span class="line" style="--i:2"><span>simplement <em>belles</em>.</span></span>
+        </h1>
         <p class="hero-sub">Elles racontent une histoire. Peut-être bientôt la vôtre.</p>
         <div class="hero-actions">
-          <a class="btn btn-solid" href="#collection">Découvrir les pierres</a>
-          <a class="btn btn-ghost" href="#histoire">Mon histoire</a>
+          <a class="btn btn-solid" href="#atelier"><span>Composer un bracelet</span></a>
+          <a class="btn btn-ghost" href="#histoire"><span>Mon histoire</span></a>
         </div>
-        <p class="hero-note">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
-            <path d="M13.5 2.5 17 7.5 16 21h-6L9 7.5Z"/>
-            <path d="M9 7.5h8" opacity=".55"/>
-            <path d="M6.5 9 8.5 12 8 21H4l-.5-9Z" opacity=".8"/>
-          </svg>
-          Chaque pièce est montée à la main, pierre par pierre.
-        </p>
+        <div class="hero-meta">
+          <div><b>100 %</b><span>Pierres naturelles</span></div>
+          <div><b>À la main</b><span>Montage perle à perle</span></div>
+          <div><b>Unique</b><span>Aucune pièce identique</span></div>
+        </div>
       </div>
 
-      <div class="hero-seal">
-        <div class="seal seal-float">
+      <div class="hero-seal-wrap">
+        <div class="halo" aria-hidden="true"></div>
+        <svg class="orbit" viewBox="0 0 400 400" fill="var(--gold)" aria-hidden="true">
+          <circle cx="200" cy="18" r="3"/><circle cx="345" cy="105" r="2.2"/>
+          <circle cx="330" cy="300" r="2.6"/><circle cx="122" cy="378" r="1.9"/>
+          <circle cx="30" cy="180" r="2.4"/>
+        </svg>
+        <svg class="orbit orbit-rev" viewBox="0 0 400 400" fill="var(--sage)" aria-hidden="true">
+          <circle cx="70" cy="70" r="2"/><circle cx="360" cy="220" r="1.8"/>
+          <circle cx="200" cy="392" r="2.2"/>
+        </svg>
+
+        <div class="seal">
           <svg viewBox="0 0 240 240" aria-hidden="true"><use href="#seal-decor"/></svg>
           <div class="seal-word">
             <span class="eden">L'Eden</span>
@@ -1065,140 +1267,158 @@
     </div>
   </section>
 
-  <section class="section-pad band-soft" id="histoire">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
+      <span>Labradorite</span><span>Œil de tigre</span><span>Pierre de lune</span>
+      <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
+      <span>Labradorite</span><span>Œil de tigre</span><span>Pierre de lune</span>
+    </div>
+  </div>
+
+  <section class="pad" id="histoire">
+    <div class="foliage" data-depth="0.08" style="top:6%;right:2%;width:min(26vw,300px)" aria-hidden="true">
+      <svg viewBox="0 0 300 320" fill="currentColor">
+        <path d="M60 320c0-70 20-140 70-190 30-30 70-50 110-60-20 60-60 110-110 150-40 32-60 60-70 100Z" opacity=".6"/>
+      </svg>
+    </div>
+
     <div class="shell story-grid">
-      <div class="story-aside">
+      <div class="story-aside reveal">
         <p class="kicker">L'origine</p>
         <h2>Née d'une<span class="script">véritable passion</span></h2>
       </div>
 
       <div class="story-body">
-        <p class="lede">
+        <p class="lede reveal" style="--d:80ms">
           L'Eden des Pierres est né d'une véritable passion pour les pierres naturelles, leurs couleurs,
           leurs nuances, leurs particularités… et de cette envie permanente d'imaginer de nouvelles associations.
         </p>
-        <p class="body-text">
+        <p class="body-text reveal" style="--d:140ms">
           Tout commence par une pierre que l'on repose trois fois avant de la garder. Puis par une deuxième,
-          choisie parce qu'elle répond à la première. Le bijou vient après : il n'est que la conséquence
+          choisie parce qu'elle répond à la première. Le bracelet vient après : il n'est que la conséquence
           d'un accord juste entre deux matières.
         </p>
-
-        <div class="story-figure rise" style="--d:120ms">
-          <div class="mini-stone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
-              <path d="M12 2.5 20 8.5 17 21H7L4 8.5Z" stroke-linejoin="round"/><path d="M4 8.5h16" opacity=".6"/>
-            </svg>
-            <strong>Pierres naturelles</strong>
-            <span>Sélectionnées auprès de fournisseurs de confiance.</span>
-          </div>
-          <div class="mini-stone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
-              <circle cx="8" cy="9" r="4"/><circle cx="15.5" cy="14.5" r="5" opacity=".7"/>
-            </svg>
-            <strong>Perles de qualité</strong>
-            <span>Choisies pour leur éclat et leur rendu une fois montées.</span>
-          </div>
-          <div class="mini-stone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
-              <path d="M4 15c3-6 6-9 8.5-9s4 2 3 4.5S11 15 8 16.5"/><path d="M4 19h16" opacity=".55"/>
-            </svg>
-            <strong>Montage à la main</strong>
-            <span>Assemblées une à une, jamais en série.</span>
-          </div>
+        <div class="pill-row reveal" style="--d:200ms">
+          <span class="pill"><i></i>Pierres naturelles</span>
+          <span class="pill"><i></i>Perles de qualité supérieure</span>
+          <span class="pill"><i></i>Montage perle à perle</span>
+          <span class="pill"><i></i>Pièces uniques</span>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section-pad" id="selection">
-    <div class="shell selection-grid">
-      <div class="selection-copy">
-        <p class="kicker">Au cœur de mon univers</p>
-        <h2>L'exigence de la sélection</h2>
-        <p class="body-text" style="margin-top:1.4rem">
-          Je privilégie des pierres naturelles, choisies avec soin auprès de mes fournisseurs, ainsi que des
-          perles de belle qualité — souvent de qualité supérieure — sélectionnées pour leurs nuances, leur éclat,
-          leur caractère et leur rendu une fois travaillées.
-        </p>
+  <section class="pad atelier" id="atelier">
+    <div class="shell atelier-grid">
+      <div class="atelier-copy">
+        <p class="kicker">L'atelier</p>
+        <h2>Changez la pierre,<br>le bracelet suit.</h2>
         <p class="body-text">
-          Parce qu'une pierre naturelle n'est jamais parfaitement identique à une autre, j'aime justement ces
-          petites différences de teintes, de dessins, d'inclusions ou de transparence qui rendent chaque
-          création singulière.
+          Chaque modèle part d'une pierre dominante, puis d'un accord : une nuance plus claire pour
+          respirer, une plus profonde pour tenir l'ensemble, et parfois une perle dorée pour la lumière.
+          Touchez une pierre pour voir le bracelet se recomposer.
         </p>
 
-        <ul class="selection-list">
-          <li><b>Teinte</b><span>Deux améthystes du même lot n'ont jamais tout à fait le même violet.</span></li>
-          <li><b>Dessin</b><span>Les veines et les stries dessinent un motif qui n'existera qu'une fois.</span></li>
-          <li><b>Inclusion</b><span>Une inclusion n'est pas un défaut : c'est la signature de la pierre.</span></li>
-          <li><b>Transparence</b><span>Du translucide au laiteux, la lumière ne traverse jamais deux pierres pareil.</span></li>
-        </ul>
+        <div class="swatches" id="swatches" role="group" aria-label="Choisir une pierre"></div>
+
+        <p class="atelier-note">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M12 8v9M12 6.4v.2" stroke-linecap="round"/>
+          </svg>
+          Aperçu de composition — les teintes réelles varient d'une pierre à l'autre.
+        </p>
       </div>
 
-      <figure class="selection-visual rise" style="margin:0">
-        <div class="visual-row">
-          <div class="stone-chip" style="--stone-a:#8E7BB5;--stone-b:#B3A3D4;--stone-line:rgba(255,255,255,.5)">
-            <svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg>
-            <span>Améthyste</span>
-          </div>
-          <div class="stone-chip" style="--stone-a:#D79FA3;--stone-b:#EEC4C6;--stone-line:rgba(255,255,255,.6)">
-            <svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg>
-            <span>Quartz rose</span>
-          </div>
-          <div class="stone-chip" style="--stone-a:#6E8AA0;--stone-b:#9FBACB;--stone-line:rgba(255,255,255,.5)">
-            <svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg>
-            <span>Labradorite</span>
-          </div>
+      <div class="bracelet-stage">
+        <svg class="bracelet" viewBox="0 0 400 400" role="img" aria-labelledby="bracelet-title">
+          <title id="bracelet-title">Aperçu d'un bracelet de perles en pierres naturelles</title>
+          <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(210,172,99,0.22)" stroke-width="1"/>
+          <g id="beads"></g>
+        </svg>
+        <div class="bracelet-core">
+          <span class="name" id="stone-name">Améthyste</span>
+          <span class="note" id="stone-note">Quartz violet</span>
         </div>
-        <figcaption class="visual-caption">
-          Trois pierres, trois lectures de la lumière. Aucune ne se répète.
-        </figcaption>
-      </figure>
+      </div>
     </div>
   </section>
 
-  <section class="section-pad band-soft" id="collection">
+  <section class="pad" id="selection">
+    <div class="shell">
+      <p class="kicker reveal">Au cœur de mon univers</p>
+      <h2 class="reveal" style="--d:60ms;font-size:clamp(2.2rem,4vw,3.4rem);margin-top:1rem">L'exigence de la sélection</h2>
+      <p class="body-text reveal" style="--d:120ms;margin-top:1.4rem">
+        Je privilégie des pierres naturelles, choisies avec soin auprès de mes fournisseurs, ainsi que des
+        perles de belle qualité — souvent de qualité supérieure — sélectionnées pour leurs nuances, leur éclat,
+        leur caractère et leur rendu une fois travaillées. Parce qu'une pierre naturelle n'est jamais
+        parfaitement identique à une autre, j'aime justement ces petites différences qui rendent chaque
+        création singulière.
+      </p>
+
+      <div class="criteria">
+        <article class="criterion reveal" style="--d:0ms">
+          <b>Teinte</b>
+          <span>Deux améthystes du même lot n'ont jamais tout à fait le même violet.</span>
+        </article>
+        <article class="criterion reveal" style="--d:70ms">
+          <b>Dessin</b>
+          <span>Les veines et les stries tracent un motif qui n'existera qu'une fois.</span>
+        </article>
+        <article class="criterion reveal" style="--d:140ms">
+          <b>Inclusion</b>
+          <span>Une inclusion n'est pas un défaut : c'est la signature de la pierre.</span>
+        </article>
+        <article class="criterion reveal" style="--d:210ms">
+          <b>Transparence</b>
+          <span>Du translucide au laiteux, la lumière ne traverse jamais deux pierres pareil.</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="pierres">
     <div class="shell">
       <div class="collection-head">
-        <div>
+        <div class="reveal">
           <p class="kicker">Les pierres que je travaille</p>
           <h2>Un vocabulaire de couleurs</h2>
         </div>
-        <p>Voici les familles de pierres qui reviennent le plus souvent dans mes créations — chacune apporte
-          sa matière, sa lumière et son tempérament.</p>
+        <p class="reveal" style="--d:80ms">Six familles qui reviennent le plus souvent dans mes bracelets — chacune apporte sa matière et son tempérament.</p>
       </div>
 
-      <div class="stone-grid">
-        <article class="stone-card rise"  style="--stone-a:#8E7BB5;--stone-b:#B7A7D8;--stone-line:rgba(255,255,255,.55)">
+      <div class="stone-grid" id="stone-grid">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#8E7BB5;--stone-b:#B7A7D8">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Améthyste <small>Quartz violet</small></h3>
           <p>Du lilas pâle au violet profond selon l'endroit où l'on coupe le cristal. Se marie sans effort avec l'argent et les perles claires.</p>
         </article>
 
-        <article class="stone-card rise"  style="--stone-a:#D79FA3;--stone-b:#F0C7C9;--stone-line:rgba(255,255,255,.65)">
+        <article class="stone-card reveal" data-tilt style="--d:60ms;--stone-a:#D79FA3;--stone-b:#F0C7C9">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Quartz rose <small>Quartz laiteux</small></h3>
           <p>Un rose poudré, rarement transparent. Sa légère brume interne est précisément ce qui le rend doux à porter.</p>
         </article>
 
-        <article class="stone-card rise"  style="--stone-a:#D9A94C;--stone-b:#F0CE84;--stone-line:rgba(255,255,255,.6)">
+        <article class="stone-card reveal" data-tilt style="--d:120ms;--stone-a:#D9A94C;--stone-b:#F0CE84">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Citrine <small>Quartz miel</small></h3>
           <p>La pierre la plus solaire du panier. Elle réchauffe instantanément une composition trop sage.</p>
         </article>
 
-        <article class="stone-card rise"  style="--stone-a:#5F7B8E;--stone-b:#96B6C6;--stone-line:rgba(255,255,255,.55)">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#5F7B8E;--stone-b:#96B6C6">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Labradorite <small>Feldspath</small></h3>
           <p>Grise au repos, elle s'allume en bleu ou en vert dès qu'on la tourne vers la lumière. Ma préférée pour les pièces discrètes.</p>
         </article>
 
-        <article class="stone-card rise"  style="--stone-a:#9A6B3A;--stone-b:#C79355;--stone-line:rgba(255,255,255,.5)">
+        <article class="stone-card reveal" data-tilt style="--d:60ms;--stone-a:#9A6B3A;--stone-b:#C79355">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Œil de tigre <small>Quartz chatoyant</small></h3>
           <p>Ses bandes dorées bougent avec le poignet. Une pierre franche, qui structure les modèles plus masculins.</p>
         </article>
 
-        <article class="stone-card rise"  style="--stone-a:#C9CBC2;--stone-b:#E8E9E2;--stone-line:rgba(120,120,110,.45)">
+        <article class="stone-card reveal" data-tilt style="--d:120ms;--stone-a:#C9CBC2;--stone-b:#EDEEE8">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Pierre de lune <small>Feldspath opalescent</small></h3>
           <p>Blanche, laiteuse, traversée d'un reflet bleuté. Elle demande une monture sobre pour ne pas être écrasée.</p>
@@ -1208,47 +1428,31 @@
   </section>
 
   <section class="statement">
-    <div class="statement-glow" aria-hidden="true"></div>
-    <div class="shell statement-inner">
-      <p class="kicker">La signature de la maison</p>
-      <blockquote>Des pierres naturelles.<br>Des créations qui ont leur <em>propre identité</em>.</blockquote>
-      <cite>Sonia — L'Eden des Pierres</cite>
+    <div class="shell">
+      <p class="kicker reveal">La signature de la maison</p>
+      <blockquote class="reveal" style="--d:80ms">Des pierres naturelles. Des créations qui ont leur <em>propre identité</em>.</blockquote>
+      <cite class="reveal" style="--d:160ms">Sonia — L'Eden des Pierres</cite>
     </div>
   </section>
 
-  <section class="section-pad" id="sur-mesure">
+  <section class="pad" id="sur-mesure">
     <div class="shell custom-grid">
       <div class="custom-copy">
-        <p class="kicker">Sur mesure</p>
-        <h2>Votre histoire, dans une pierre</h2>
-        <p>
-          Une teinte précise, une pierre qui vous suit depuis longtemps, un bijou à refaire vivre :
+        <p class="kicker reveal">Sur mesure</p>
+        <h2 class="reveal" style="--d:60ms">Votre histoire, dans une pierre</h2>
+        <p class="reveal" style="--d:120ms">
+          Une teinte précise, un tour de poignet particulier, une pierre qui vous suit depuis longtemps :
           les créations sur mesure partent toujours d'une conversation, jamais d'un catalogue.
         </p>
 
         <ol class="steps">
-          <li>
-            <div>
-              <strong>On échange</strong>
-              <span>Vous me dites la couleur, la longueur, l'occasion — ou simplement la pierre qui vous attire.</span>
-            </div>
-          </li>
-          <li>
-            <div>
-              <strong>Je sélectionne</strong>
-              <span>Je choisis les pierres et les perles une à une, et je vous envoie une photo de la composition avant montage.</span>
-            </div>
-          </li>
-          <li>
-            <div>
-              <strong>Je monte la pièce</strong>
-              <span>Assemblage à la main, finitions vérifiées, puis expédition dans son écrin.</span>
-            </div>
-          </li>
+          <li class="reveal"><div><strong>On échange</strong><span>Vous me dites la couleur, le tour de poignet, l'occasion — ou simplement la pierre qui vous attire.</span></div></li>
+          <li class="reveal" style="--d:70ms"><div><strong>Je sélectionne</strong><span>Je choisis les pierres et les perles une à une, et je vous envoie une photo de la composition avant montage.</span></div></li>
+          <li class="reveal" style="--d:140ms"><div><strong>Je monte la pièce</strong><span>Assemblage à la main, finitions vérifiées, puis expédition dans son écrin.</span></div></li>
         </ol>
       </div>
 
-      <div class="contact-card rise" id="contact">
+      <div class="contact-card reveal" id="contact" style="--d:80ms">
         <div class="seal">
           <svg viewBox="0 0 240 240" aria-hidden="true"><use href="#seal-decor"/></svg>
           <div class="seal-word">
@@ -1261,8 +1465,8 @@
         <h3>Parlons de votre pièce</h3>
         <p>Une question, une idée, une pierre en tête : écrivez-moi, je réponds moi-même.</p>
         <div class="contact-actions">
-          <a class="btn btn-solid" href="#contact">Écrire à Sonia</a>
-          <a class="btn btn-ghost" href="#collection">Voir les pierres disponibles</a>
+          <a class="btn btn-solid" href="#contact"><span>Écrire à Sonia</span></a>
+          <a class="btn btn-ghost" href="#atelier"><span>Composer un bracelet</span></a>
         </div>
         <div class="contact-meta">
           <span>Créations à la main</span>
@@ -1278,29 +1482,32 @@
     <div class="foot-inner">
       <a class="brand" href="#accueil">
         <svg class="brand-mark" viewBox="0 0 240 240" aria-hidden="true"><use href="#mark-small"/></svg>
-        <span class="brand-text">
-          <span>L'Eden des Pierres</span>
-          <span>Sonia</span>
+        <span>
+          <span class="brand-name">L'Eden des Pierres</span>
+          <span class="brand-sub">Sonia</span>
         </span>
       </a>
       <nav class="foot-links" aria-label="Navigation de pied de page">
         <a href="#histoire">Histoire</a>
+        <a href="#atelier">Atelier</a>
         <a href="#selection">Sélection</a>
-        <a href="#collection">Pierres</a>
+        <a href="#pierres">Pierres</a>
         <a href="#sur-mesure">Sur mesure</a>
-        <a href="#contact">Contact</a>
       </nav>
       <span>© L'Eden des Pierres</span>
     </div>
     <p class="demo-flag">
-      Maquette de démonstration — les visuels de pierres sont des illustrations, à remplacer par vos
-      photos de créations, et les coordonnées restent à renseigner.
+      Maquette de démonstration — les pierres sont des illustrations à remplacer par vos photos de
+      créations, et les coordonnées (email, Instagram) restent à renseigner.
     </p>
   </div>
 </footer>
 
 <script>
   (function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- Menu mobile ---- */
     var toggle = document.getElementById('menu-toggle');
     var links = document.getElementById('nav-links');
 
@@ -1318,6 +1525,213 @@
       }
     });
 
+    /* ---- Rideau : retrait définitif après l'animation ---- */
+    var curtain = document.getElementById('curtain');
+    if (curtain) {
+      if (reduce) {
+        curtain.remove();
+      } else {
+        setTimeout(function () { curtain.remove(); }, 3200);
+      }
+    }
+
+    /* ---- Atelier : composition du bracelet ---- */
+    var stones = [
+      { name: 'Améthyste', note: 'Quartz violet', tones: ['#8E7BB5', '#6E5C96', '#B7A7D8', '#D9CFEC'] },
+      { name: 'Quartz rose', note: 'Quartz laiteux', tones: ['#D79FA3', '#C4848A', '#F0C7C9', '#F7E3E3'] },
+      { name: 'Citrine', note: 'Quartz miel', tones: ['#D9A94C', '#B98A34', '#F0CE84', '#F7E6BC'] },
+      { name: 'Labradorite', note: 'Feldspath', tones: ['#5F7B8E', '#445C6D', '#96B6C6', '#C6D6DE'] },
+      { name: 'Œil de tigre', note: 'Quartz chatoyant', tones: ['#9A6B3A', '#7A5228', '#C79355', '#E0BA85'] },
+      { name: 'Pierre de lune', note: 'Feldspath opalescent', tones: ['#C9CBC2', '#AFB2A8', '#EDEEE8', '#FFFFFF'] }
+    ];
+
+    var GOLD = '#D2AC63';
+    var beadsGroup = document.getElementById('beads');
+    var swatchWrap = document.getElementById('swatches');
+    var nameEl = document.getElementById('stone-name');
+    var noteEl = document.getElementById('stone-note');
+    var NS = 'http://www.w3.org/2000/svg';
+    var COUNT = 30;
+    var R = 140;
+    var beads = [];
+
+    for (var i = 0; i < COUNT; i++) {
+      var a = (i / COUNT) * Math.PI * 2 - Math.PI / 2;
+      var cx = 200 + R * Math.cos(a);
+      var cy = 200 + R * Math.sin(a);
+      var rad = i % 5 === 0 ? 12 : 15.5;
+
+      var bead = document.createElementNS(NS, 'circle');
+      bead.setAttribute('cx', cx.toFixed(2));
+      bead.setAttribute('cy', cy.toFixed(2));
+      bead.setAttribute('r', rad);
+      bead.style.transitionDelay = (i * 26) + 'ms';
+      beadsGroup.appendChild(bead);
+
+      var shine = document.createElementNS(NS, 'circle');
+      shine.setAttribute('cx', (cx - rad * 0.3).toFixed(2));
+      shine.setAttribute('cy', (cy - rad * 0.36).toFixed(2));
+      shine.setAttribute('r', (rad * 0.3).toFixed(2));
+      shine.setAttribute('fill', 'rgba(255,255,255,0.4)');
+      beadsGroup.appendChild(shine);
+
+      var shade = document.createElementNS(NS, 'circle');
+      shade.setAttribute('cx', (cx + rad * 0.26).toFixed(2));
+      shade.setAttribute('cy', (cy + rad * 0.32).toFixed(2));
+      shade.setAttribute('r', (rad * 0.5).toFixed(2));
+      shade.setAttribute('fill', 'rgba(0,0,0,0.22)');
+      beadsGroup.insertBefore(shade, shine);
+
+      beads.push(bead);
+    }
+
+    function paint(stone) {
+      beads.forEach(function (bead, idx) {
+        var color = idx % 7 === 3 ? GOLD : stone.tones[idx % stone.tones.length];
+        bead.setAttribute('fill', color);
+      });
+      nameEl.textContent = stone.name;
+      noteEl.textContent = stone.note;
+    }
+
+    stones.forEach(function (stone, idx) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch';
+      btn.setAttribute('aria-pressed', idx === 0 ? 'true' : 'false');
+      btn.innerHTML = '<em style="background:linear-gradient(140deg,' + stone.tones[2] + ',' + stone.tones[1] + ')"></em>' + stone.name;
+      btn.addEventListener('click', function () {
+        swatchWrap.querySelectorAll('.swatch').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        paint(stone);
+      });
+      swatchWrap.appendChild(btn);
+    });
+
+    paint(stones[0]);
+
+    /* ---- Poussière lumineuse ---- */
+    var canvas = document.getElementById('dust');
+    var ctx = canvas.getContext('2d');
+    var motes = [];
+    var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function sizeCanvas() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var target = w < 700 ? 26 : 58;
+      motes = [];
+      for (var i = 0; i < target; i++) {
+        motes.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.8 + 0.5,
+          sp: Math.random() * 0.22 + 0.06,
+          sway: Math.random() * 0.5 + 0.2,
+          ph: Math.random() * Math.PI * 2,
+          gold: Math.random() > 0.55
+        });
+      }
+    }
+
+    var t = 0;
+    function frame() {
+      t += 0.006;
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < motes.length; i++) {
+        var m = motes[i];
+        m.y -= m.sp;
+        if (m.y < -12) { m.y = h + 12; m.x = Math.random() * w; }
+        var x = m.x + Math.sin(t * 1.4 + m.ph) * (m.sway * 22);
+        var alpha = 0.18 + Math.abs(Math.sin(t * 1.1 + m.ph)) * 0.42;
+        ctx.beginPath();
+        ctx.arc(x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = m.gold
+          ? 'rgba(210,172,99,' + alpha.toFixed(3) + ')'
+          : 'rgba(157,186,139,' + (alpha * 0.8).toFixed(3) + ')';
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    var raf = null;
+    if (!reduce) {
+      sizeCanvas();
+      window.addEventListener('resize', sizeCanvas);
+      frame();
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { cancelAnimationFrame(raf); }
+        else { raf = requestAnimationFrame(frame); }
+      });
+    } else {
+      canvas.style.display = 'none';
+    }
+
+    /* ---- Barre de progression + parallaxe ---- */
+    var bar = document.getElementById('progress');
+    var layers = Array.prototype.slice.call(document.querySelectorAll('.foliage'));
+    var braceletSvg = document.querySelector('.bracelet');
+    var sealWrap = document.querySelector('.hero-seal-wrap');
+    var ticking = false;
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        var p = max > 0 ? window.scrollY / max : 0;
+        bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+
+        if (!reduce) {
+          for (var i = 0; i < layers.length; i++) {
+            var el = layers[i];
+            var d = parseFloat(el.dataset.depth || '0.1');
+            var base = el.style.transform.indexOf('scaleX(-1)') > -1 ? ' scaleX(-1)' : '';
+            el.style.transform = 'translate3d(0,' + (window.scrollY * d).toFixed(1) + 'px,0)' + base;
+          }
+
+          /* Le sceau s'éloigne doucement, le bracelet tourne avec le défilement */
+          if (sealWrap) {
+            var hf = Math.min(window.scrollY / window.innerHeight, 1);
+            sealWrap.style.transform = 'translate3d(0,' + (hf * 60).toFixed(1) + 'px,0) scale(' + (1 - hf * 0.08).toFixed(3) + ')';
+          }
+          if (braceletSvg) {
+            var r = braceletSvg.getBoundingClientRect();
+            var through = (window.innerHeight - r.top) / (window.innerHeight + r.height);
+            braceletSvg.style.transform = 'rotate(' + (through * 46).toFixed(2) + 'deg)';
+          }
+        }
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* ---- Inclinaison 3D des cartes ---- */
+    if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll('[data-tilt]').forEach(function (card) {
+        card.addEventListener('pointermove', function (e) {
+          var r = card.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width;
+          var py = (e.clientY - r.top) / r.height;
+          card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+          card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+          card.style.transform =
+            'perspective(900px) rotateY(' + ((px - 0.5) * 7).toFixed(2) + 'deg) rotateX(' +
+            ((0.5 - py) * 7).toFixed(2) + 'deg) translateY(-4px)';
+        });
+        card.addEventListener('pointerleave', function () {
+          card.style.transform = '';
+        });
+      });
+    }
   })();
 </script>
 
