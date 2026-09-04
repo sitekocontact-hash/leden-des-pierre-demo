@@ -22,19 +22,28 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
 
 ## Direction artistique voulue
 
-- **Ambiance** : nature et minéral, immersif, **moderne et animé**. Fond nature vivant
-  (brume qui dérive, poussière lumineuse, feuillages en parallaxe), pas de page statique.
-- **Parti pris chromatique** : nocturne. Verts forêt profonds, sauge, or antique, ivoire.
-  Surfaces en verre dépoli plutôt que cartes blanches.
-- **Animations attendues** (le client en veut, explicitement) :
-  - Animation d'ouverture à l'arrivée : le logo se **dessine** trait par trait, puis le rideau se lève.
-  - Le logo vit : halo qui respire, particules en orbite, éclats qui scintillent.
-  - Titres qui montent ligne par ligne, bandeau de pierres défilant, cartes qui s'inclinent au survol.
-  - Au moins une **interaction réelle** : l'atelier où l'on change la pierre et où les perles
-    du bracelet se recomposent.
-- **Règle non négociable** : aucune section ne doit rester invisible en attendant un scroll
-  (pas d'`opacity: 0` piloté par IntersectionObserver ni `animation-timeline: view()` sans
-  état visible de repos). Les animations d'entrée se jouent au chargement.
+- **Ambiance** : nature et minéral, immersif, **clair et zen**. Lumière douce, contrastes
+  bas, matière plutôt que couleur. Le site respire le bien-être, pas la bijouterie.
+- **Parti pris chromatique** : jour. Grès pâle, argile, taupe, or patiné très désaturé,
+  encre chaude pour le texte. **Jamais de fond vert**, jamais de couleur saturée ou
+  « boostée » — la marque vend des pierres **100 % naturellement teintées, non traitées**,
+  le visuel doit rester fidèle à ça.
+- **Un seul temps sombre** assumé dans la page : le bandeau de la phrase signature.
+- **Animations attendues** (le client en veut, explicitement), toutes en **GSAP** :
+  - **Ouverture cinématographique** : une scène de pierre mouillée plein écran pendant
+    ~2,5 s, puis le logo émerge en fondu + léger zoom, puis la scène se retire vers le hero.
+    La scène est **générée en WebGL** (shader de bruit fractal avec domaine déformé,
+    reflets spéculaires d'eau, grain fin) — aucun fichier vidéo ni photo à fournir. Repli
+    en dégradé Canvas 2D si WebGL est indisponible.
+  - Titres qui montent ligne par ligne, bandeau de pierres défilant, cartes qui s'inclinent
+    au survol, apparitions progressives au scroll via **ScrollTrigger**.
+  - Une **interaction réelle** : l'atelier où l'on change la pierre et où les perles du
+    bracelet se recomposent en cascade.
+- **Règle non négociable** : aucune section ne doit rester invisible en attendant un scroll.
+  Conciliation avec ScrollTrigger : on ne masque **que** les éléments déjà hors écran au
+  chargement, et un filet de sécurité (8 s) rétablit tout élément dont le déclencheur n'est
+  jamais parti. Le premier écran est toujours complet.
+
 
 ## Typographie
 
@@ -42,15 +51,16 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
 - Script de marque : **Mrs Saint Delafield** (reprend le « des Pierres » du logo, usage rare)
 - Texte courant : **Jost** en graisse légère (200–400)
 
-## Palette (version nocturne)
+## Palette (version claire, pierre naturelle)
 
 | Rôle | Valeur |
 | --- | --- |
-| Fond nuit | `#080D08` / `#0C130C` |
-| Écorce / mousse | `#111A11` / `#18261A` |
-| Sauge | `#9DBA8B` (atténué `#7A9569`) |
-| Or | `#D2AC63` (clair `#EBD5A6`, profond `#8E7134`) |
-| Ivoire (texte) | `#F1EEE3` — texte secondaire `#A6B29B` |
+| Papier / fond | `#FAF7EF` — fond alterné `#F1EBDE`, creux `#E4DBC6` |
+| Pierre (traits, bordures) | `#CFC5AC` — profond `#A99C7C` |
+| Or patiné (accent) | `#9C8557` — clair `#C1AA80`, texte `#6C5A3A` |
+| Mousse (accent rare, jamais en fond) | `#7E8871` — profond `#545C48` |
+| Encre (texte) | `#322C24` — secondaire `#6C6353`, titres `#211D18` |
+
 
 ## Logo
 
@@ -76,12 +86,14 @@ Le dépôt embarque deux compétences sous `.claude/skills/` (voir leur README) 
   règles UX, presets d'animation.
 
 Les utiliser pour toute nouvelle page ou refonte de ce projet : elles priment sur les
-réflexes par défaut, mais **jamais sur le brief de marque ci-dessus** (direction nocturne,
-animations obligatoires, logo reconstitué en SVG).
+réflexes par défaut, mais **jamais sur le brief de marque ci-dessus** (direction claire et
+zen, teintes naturelles non saturées, animations obligatoires, logo reconstitué en SVG).
 
 ## Conventions techniques
 
 - HTML/CSS/JS autonome, sans framework ni build. Tout tient dans `index.html`.
+- Seule dépendance externe : **GSAP + ScrollTrigger** (CDN cdnjs, version épinglée).
+  Toutes les animations passent par GSAP, pas par des `@keyframes` dispersés.
 - Polices via Google Fonts, images et icônes en SVG intégré.
 - Toujours respecter `prefers-reduced-motion` : couper rideau, particules, parallaxe et
   rotations, garder la page lisible.

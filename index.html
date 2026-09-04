@@ -3,44 +3,49 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="L'Eden des Pierres — bracelets et créations en pierres naturelles montés à la main, par Sonia.">
+<meta name="description" content="L'Eden des Pierres — bracelets en pierres naturelles non traitées, montés à la main par Sonia.">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>L'Eden des Pierres</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Mrs+Saint+Delafield&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <style>
-  /* ============ Système de couleurs — parti pris nocturne assumé ============ */
+  /* ============ Système de couleurs — pierre naturelle, jour, zen ============ */
   :root {
-    --night: #080D08;
-    --night-2: #0C130C;
-    --bark: #111A11;
-    --moss: #18261A;
-    --sage: #9DBA8B;
-    --sage-dim: #7A9569;
-    --gold: #D2AC63;
-    --gold-soft: #EBD5A6;
-    --gold-deep: #8E7134;
-    --ivory: #F1EEE3;
-    --muted: #A6B29B;
+    --paper: #FAF7EF;
+    --sand: #F1EBDE;
+    --sand-deep: #E4DBC6;
+    --stone: #CFC5AC;
+    --stone-deep: #A99C7C;
+    --clay: #9C8557;
+    --clay-soft: #C1AA80;
+    --clay-deep: #6C5A3A;
+    --moss: #7E8871;
+    --moss-deep: #545C48;
+    --ink: #322C24;
+    --ink-soft: #6C6353;
+    --ink-deep: #211D18;
 
-    --glass: rgba(255, 255, 255, 0.042);
-    --glass-strong: rgba(255, 255, 255, 0.07);
-    --edge: rgba(210, 172, 99, 0.2);
-    --edge-soft: rgba(157, 186, 139, 0.14);
+    --glass: rgba(50, 44, 36, 0.035);
+    --glass-strong: rgba(50, 44, 36, 0.06);
+    --edge: rgba(156, 133, 87, 0.28);
+    --edge-soft: rgba(126, 136, 113, 0.2);
 
     --shell: min(1280px, 100% - 3rem);
     --r-card: 20px;
     --r-pill: 999px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow: 0 24px 54px -32px rgba(50, 44, 36, 0.28);
   }
 
   * { box-sizing: border-box; }
 
   body {
-    background: var(--night);
-    color: var(--ivory);
+    background: var(--paper);
+    color: var(--ink);
     font-family: "Jost", "Avenir Next", "Segoe UI", sans-serif;
     font-weight: 300;
     font-size: 16.5px;
@@ -52,18 +57,18 @@
   h1, h2, h3 {
     font-family: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
     font-weight: 400;
-    line-height: 1.06;
-    letter-spacing: -0.015em;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
     margin: 0;
     text-wrap: balance;
-    color: var(--ivory);
+    color: var(--ink-deep);
   }
 
   p { margin: 0; }
   a { color: inherit; }
 
   :focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--clay-deep);
     outline-offset: 4px;
     border-radius: 6px;
   }
@@ -72,7 +77,7 @@
 
   .script {
     font-family: "Mrs Saint Delafield", "Snell Roundhand", cursive;
-    color: var(--gold);
+    color: var(--clay-deep);
     line-height: 0.92;
   }
 
@@ -81,7 +86,7 @@
     font-weight: 400;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--clay-deep);
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -91,66 +96,60 @@
     content: "";
     width: 34px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold));
+    background: linear-gradient(90deg, transparent, var(--stone-deep));
   }
 
   .lede {
     font-size: clamp(1.1rem, 1.7vw, 1.32rem);
-    color: var(--ivory);
+    color: var(--ink);
     font-weight: 300;
     max-width: 60ch;
   }
 
-  .body-text { color: var(--muted); max-width: 62ch; }
+  .body-text { color: var(--ink-soft); max-width: 62ch; }
 
-  /* ============ Décor animé de fond ============ */
+  /* ============ Décor ambiant — lumière, jamais de fond vert ============ */
 
   .backdrop {
     position: fixed;
     inset: 0;
     z-index: -2;
     background:
-      radial-gradient(120% 90% at 50% -10%, #16261A 0%, transparent 55%),
-      radial-gradient(90% 70% at 85% 110%, #1A2A18 0%, transparent 60%),
-      var(--night);
+      radial-gradient(115% 80% at 50% -8%, #FBF8F0 0%, transparent 55%),
+      radial-gradient(90% 70% at 88% 105%, #EFE6D2 0%, transparent 60%),
+      var(--paper);
   }
 
-  .mist {
+  .bloom {
     position: fixed;
     z-index: -1;
     border-radius: 50%;
-    filter: blur(70px);
-    opacity: 0.5;
+    filter: blur(80px);
+    opacity: 0.55;
     pointer-events: none;
     will-change: transform;
   }
 
-  .mist-a {
-    width: 46vw; height: 46vw; left: -10vw; top: 4vh;
-    background: radial-gradient(circle, rgba(122, 149, 105, 0.4), transparent 68%);
-    animation: driftA 34s ease-in-out infinite;
+  .bloom-a {
+    width: 42vw; height: 42vw; left: -8vw; top: 2vh;
+    background: radial-gradient(circle, rgba(193, 170, 128, 0.32), transparent 68%);
+    animation: driftA 40s ease-in-out infinite;
   }
 
-  .mist-b {
-    width: 38vw; height: 38vw; right: -8vw; top: 32vh;
-    background: radial-gradient(circle, rgba(210, 172, 99, 0.26), transparent 68%);
-    animation: driftB 44s ease-in-out infinite;
-  }
-
-  .mist-c {
-    width: 52vw; height: 52vw; left: 22vw; bottom: -18vh;
-    background: radial-gradient(circle, rgba(60, 104, 66, 0.34), transparent 70%);
-    animation: driftA 52s ease-in-out infinite reverse;
+  .bloom-b {
+    width: 36vw; height: 36vw; right: -6vw; top: 30vh;
+    background: radial-gradient(circle, rgba(126, 136, 113, 0.16), transparent 68%);
+    animation: driftB 50s ease-in-out infinite;
   }
 
   @keyframes driftA {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(6vw, -5vh, 0) scale(1.12); }
+    50% { transform: translate3d(5vw, -4vh, 0) scale(1.08); }
   }
 
   @keyframes driftB {
-    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
-    50% { transform: translate3d(-7vw, 6vh, 0) scale(0.92); }
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.03); }
+    50% { transform: translate3d(-5vw, 5vh, 0) scale(0.94); }
   }
 
   #dust {
@@ -160,71 +159,135 @@
     pointer-events: none;
   }
 
-  .foliage {
-    position: absolute;
-    pointer-events: none;
-    color: var(--sage);
-    opacity: 0.13;
-    will-change: transform;
-  }
+  /* ============ Intro cinématographique ============ */
 
-  .foliage svg { display: block; width: 100%; height: auto; }
-
-  /* ============ Rideau d'ouverture ============ */
-
-  .curtain {
+  .cine {
     position: fixed;
     inset: 0;
     z-index: 90;
+    background: #C9BC9C;
+    overflow: hidden;
+  }
+
+  .cine-scene {
+    position: absolute;
+    inset: -2%;
+    width: 104%;
+    height: 104%;
+    display: block;
+  }
+
+  .cine-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(46% 46% at 50% 47%, rgba(24, 20, 14, 0.62) 0%, rgba(24, 20, 14, 0.22) 55%, transparent 78%),
+      linear-gradient(180deg, rgba(28, 24, 18, 0.3) 0%, rgba(28, 24, 18, 0.04) 34%, rgba(28, 24, 18, 0.38) 100%);
+  }
+
+  .cine-logo {
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
-    background: var(--night);
-    animation: curtain-lift 900ms var(--ease) 2050ms forwards;
-  }
-
-  @keyframes curtain-lift {
-    to { opacity: 0; visibility: hidden; pointer-events: none; }
-  }
-
-  .curtain .draw-seal { width: min(58vw, 320px); }
-
-  .draw-seal [data-draw] {
-    stroke-dasharray: var(--len, 600);
-    stroke-dashoffset: var(--len, 600);
-    animation: draw 1500ms var(--ease) forwards;
-    animation-delay: var(--dd, 0ms);
-  }
-
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-
-  .draw-seal [data-pop] {
     opacity: 0;
-    animation: pop 700ms var(--ease) forwards;
-    animation-delay: var(--dd, 400ms);
   }
 
-  @keyframes pop {
-    from { opacity: 0; transform: scale(0.7); }
-    to { opacity: 1; transform: scale(1); }
+  .cine-logo .seal {
+    width: min(74vw, 380px);
+    font-size: clamp(11px, 2.4vw, 17px);
   }
 
-  .curtain-word {
+  .cine-logo .seal > svg {
+    filter: brightness(1.42) saturate(0.62)
+            drop-shadow(0 6px 22px rgba(12, 10, 6, 0.85))
+            drop-shadow(0 0 50px rgba(12, 10, 6, 0.5));
+  }
+
+  .cine-logo .seal-word .eden,
+  .cine-logo .seal-word .sonia { color: #F6EFDD; }
+
+  .cine-logo .seal-word .pierres,
+  .cine-logo .seal-rule { color: #E4C58C; }
+
+  .cine-word {
     position: absolute;
     bottom: clamp(2rem, 8vh, 5rem);
-    font-size: 0.68rem;
+    left: 50%;
+    translate: -50% 0;
+    font-size: 0.66rem;
     letter-spacing: 0.42em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: #F8F1DE;
     opacity: 0;
-    animation: fade-up 900ms var(--ease) 1200ms forwards;
+    text-align: center;
+    white-space: nowrap;
   }
 
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: none; }
+  /* ============ Sceau / logo — géométrie inchangée, rendu affiné ============ */
+
+  .seal {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    font-size: clamp(9px, 1.15vw, 14px);
   }
 
-  /* ============ Barre de navigation ============ */
+  .seal > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 10px rgba(108, 90, 58, 0.25));
+  }
+
+  .seal-word {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 4.6em;
+    padding-left: 1.1em;
+  }
+
+  .seal-word .eden {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 3.05em;
+    font-weight: 500;
+    color: var(--ink-deep);
+    line-height: 0.9;
+  }
+
+  .seal-word .pierres {
+    font-family: "Mrs Saint Delafield", cursive;
+    font-size: 3.5em;
+    color: var(--clay-deep);
+    line-height: 0.8;
+    margin-top: 0.1em;
+  }
+
+  .seal-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.7em;
+    color: var(--clay-deep);
+  }
+
+  .seal-rule i { display: block; width: 2.4em; height: 1px; background: currentColor; }
+  .seal-rule b { width: 0.4em; height: 0.4em; background: currentColor; rotate: 45deg; }
+
+  .seal-word .sonia {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.3em;
+    letter-spacing: 0.24em;
+    color: var(--moss-deep);
+    margin-top: 0.5em;
+  }
+
+  /* ============ Navigation ============ */
 
   .progress {
     position: fixed;
@@ -233,7 +296,7 @@
     width: 100%;
     transform: scaleX(0);
     transform-origin: 0 50%;
-    background: linear-gradient(90deg, var(--sage), var(--gold));
+    background: linear-gradient(90deg, var(--moss), var(--clay-deep));
     z-index: 60;
   }
 
@@ -242,8 +305,8 @@
     top: 0;
     z-index: 50;
     backdrop-filter: blur(16px);
-    background: linear-gradient(180deg, rgba(8, 13, 8, 0.82), rgba(8, 13, 8, 0.35));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(180deg, rgba(250, 247, 239, 0.9), rgba(250, 247, 239, 0.4));
+    border-bottom: 1px solid rgba(50, 44, 36, 0.07);
   }
 
   .topbar-inner {
@@ -263,6 +326,7 @@
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 1.16rem;
     letter-spacing: 0.06em;
+    color: var(--ink-deep);
   }
 
   .brand-sub {
@@ -270,7 +334,7 @@
     font-size: 0.56rem;
     letter-spacing: 0.36em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--clay-deep);
     margin-top: 0.22rem;
   }
 
@@ -281,7 +345,7 @@
     font-size: 0.78rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-soft);
   }
 
   .nav-links a {
@@ -296,13 +360,13 @@
     position: absolute;
     left: 0; bottom: 0;
     height: 1px; width: 100%;
-    background: var(--gold);
+    background: var(--clay-deep);
     transform: scaleX(0);
     transform-origin: 100% 50%;
     transition: transform 0.45s var(--ease);
   }
 
-  .nav-links a:hover { color: var(--ivory); }
+  .nav-links a:hover { color: var(--ink-deep); }
   .nav-links a:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
 
   .btn {
@@ -330,23 +394,23 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, var(--gold), var(--gold-soft) 45%, var(--gold));
+    background: var(--ink-deep);
     transition: transform 0.5s var(--ease);
   }
 
   .btn span { position: relative; z-index: 1; }
 
-  .btn-solid { color: #10180F; }
-  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -22px rgba(210, 172, 99, 0.9); }
+  .btn-solid { color: var(--paper); }
+  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -22px rgba(33, 29, 24, 0.55); }
   .btn-solid:active { transform: translateY(0); }
 
   .btn-ghost {
-    color: var(--ivory);
+    color: var(--ink-deep);
     border-color: var(--edge);
   }
 
   .btn-ghost::before { transform: translateY(101%); }
-  .btn-ghost:hover { color: #10180F; border-color: transparent; }
+  .btn-ghost:hover { color: var(--paper); border-color: transparent; }
   .btn-ghost:hover::before { transform: translateY(0); }
 
   .btn-sm { padding: 0.7rem 1.4rem; font-size: 0.7rem; }
@@ -357,7 +421,7 @@
     border: 1px solid var(--edge);
     border-radius: var(--r-pill);
     padding: 0.55rem 1.1rem;
-    color: var(--ivory);
+    color: var(--ink-deep);
     font-family: inherit;
     font-size: 0.7rem;
     letter-spacing: 0.18em;
@@ -386,39 +450,17 @@
   }
 
   .hero h1 .line { display: block; overflow: hidden; }
-
-  .hero h1 .line > span {
-    display: block;
-    transform: translateY(105%);
-    animation: line-up 1s var(--ease) forwards;
-    animation-delay: calc(2150ms + var(--i, 0) * 130ms);
-  }
-
-  @keyframes line-up { to { transform: none; } }
+  .hero h1 .line > span { display: block; }
 
   .hero h1 em {
     font-style: italic;
     font-weight: 300;
-    color: var(--gold);
+    color: var(--clay-deep);
   }
 
-  .hero-sub {
-    margin-top: 1.9rem;
-    max-width: 34ch;
-    color: var(--muted);
-    font-size: 1.06rem;
-    opacity: 0;
-    animation: fade-up 900ms var(--ease) 2650ms forwards;
-  }
+  .hero-sub { margin-top: 1.9rem; max-width: 34ch; color: var(--ink-soft); font-size: 1.06rem; }
 
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.9rem;
-    margin-top: 2.6rem;
-    opacity: 0;
-    animation: fade-up 900ms var(--ease) 2800ms forwards;
-  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.6rem; }
 
   .hero-meta {
     display: flex;
@@ -426,9 +468,7 @@
     gap: 2rem;
     margin-top: 3.2rem;
     padding-top: 1.7rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    opacity: 0;
-    animation: fade-up 900ms var(--ease) 2950ms forwards;
+    border-top: 1px solid rgba(50, 44, 36, 0.1);
   }
 
   .hero-meta div { display: grid; gap: 0.15rem; }
@@ -437,17 +477,15 @@
     font-family: "Cormorant Garamond", Georgia, serif;
     font-weight: 400;
     font-size: 1.5rem;
-    color: var(--gold-soft);
+    color: var(--clay-deep);
   }
 
   .hero-meta span {
     font-size: 0.68rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-soft);
   }
-
-  /* Sceau du héros */
 
   .hero-seal-wrap {
     position: relative;
@@ -462,100 +500,21 @@
     position: absolute;
     inset: 6%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(210, 172, 99, 0.2), transparent 62%);
-    animation: breathe 7s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(193, 170, 128, 0.22), transparent 62%);
   }
 
-  @keyframes breathe {
-    0%, 100% { transform: scale(1); opacity: 0.75; }
-    50% { transform: scale(1.09); opacity: 1; }
-  }
-
-  .orbit {
-    position: absolute;
-    inset: 0;
-    animation: spin 46s linear infinite;
-  }
-
-  .orbit-rev { animation-duration: 68s; animation-direction: reverse; }
-
-  @keyframes spin { to { rotate: 360deg; } }
-
-  .seal {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 86%;
-    aspect-ratio: 1;
-    font-size: clamp(9px, 1.15vw, 14px);
-  }
-
-  .seal > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-
-  .seal-word {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding-top: 4.6em;
-    padding-left: 1.1em;
-  }
-
-  .seal-word .eden {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 3.05em;
-    font-weight: 500;
-    color: var(--ivory);
-    line-height: 0.9;
-  }
-
-  .seal-word .pierres {
-    font-family: "Mrs Saint Delafield", cursive;
-    font-size: 3.5em;
-    color: var(--gold);
-    line-height: 0.8;
-    margin-top: 0.1em;
-  }
-
-  .seal-rule {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    margin-top: 0.7em;
-    color: var(--gold);
-  }
-
-  .seal-rule i { display: block; width: 2.4em; height: 1px; background: currentColor; }
-  .seal-rule b { width: 0.4em; height: 0.4em; background: currentColor; rotate: 45deg; }
-
-  .seal-word .sonia {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.3em;
-    letter-spacing: 0.24em;
-    color: var(--sage);
-    margin-top: 0.5em;
-  }
+  .orbit { position: absolute; inset: 0; }
 
   /* ============ Bandeau défilant ============ */
 
   .marquee {
-    border-block: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.015);
+    border-block: 1px solid rgba(50, 44, 36, 0.08);
+    background: rgba(50, 44, 36, 0.012);
     overflow: hidden;
     padding-block: 1.1rem;
   }
 
-  .marquee-track {
-    display: flex;
-    gap: 3rem;
-    width: max-content;
-    animation: slide 38s linear infinite;
-  }
-
-  .marquee:hover .marquee-track { animation-play-state: paused; }
-
-  @keyframes slide { to { transform: translateX(-50%); } }
+  .marquee-track { display: flex; gap: 3rem; width: max-content; }
 
   .marquee span {
     display: flex;
@@ -565,29 +524,16 @@
     font-size: 1.15rem;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-soft);
     white-space: nowrap;
   }
 
-  .marquee span::after {
-    content: "";
-    width: 5px; height: 5px;
-    background: var(--gold);
-    rotate: 45deg;
-  }
+  .marquee span::after { content: ""; width: 5px; height: 5px; background: var(--clay-deep); rotate: 45deg; }
 
   /* ============ Sections ============ */
 
   section { position: relative; scroll-margin-top: 92px; }
-
   .pad { padding-block: clamp(4.5rem, 9vw, 8rem); }
-
-  .reveal { animation: rise 1s var(--ease) both; animation-delay: var(--d, 0ms); }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(22px); }
-    to { opacity: 1; transform: none; }
-  }
 
   /* Histoire */
 
@@ -616,15 +562,10 @@
     font-size: 0.76rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-soft);
   }
 
-  .pill i {
-    width: 6px; height: 6px;
-    background: var(--gold);
-    rotate: 45deg;
-    display: block;
-  }
+  .pill i { width: 6px; height: 6px; background: var(--clay-deep); rotate: 45deg; display: block; }
 
   /* Atelier interactif */
 
@@ -654,14 +595,12 @@
     position: absolute;
     inset: 12%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(210, 172, 99, 0.14), transparent 65%);
+    background: radial-gradient(circle, rgba(193, 170, 128, 0.2), transparent 65%);
   }
 
   .bracelet { position: relative; width: 100%; height: auto; }
 
-  #beads { animation: spin 90s linear infinite; transform-origin: 200px 200px; }
-
-  #beads circle { transition: fill 0.75s var(--ease); }
+  #beads circle { transform-box: fill-box; transform-origin: center; }
 
   .bracelet-core {
     position: absolute;
@@ -675,22 +614,17 @@
   .bracelet-core .name {
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: clamp(1.6rem, 2.6vw, 2.1rem);
-    color: var(--ivory);
+    color: var(--ink-deep);
   }
 
   .bracelet-core .note {
     font-size: 0.72rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--clay-deep);
   }
 
-  .swatches {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-    margin-top: 2.4rem;
-  }
+  .swatches { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2.4rem; }
 
   .swatch {
     display: inline-flex;
@@ -698,9 +632,9 @@
     gap: 0.6rem;
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     border-radius: var(--r-pill);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(50, 44, 36, 0.14);
     background: var(--glass);
-    color: var(--muted);
+    color: var(--ink-soft);
     font-family: inherit;
     font-size: 0.76rem;
     letter-spacing: 0.1em;
@@ -712,21 +646,21 @@
     width: 20px; height: 20px;
     border-radius: 50%;
     display: block;
-    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.45), inset 0 3px 5px rgba(255, 255, 255, 0.28);
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.22), inset 0 3px 5px rgba(255, 255, 255, 0.4);
   }
 
-  .swatch:hover { color: var(--ivory); border-color: var(--edge); transform: translateY(-2px); }
+  .swatch:hover { color: var(--ink-deep); border-color: var(--edge); transform: translateY(-2px); }
 
   .swatch[aria-pressed="true"] {
-    color: #10180F;
-    background: linear-gradient(120deg, var(--gold), var(--gold-soft));
+    color: var(--paper);
+    background: var(--ink-deep);
     border-color: transparent;
   }
 
   .atelier-note {
     margin-top: 1.6rem;
     font-size: 0.82rem;
-    color: var(--muted);
+    color: var(--ink-soft);
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -744,7 +678,7 @@
   .criterion {
     padding: 1.7rem 1.5rem;
     border-radius: var(--r-card);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(50, 44, 36, 0.08);
     background: var(--glass);
     display: grid;
     gap: 0.7rem;
@@ -752,20 +686,16 @@
     transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s var(--ease);
   }
 
-  .criterion:hover {
-    border-color: var(--edge);
-    background: var(--glass-strong);
-    transform: translateY(-4px);
-  }
+  .criterion:hover { border-color: var(--edge); background: var(--glass-strong); transform: translateY(-4px); }
 
   .criterion b {
     font-family: "Cormorant Garamond", Georgia, serif;
     font-weight: 400;
     font-size: 1.45rem;
-    color: var(--gold-soft);
+    color: var(--clay-deep);
   }
 
-  .criterion span { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+  .criterion span { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; }
 
   /* Grille de pierres */
 
@@ -779,20 +709,16 @@
   }
 
   .collection-head h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
-  .collection-head p { color: var(--muted); max-width: 34ch; }
+  .collection-head p { color: var(--ink-soft); max-width: 34ch; }
 
-  .stone-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1.3rem;
-  }
+  .stone-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.3rem; }
 
   .stone-card {
     position: relative;
     grid-column: span 4;
     padding: 1.9rem 1.7rem;
     border-radius: var(--r-card);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(50, 44, 36, 0.08);
     background: var(--glass);
     display: grid;
     gap: 1rem;
@@ -805,7 +731,7 @@
     content: "";
     position: absolute;
     inset: -40%;
-    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(210, 172, 99, 0.18), transparent 45%);
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(156, 133, 87, 0.16), transparent 45%);
     opacity: 0;
     transition: opacity 0.45s ease;
     pointer-events: none;
@@ -823,20 +749,8 @@
 
   .stone-art { position: relative; display: grid; place-items: center; padding-block: 0.3rem; }
   .stone-art svg { width: 92px; height: 92px; overflow: visible; }
-  .stone-art .glint { animation: glint 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 
-  @keyframes glint {
-    0%, 100% { opacity: 0.15; }
-    50% { opacity: 0.6; }
-  }
-
-  .stone-card h3 {
-    font-size: 1.55rem;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+  .stone-card h3 { font-size: 1.55rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 
   .stone-card h3 small {
     font-family: "Jost", sans-serif;
@@ -844,18 +758,20 @@
     font-weight: 300;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--clay-deep);
   }
 
-  .stone-card p { color: var(--muted); font-size: 0.94rem; line-height: 1.62; }
+  .stone-card p { color: var(--ink-soft); font-size: 0.94rem; line-height: 1.62; }
 
-  /* Déclaration */
+  /* Déclaration — le seul temps sombre de la page, assumé et unique */
 
   .statement {
     position: relative;
     padding-block: clamp(5rem, 11vw, 9rem);
     text-align: center;
     overflow: hidden;
+    background: var(--ink-deep);
+    color: #F4EEDF;
   }
 
   .statement blockquote {
@@ -864,9 +780,10 @@
     font-size: clamp(2.1rem, 5vw, 3.9rem);
     line-height: 1.14;
     max-width: 18ch;
+    color: #F4EEDF;
   }
 
-  .statement blockquote em { font-style: italic; color: var(--gold); }
+  .statement blockquote em { font-style: italic; color: var(--clay-soft); }
 
   .statement cite {
     display: block;
@@ -875,15 +792,11 @@
     font-size: 0.7rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: rgba(244, 238, 223, 0.6);
   }
 
-  .statement .kicker { justify-content: center; }
-  .statement .kicker::after {
-    content: "";
-    width: 34px; height: 1px;
-    background: linear-gradient(270deg, transparent, var(--gold));
-  }
+  .statement .kicker { justify-content: center; color: var(--clay-soft); }
+  .statement .kicker::before { background: linear-gradient(90deg, transparent, var(--clay-soft)); }
 
   /* Sur mesure + contact */
 
@@ -895,7 +808,7 @@
   }
 
   .custom-copy h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
-  .custom-copy > p { margin-top: 1.4rem; color: var(--muted); max-width: 40ch; }
+  .custom-copy > p { margin-top: 1.4rem; color: var(--ink-soft); max-width: 40ch; }
 
   .steps {
     counter-reset: step;
@@ -913,7 +826,7 @@
     gap: 1.2rem;
     align-items: start;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(50, 44, 36, 0.08);
   }
 
   .steps li:last-child { border-bottom: none; padding-bottom: 0; }
@@ -923,7 +836,7 @@
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 0.95rem;
     letter-spacing: 0.1em;
-    color: var(--gold);
+    color: var(--clay-deep);
     padding-top: 0.3rem;
   }
 
@@ -932,26 +845,27 @@
     font-family: "Cormorant Garamond", Georgia, serif;
     font-weight: 400;
     font-size: 1.35rem;
-    color: var(--ivory);
+    color: var(--ink-deep);
   }
 
-  .steps span { color: var(--muted); font-size: 0.94rem; }
+  .steps span { color: var(--ink-soft); font-size: 0.94rem; }
 
   .contact-card {
     position: relative;
     border-radius: 26px;
     border: 1px solid var(--edge);
-    background: linear-gradient(150deg, rgba(210, 172, 99, 0.09), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.03));
+    background: linear-gradient(150deg, rgba(156, 133, 87, 0.1), rgba(250, 247, 239, 0.6) 45%, var(--paper));
     padding: clamp(2rem, 4vw, 3rem);
     display: grid;
     gap: 1.5rem;
     overflow: hidden;
+    box-shadow: var(--shadow);
   }
 
   .contact-card .seal { width: min(230px, 68%); justify-self: center; }
 
   .contact-card h3 { font-size: 1.9rem; text-align: center; }
-  .contact-card > p { text-align: center; color: var(--muted); max-width: 30ch; margin-inline: auto; font-size: 0.95rem; }
+  .contact-card > p { text-align: center; color: var(--ink-soft); max-width: 30ch; margin-inline: auto; font-size: 0.95rem; }
 
   .contact-actions { display: grid; gap: 0.75rem; }
   .contact-actions .btn { width: 100%; }
@@ -960,20 +874,17 @@
     display: flex;
     justify-content: center;
     gap: 1.6rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: 1px solid rgba(50, 44, 36, 0.1);
     padding-top: 1.3rem;
     font-size: 0.7rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-soft);
   }
 
   /* Pied de page */
 
-  .site-foot {
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    padding-block: 2.8rem 3.2rem;
-  }
+  .site-foot { border-top: 1px solid rgba(50, 44, 36, 0.08); padding-block: 2.8rem 3.2rem; }
 
   .foot-inner {
     display: flex;
@@ -982,39 +893,20 @@
     justify-content: space-between;
     gap: 1.6rem;
     font-size: 0.8rem;
-    color: var(--muted);
+    color: var(--ink-soft);
   }
 
-  .foot-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
+  .foot-links { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; }
   .foot-links a { text-decoration: none; transition: color 0.3s ease; }
-  .foot-links a:hover { color: var(--gold); }
+  .foot-links a:hover { color: var(--clay-deep); }
 
-  .demo-flag {
-    margin-top: 1.8rem;
-    font-size: 0.72rem;
-    color: var(--muted);
-    opacity: 0.7;
-    max-width: 70ch;
-  }
+  .demo-flag { margin-top: 1.8rem; font-size: 0.72rem; color: var(--ink-soft); opacity: 0.8; max-width: 70ch; }
 
   /* ============ Accessibilité mouvement ============ */
 
   @media (prefers-reduced-motion: reduce) {
-    .curtain { display: none; }
-    .mist, .halo, .orbit, #beads, .marquee-track, .stone-art .glint { animation: none !important; }
-    .hero h1 .line > span { transform: none; animation: none; }
-    .hero-sub, .hero-actions, .hero-meta, .curtain-word { opacity: 1; animation: none; }
-    .reveal { animation: none; opacity: 1; transform: none; }
-    .draw-seal [data-draw] { stroke-dashoffset: 0; animation: none; }
-    .draw-seal [data-pop] { opacity: 1; animation: none; }
+    .cine { display: none; }
+    .bloom { animation: none !important; }
     .stone-card, .criterion, .btn, .swatch { transition: none; }
   }
 
@@ -1028,8 +920,8 @@
       top: 76px; left: 0; right: 0;
       gap: 1.1rem;
       padding: 1.4rem 1.5rem 1.8rem;
-      background: rgba(8, 13, 8, 0.97);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(250, 247, 239, 0.98);
+      border-bottom: 1px solid rgba(50, 44, 36, 0.1);
     }
     .menu-toggle { display: inline-flex; }
     .topbar .btn-solid { display: none; }
@@ -1038,7 +930,6 @@
     .hero-seal-wrap { order: -1; width: min(100%, 350px); }
     .criteria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .stone-card, .stone-card:nth-child(n) { grid-column: span 6; }
-    .story-aside { padding-bottom: 0.5rem; }
   }
 
   @media (max-width: 640px) {
@@ -1048,16 +939,14 @@
     .hero-meta { gap: 1.4rem; }
     .contact-meta { flex-direction: column; gap: 0.5rem; text-align: center; }
     .hero-actions .btn { flex: 1 1 100%; }
-    .foliage { display: none; }
   }
 </style>
 
 </head>
 <body>
 <div class="backdrop" aria-hidden="true"></div>
-<div class="mist mist-a" aria-hidden="true"></div>
-<div class="mist mist-b" aria-hidden="true"></div>
-<div class="mist mist-c" aria-hidden="true"></div>
+<div class="bloom bloom-a" aria-hidden="true"></div>
+<div class="bloom bloom-b" aria-hidden="true"></div>
 <canvas id="dust" aria-hidden="true"></canvas>
 <div class="progress" id="progress" aria-hidden="true"></div>
 
@@ -1070,19 +959,25 @@
       <path d="M0-10C1.4-3.2 3.2-1.4 10 0C3.2 1.4 1.4 3.2 0 10C-1.4 3.2-3.2 1.4-10 0C-3.2-1.4-1.4-3.2 0-10Z"/>
     </g>
 
+    <linearGradient id="gold-facet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B49560"/>
+      <stop offset="0.42" stop-color="#8A6F3E"/>
+      <stop offset="1" stop-color="#5E4C2C"/>
+    </linearGradient>
+
     <symbol id="seal-decor" viewBox="0 0 240 240">
-      <g fill="none" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round">
+      <g fill="none" stroke="url(#gold-facet)" stroke-width="1.3" stroke-linecap="round">
         <path d="M11.8 149 A112 112 0 1 1 228.2 149"/>
         <path d="M16.4 110.9 A104 104 0 0 1 210.1 68" opacity="0.7"/>
         <path d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
         <path d="M192.8 192.8 A103 103 0 0 1 111 222.6" opacity="0.65"/>
       </g>
-      <g fill="var(--gold)">
+      <g fill="var(--clay-deep)">
         <circle cx="223.8" cy="78" r="2.6"/><circle cx="227.6" cy="89.1" r="2.2"/>
         <circle cx="230.3" cy="100.5" r="1.9"/><circle cx="231.7" cy="112.2" r="1.5"/>
         <circle cx="231.9" cy="123.9" r="1.2"/>
       </g>
-      <g fill="none" stroke="var(--gold)" stroke-width="1.25" stroke-linejoin="round">
+      <g fill="none" stroke="url(#gold-facet)" stroke-width="1.25" stroke-linejoin="round">
         <path d="M120 42 134 66 132 104 108 104 106 66Z"/>
         <path d="M106 66H134M120 42V104" opacity="0.6"/>
         <path d="M92 74 104 92 100 110 82 110 80 92Z"/>
@@ -1090,15 +985,15 @@
         <path d="M150 66 160 88 157 110 140 110 138 88Z"/>
         <path d="M138 88H160M150 66V110" opacity="0.55"/>
       </g>
-      <g fill="var(--gold)">
-        <use href="#sparkle-shape" transform="translate(170 62) scale(0.5)" class="glint"/>
-        <use href="#sparkle-shape" transform="translate(88 50) scale(0.32)" class="glint"/>
-        <use href="#sparkle-shape" transform="translate(176 98) scale(0.34)" class="glint"/>
+      <g fill="var(--clay-deep)">
+        <use href="#sparkle-shape" transform="translate(170 62) scale(0.5)" opacity="0.7"/>
+        <use href="#sparkle-shape" transform="translate(88 50) scale(0.32)" opacity="0.55"/>
+        <use href="#sparkle-shape" transform="translate(176 98) scale(0.34)" opacity="0.6"/>
       </g>
-      <g stroke="var(--sage-dim)" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <g stroke="var(--moss-deep)" stroke-width="1.4" fill="none" stroke-linecap="round">
         <path d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48"/>
       </g>
-      <g fill="var(--sage)" stroke="var(--sage-dim)" stroke-width="0.9" opacity="0.92">
+      <g fill="var(--moss)" stroke="var(--moss-deep)" stroke-width="0.9" opacity="0.92">
         <use href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
         <use href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
         <use href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
@@ -1112,7 +1007,7 @@
         <use href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
         <use href="#leaf-shape" transform="translate(78 49) rotate(-124) scale(-0.8 0.8)"/>
       </g>
-      <g fill="var(--gold)">
+      <g fill="var(--clay-deep)">
         <circle cx="67" cy="197" r="3"/><circle cx="53" cy="171" r="2.4"/>
         <circle cx="45" cy="141" r="3.2"/><circle cx="46" cy="105" r="2.3"/>
         <circle cx="61" cy="74" r="2.8"/><circle cx="82" cy="53" r="2"/>
@@ -1120,16 +1015,16 @@
     </symbol>
 
     <symbol id="mark-small" viewBox="0 0 240 240">
-      <g fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round">
+      <g fill="none" stroke="url(#gold-facet)" stroke-width="5" stroke-linecap="round">
         <path d="M22 154 A108 108 0 1 1 218 154"/>
         <path d="M198 190 A108 108 0 0 1 88 216"/>
       </g>
-      <g fill="none" stroke="var(--gold)" stroke-width="5">
+      <g fill="none" stroke="url(#gold-facet)" stroke-width="5">
         <path d="M132 48 156 88 152 168 112 168 108 88Z"/>
         <path d="M108 88H156" opacity="0.5"/>
         <path d="M92 96 106 120 103 168 78 168 76 120Z"/>
       </g>
-      <g fill="var(--sage)" stroke="var(--sage-dim)" stroke-width="2.4">
+      <g fill="var(--moss)" stroke="var(--moss-deep)" stroke-width="2.4">
         <use href="#leaf-shape" transform="translate(66 196) rotate(-46) scale(1.35)"/>
         <use href="#leaf-shape" transform="translate(52 160) rotate(-134) scale(-1.35 1.35)"/>
         <use href="#leaf-shape" transform="translate(50 122) rotate(-58) scale(1.3)"/>
@@ -1139,10 +1034,10 @@
     <symbol id="gem" viewBox="0 0 120 120">
       <path d="M60 8 100 40 84 108 36 108 20 40Z" fill="var(--stone-a)"/>
       <path d="M60 8 100 40 60 40Z" fill="var(--stone-b)"/>
-      <path d="M20 40 60 40 36 108Z" fill="#000" opacity="0.22"/>
-      <path d="M60 40 100 40 84 108Z" fill="#fff" opacity="0.13"/>
-      <path d="M60 8 100 40 60 40Z" fill="#fff" opacity="0.28" class="glint"/>
-      <g fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="1">
+      <path d="M20 40 60 40 36 108Z" fill="#000" opacity="0.16"/>
+      <path d="M60 40 100 40 84 108Z" fill="#fff" opacity="0.16"/>
+      <path d="M60 8 100 40 60 40Z" fill="#fff" opacity="0.22"/>
+      <g fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1">
         <path d="M60 8 100 40 84 108 36 108 20 40Z"/>
         <path d="M20 40H100M60 8V108M20 40 36 108M100 40 84 108"/>
       </g>
@@ -1150,38 +1045,21 @@
   </defs>
 </svg>
 
-<div class="curtain" id="curtain">
-  <svg class="draw-seal" viewBox="0 0 240 240" aria-label="L'Eden des Pierres">
-    <g fill="none" stroke="#D2AC63" stroke-width="1.4" stroke-linecap="round">
-      <path data-draw style="--len:700;--dd:0ms" d="M11.8 149 A112 112 0 1 1 228.2 149"/>
-      <path data-draw style="--len:500;--dd:250ms" d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
-      <path data-draw style="--len:420;--dd:150ms" d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48" stroke="#7A9569"/>
-    </g>
-    <g fill="none" stroke="#D2AC63" stroke-width="1.3" stroke-linejoin="round">
-      <path data-draw style="--len:220;--dd:500ms" d="M120 42 134 66 132 104 108 104 106 66Z"/>
-      <path data-draw style="--len:180;--dd:640ms" d="M92 74 104 92 100 110 82 110 80 92Z"/>
-      <path data-draw style="--len:180;--dd:720ms" d="M150 66 160 88 157 110 140 110 138 88Z"/>
-    </g>
-    <g fill="#9DBA8B" stroke="#7A9569" stroke-width="0.9">
-      <use data-pop style="--dd:700ms" href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
-      <use data-pop style="--dd:760ms" href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
-      <use data-pop style="--dd:820ms" href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
-      <use data-pop style="--dd:880ms" href="#leaf-shape" transform="translate(48 163) rotate(-148) scale(-1 1)"/>
-      <use data-pop style="--dd:940ms" href="#leaf-shape" transform="translate(43 148) rotate(-48) scale(1.1)"/>
-      <use data-pop style="--dd:1000ms" href="#leaf-shape" transform="translate(41 132) rotate(-142) scale(-1 1)"/>
-      <use data-pop style="--dd:1060ms" href="#leaf-shape" transform="translate(40 116) rotate(-54) scale(1.05)"/>
-      <use data-pop style="--dd:1120ms" href="#leaf-shape" transform="translate(43 100) rotate(-136) scale(-0.95 0.95)"/>
-      <use data-pop style="--dd:1180ms" href="#leaf-shape" transform="translate(48 86) rotate(-60)"/>
-      <use data-pop style="--dd:1240ms" href="#leaf-shape" transform="translate(56 71) rotate(-130) scale(-0.9 0.9)"/>
-      <use data-pop style="--dd:1300ms" href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
-    </g>
-    <g fill="#D2AC63">
-      <use data-pop style="--dd:1350ms" href="#sparkle-shape" transform="translate(170 62) scale(0.5)"/>
-      <use data-pop style="--dd:1450ms" href="#sparkle-shape" transform="translate(88 50) scale(0.32)"/>
-      <use data-pop style="--dd:1550ms" href="#sparkle-shape" transform="translate(176 98) scale(0.34)"/>
-    </g>
-  </svg>
-  <p class="curtain-word">L'Eden des Pierres</p>
+<div class="cine" id="cine">
+  <canvas class="cine-scene" id="cine-scene" aria-hidden="true"></canvas>
+  <div class="cine-veil" aria-hidden="true"></div>
+  <div class="cine-logo" id="cine-logo">
+    <div class="seal">
+      <svg viewBox="0 0 240 240" role="img" aria-label="L'Eden des Pierres"><use href="#seal-decor"/></svg>
+      <div class="seal-word">
+        <span class="eden">L'Eden</span>
+        <span class="pierres">des Pierres</span>
+        <span class="seal-rule"><i></i><b></b><i></i></span>
+        <span class="sonia">Sonia</span>
+      </div>
+    </div>
+  </div>
+  <p class="cine-word" id="cine-word">L'Eden des Pierres</p>
 </div>
 
 <header class="topbar">
@@ -1210,46 +1088,34 @@
 <main id="accueil">
 
   <section class="hero">
-    <div class="foliage" data-depth="0.12" style="top:-4%;left:-6%;width:min(38vw,420px)" aria-hidden="true">
-      <svg viewBox="0 0 300 320" fill="currentColor">
-        <path d="M20 320C10 240 30 150 90 90c40-40 90-60 140-70-10 60-40 120-90 165-40 36-90 60-120 135Z" opacity=".55"/>
-        <path d="M60 320c0-70 20-140 70-190 30-30 70-50 110-60-20 60-60 110-110 150-40 32-60 60-70 100Z" opacity=".8"/>
-      </svg>
-    </div>
-    <div class="foliage" data-depth="-0.16" style="bottom:-12%;right:-8%;width:min(42vw,460px);transform:scaleX(-1)" aria-hidden="true">
-      <svg viewBox="0 0 300 320" fill="currentColor">
-        <path d="M20 320C10 240 30 150 90 90c40-40 90-60 140-70-10 60-40 120-90 165-40 36-90 60-120 135Z" opacity=".5"/>
-      </svg>
-    </div>
-
     <div class="shell hero-grid">
       <div class="hero-copy">
-        <p class="kicker">Bracelets en pierres naturelles</p>
-        <h1>
-          <span class="line" style="--i:0"><span>Ici, les pierres</span></span>
-          <span class="line" style="--i:1"><span>ne sont pas</span></span>
-          <span class="line" style="--i:2"><span>simplement <em>belles</em>.</span></span>
+        <p class="kicker" id="hero-kicker">Bracelets en pierres naturelles</p>
+        <h1 id="hero-title">
+          <span class="line"><span>Ici, les pierres</span></span>
+          <span class="line"><span>ne sont pas</span></span>
+          <span class="line"><span>simplement <em>belles</em>.</span></span>
         </h1>
-        <p class="hero-sub">Elles racontent une histoire. Peut-être bientôt la vôtre.</p>
-        <div class="hero-actions">
+        <p class="hero-sub" id="hero-sub">Elles racontent une histoire. Peut-être bientôt la vôtre.</p>
+        <div class="hero-actions" id="hero-actions">
           <a class="btn btn-solid" href="#atelier"><span>Composer un bracelet</span></a>
           <a class="btn btn-ghost" href="#histoire"><span>Mon histoire</span></a>
         </div>
-        <div class="hero-meta">
+        <div class="hero-meta" id="hero-meta">
           <div><b>100 %</b><span>Pierres naturelles</span></div>
+          <div><b>Non traitées</b><span>Teintes 100 % naturelles</span></div>
           <div><b>À la main</b><span>Montage perle à perle</span></div>
-          <div><b>Unique</b><span>Aucune pièce identique</span></div>
         </div>
       </div>
 
-      <div class="hero-seal-wrap">
+      <div class="hero-seal-wrap" id="hero-seal-wrap">
         <div class="halo" aria-hidden="true"></div>
-        <svg class="orbit" viewBox="0 0 400 400" fill="var(--gold)" aria-hidden="true">
+        <svg class="orbit" viewBox="0 0 400 400" fill="var(--clay-deep)" aria-hidden="true">
           <circle cx="200" cy="18" r="3"/><circle cx="345" cy="105" r="2.2"/>
           <circle cx="330" cy="300" r="2.6"/><circle cx="122" cy="378" r="1.9"/>
           <circle cx="30" cy="180" r="2.4"/>
         </svg>
-        <svg class="orbit orbit-rev" viewBox="0 0 400 400" fill="var(--sage)" aria-hidden="true">
+        <svg class="orbit" viewBox="0 0 400 400" fill="var(--moss)" aria-hidden="true">
           <circle cx="70" cy="70" r="2"/><circle cx="360" cy="220" r="1.8"/>
           <circle cx="200" cy="392" r="2.2"/>
         </svg>
@@ -1268,7 +1134,7 @@
   </section>
 
   <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
+    <div class="marquee-track" id="marquee-track">
       <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
       <span>Labradorite</span><span>Œil de tigre</span><span>Pierre de lune</span>
       <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
@@ -1277,12 +1143,6 @@
   </div>
 
   <section class="pad" id="histoire">
-    <div class="foliage" data-depth="0.08" style="top:6%;right:2%;width:min(26vw,300px)" aria-hidden="true">
-      <svg viewBox="0 0 300 320" fill="currentColor">
-        <path d="M60 320c0-70 20-140 70-190 30-30 70-50 110-60-20 60-60 110-110 150-40 32-60 60-70 100Z" opacity=".6"/>
-      </svg>
-    </div>
-
     <div class="shell story-grid">
       <div class="story-aside reveal">
         <p class="kicker">L'origine</p>
@@ -1290,17 +1150,17 @@
       </div>
 
       <div class="story-body">
-        <p class="lede reveal" style="--d:80ms">
+        <p class="lede reveal">
           L'Eden des Pierres est né d'une véritable passion pour les pierres naturelles, leurs couleurs,
           leurs nuances, leurs particularités… et de cette envie permanente d'imaginer de nouvelles associations.
         </p>
-        <p class="body-text reveal" style="--d:140ms">
+        <p class="body-text reveal">
           Tout commence par une pierre que l'on repose trois fois avant de la garder. Puis par une deuxième,
           choisie parce qu'elle répond à la première. Le bracelet vient après : il n'est que la conséquence
           d'un accord juste entre deux matières.
         </p>
-        <div class="pill-row reveal" style="--d:200ms">
-          <span class="pill"><i></i>Pierres naturelles</span>
+        <div class="pill-row reveal">
+          <span class="pill"><i></i>Pierres naturelles non traitées</span>
           <span class="pill"><i></i>Perles de qualité supérieure</span>
           <span class="pill"><i></i>Montage perle à perle</span>
           <span class="pill"><i></i>Pièces uniques</span>
@@ -1312,28 +1172,28 @@
   <section class="pad atelier" id="atelier">
     <div class="shell atelier-grid">
       <div class="atelier-copy">
-        <p class="kicker">L'atelier</p>
-        <h2>Changez la pierre,<br>le bracelet suit.</h2>
-        <p class="body-text">
+        <p class="kicker reveal">L'atelier</p>
+        <h2 class="reveal">Changez la pierre,<br>le bracelet suit.</h2>
+        <p class="body-text reveal">
           Chaque modèle part d'une pierre dominante, puis d'un accord : une nuance plus claire pour
-          respirer, une plus profonde pour tenir l'ensemble, et parfois une perle dorée pour la lumière.
-          Touchez une pierre pour voir le bracelet se recomposer.
+          respirer, une plus profonde pour tenir l'ensemble. Touchez une pierre pour voir le bracelet
+          se recomposer — un aperçu stylisé, pas une photo.
         </p>
 
-        <div class="swatches" id="swatches" role="group" aria-label="Choisir une pierre"></div>
+        <div class="swatches reveal" id="swatches" role="group" aria-label="Choisir une pierre"></div>
 
-        <p class="atelier-note">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2" aria-hidden="true">
+        <p class="atelier-note reveal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--clay-deep)" stroke-width="1.2" aria-hidden="true">
             <circle cx="12" cy="12" r="9"/><path d="M12 8v9M12 6.4v.2" stroke-linecap="round"/>
           </svg>
-          Aperçu de composition — les teintes réelles varient d'une pierre à l'autre.
+          Pierres naturelles non traitées — les teintes réelles varient légèrement d'une pierre à l'autre.
         </p>
       </div>
 
-      <div class="bracelet-stage">
+      <div class="bracelet-stage reveal">
         <svg class="bracelet" viewBox="0 0 400 400" role="img" aria-labelledby="bracelet-title">
-          <title id="bracelet-title">Aperçu d'un bracelet de perles en pierres naturelles</title>
-          <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(210,172,99,0.22)" stroke-width="1"/>
+          <title id="bracelet-title">Aperçu stylisé d'un bracelet de perles en pierres naturelles</title>
+          <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(156,133,87,0.25)" stroke-width="1"/>
           <g id="beads"></g>
         </svg>
         <div class="bracelet-core">
@@ -1347,29 +1207,29 @@
   <section class="pad" id="selection">
     <div class="shell">
       <p class="kicker reveal">Au cœur de mon univers</p>
-      <h2 class="reveal" style="--d:60ms;font-size:clamp(2.2rem,4vw,3.4rem);margin-top:1rem">L'exigence de la sélection</h2>
-      <p class="body-text reveal" style="--d:120ms;margin-top:1.4rem">
-        Je privilégie des pierres naturelles, choisies avec soin auprès de mes fournisseurs, ainsi que des
-        perles de belle qualité — souvent de qualité supérieure — sélectionnées pour leurs nuances, leur éclat,
-        leur caractère et leur rendu une fois travaillées. Parce qu'une pierre naturelle n'est jamais
-        parfaitement identique à une autre, j'aime justement ces petites différences qui rendent chaque
-        création singulière.
+      <h2 class="reveal" style="font-size:clamp(2.2rem,4vw,3.4rem);margin-top:1rem">L'exigence de la sélection</h2>
+      <p class="body-text reveal" style="margin-top:1.4rem">
+        Je privilégie des pierres naturelles non traitées, choisies avec soin auprès de mes fournisseurs,
+        ainsi que des perles de belle qualité — souvent de qualité supérieure — sélectionnées pour leurs
+        nuances, leur éclat, leur caractère et leur rendu une fois travaillées. Parce qu'une pierre naturelle
+        n'est jamais parfaitement identique à une autre, j'aime justement ces petites différences qui rendent
+        chaque création singulière.
       </p>
 
       <div class="criteria">
-        <article class="criterion reveal" style="--d:0ms">
+        <article class="criterion reveal">
           <b>Teinte</b>
           <span>Deux améthystes du même lot n'ont jamais tout à fait le même violet.</span>
         </article>
-        <article class="criterion reveal" style="--d:70ms">
+        <article class="criterion reveal">
           <b>Dessin</b>
           <span>Les veines et les stries tracent un motif qui n'existera qu'une fois.</span>
         </article>
-        <article class="criterion reveal" style="--d:140ms">
+        <article class="criterion reveal">
           <b>Inclusion</b>
           <span>Une inclusion n'est pas un défaut : c'est la signature de la pierre.</span>
         </article>
-        <article class="criterion reveal" style="--d:210ms">
+        <article class="criterion reveal">
           <b>Transparence</b>
           <span>Du translucide au laiteux, la lumière ne traverse jamais deux pierres pareil.</span>
         </article>
@@ -1384,41 +1244,41 @@
           <p class="kicker">Les pierres que je travaille</p>
           <h2>Un vocabulaire de couleurs</h2>
         </div>
-        <p class="reveal" style="--d:80ms">Six familles qui reviennent le plus souvent dans mes bracelets — chacune apporte sa matière et son tempérament.</p>
+        <p class="reveal">Six familles qui reviennent le plus souvent dans mes bracelets — chacune apporte sa matière et son tempérament, sans jamais être traitée.</p>
       </div>
 
       <div class="stone-grid" id="stone-grid">
-        <article class="stone-card reveal" data-tilt style="--stone-a:#8E7BB5;--stone-b:#B7A7D8">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#9C8FB8;--stone-b:#C3B9D8">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Améthyste <small>Quartz violet</small></h3>
           <p>Du lilas pâle au violet profond selon l'endroit où l'on coupe le cristal. Se marie sans effort avec l'argent et les perles claires.</p>
         </article>
 
-        <article class="stone-card reveal" data-tilt style="--d:60ms;--stone-a:#D79FA3;--stone-b:#F0C7C9">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#CBA9A6;--stone-b:#E3CAC7">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Quartz rose <small>Quartz laiteux</small></h3>
           <p>Un rose poudré, rarement transparent. Sa légère brume interne est précisément ce qui le rend doux à porter.</p>
         </article>
 
-        <article class="stone-card reveal" data-tilt style="--d:120ms;--stone-a:#D9A94C;--stone-b:#F0CE84">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#C7A25F;--stone-b:#E2C288">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Citrine <small>Quartz miel</small></h3>
           <p>La pierre la plus solaire du panier. Elle réchauffe instantanément une composition trop sage.</p>
         </article>
 
-        <article class="stone-card reveal" data-tilt style="--stone-a:#5F7B8E;--stone-b:#96B6C6">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#7E97A0;--stone-b:#AFC2C8">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Labradorite <small>Feldspath</small></h3>
           <p>Grise au repos, elle s'allume en bleu ou en vert dès qu'on la tourne vers la lumière. Ma préférée pour les pièces discrètes.</p>
         </article>
 
-        <article class="stone-card reveal" data-tilt style="--d:60ms;--stone-a:#9A6B3A;--stone-b:#C79355">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#93714A;--stone-b:#BC9866">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Œil de tigre <small>Quartz chatoyant</small></h3>
           <p>Ses bandes dorées bougent avec le poignet. Une pierre franche, qui structure les modèles plus masculins.</p>
         </article>
 
-        <article class="stone-card reveal" data-tilt style="--d:120ms;--stone-a:#C9CBC2;--stone-b:#EDEEE8">
+        <article class="stone-card reveal" data-tilt style="--stone-a:#C6C1B2;--stone-b:#E9E5D9">
           <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
           <h3>Pierre de lune <small>Feldspath opalescent</small></h3>
           <p>Blanche, laiteuse, traversée d'un reflet bleuté. Elle demande une monture sobre pour ne pas être écrasée.</p>
@@ -1430,8 +1290,8 @@
   <section class="statement">
     <div class="shell">
       <p class="kicker reveal">La signature de la maison</p>
-      <blockquote class="reveal" style="--d:80ms">Des pierres naturelles. Des créations qui ont leur <em>propre identité</em>.</blockquote>
-      <cite class="reveal" style="--d:160ms">Sonia — L'Eden des Pierres</cite>
+      <blockquote class="reveal">Des pierres naturelles. Des créations qui ont leur <em>propre identité</em>.</blockquote>
+      <cite class="reveal">Sonia — L'Eden des Pierres</cite>
     </div>
   </section>
 
@@ -1439,20 +1299,20 @@
     <div class="shell custom-grid">
       <div class="custom-copy">
         <p class="kicker reveal">Sur mesure</p>
-        <h2 class="reveal" style="--d:60ms">Votre histoire, dans une pierre</h2>
-        <p class="reveal" style="--d:120ms">
+        <h2 class="reveal">Votre histoire, dans une pierre</h2>
+        <p class="reveal">
           Une teinte précise, un tour de poignet particulier, une pierre qui vous suit depuis longtemps :
           les créations sur mesure partent toujours d'une conversation, jamais d'un catalogue.
         </p>
 
         <ol class="steps">
           <li class="reveal"><div><strong>On échange</strong><span>Vous me dites la couleur, le tour de poignet, l'occasion — ou simplement la pierre qui vous attire.</span></div></li>
-          <li class="reveal" style="--d:70ms"><div><strong>Je sélectionne</strong><span>Je choisis les pierres et les perles une à une, et je vous envoie une photo de la composition avant montage.</span></div></li>
-          <li class="reveal" style="--d:140ms"><div><strong>Je monte la pièce</strong><span>Assemblage à la main, finitions vérifiées, puis expédition dans son écrin.</span></div></li>
+          <li class="reveal"><div><strong>Je sélectionne</strong><span>Je choisis les pierres et les perles une à une, et je vous envoie une photo de la composition avant montage.</span></div></li>
+          <li class="reveal"><div><strong>Je monte la pièce</strong><span>Assemblage à la main, finitions vérifiées, puis expédition dans son écrin.</span></div></li>
         </ol>
       </div>
 
-      <div class="contact-card reveal" id="contact" style="--d:80ms">
+      <div class="contact-card reveal" id="contact">
         <div class="seal">
           <svg viewBox="0 0 240 240" aria-hidden="true"><use href="#seal-decor"/></svg>
           <div class="seal-word">
@@ -1497,8 +1357,9 @@
       <span>© L'Eden des Pierres</span>
     </div>
     <p class="demo-flag">
-      Maquette de démonstration — les pierres sont des illustrations à remplacer par vos photos de
-      créations, et les coordonnées (email, Instagram) restent à renseigner.
+      Maquette de démonstration — la scène d'ouverture (pierre mouillée) est générée par ordinateur,
+      aucun fichier à fournir. Les pierres du configurateur sont des illustrations stylisées à remplacer
+      par vos photos de créations. Coordonnées (email, Instagram) à renseigner.
     </p>
   </div>
 </footer>
@@ -1506,6 +1367,8 @@
 <script>
   (function () {
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var hasGSAP = typeof gsap !== 'undefined';
+    if (hasGSAP && typeof ScrollTrigger !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
     /* ---- Menu mobile ---- */
     var toggle = document.getElementById('menu-toggle');
@@ -1525,27 +1388,219 @@
       }
     });
 
-    /* ---- Rideau : retrait définitif après l'animation ---- */
-    var curtain = document.getElementById('curtain');
-    if (curtain) {
-      if (reduce) {
-        curtain.remove();
-      } else {
-        setTimeout(function () { curtain.remove(); }, 3200);
+    /* ================= Scène d'ouverture : pierre mouillée en WebGL ================= */
+    var cine = document.getElementById('cine');
+    var sceneCanvas = document.getElementById('cine-scene');
+    var glRaf = null;
+
+    function startStoneScene(canvas) {
+      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) return false;
+
+      var vertSrc =
+        'attribute vec2 aPos;' +
+        'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
+
+      var fragSrc =
+        'precision highp float;' +
+        'uniform vec2 uRes;' +
+        'uniform float uTime;' +
+        'float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }' +
+        'float noise(vec2 p){' +
+        '  vec2 i = floor(p); vec2 f = fract(p);' +
+        '  float a = hash(i), b = hash(i+vec2(1.0,0.0));' +
+        '  float c = hash(i+vec2(0.0,1.0)), d = hash(i+vec2(1.0,1.0));' +
+        '  vec2 u = f*f*(3.0-2.0*f);' +
+        '  return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;' +
+        '}' +
+        'mat2 rot = mat2(0.8,0.6,-0.6,0.8);' +
+        'float fbm(vec2 p){' +
+        '  float v = 0.0; float amp = 0.5;' +
+        '  for (int i = 0; i < 6; i++) { v += amp*noise(p); p = rot*p*2.0 + 10.0; amp *= 0.55; }' +
+        '  return v;' +
+        '}' +
+        'void main(){' +
+        '  vec2 uv = gl_FragCoord.xy / uRes.xy;' +
+        '  vec2 p = (gl_FragCoord.xy - 0.5*uRes.xy) / min(uRes.x,uRes.y) * 5.2;' +
+        '  p += vec2(uTime*0.02, uTime*0.035);' +
+        '  vec2 q = vec2(fbm(p), fbm(p+vec2(5.2,1.3)));' +
+        '  vec2 r = vec2(fbm(p+2.6*q+vec2(1.7,9.2)+0.12*uTime), fbm(p+2.6*q+vec2(8.3,2.8)+0.1*uTime));' +
+        '  float f = fbm(p + 2.8*r);' +
+        '  float micro = fbm(p*7.5) * 0.09;' +
+        '  vec3 stoneDeep = vec3(0.50,0.46,0.40);' +
+        '  vec3 stoneMid  = vec3(0.71,0.66,0.56);' +
+        '  vec3 stonePale = vec3(0.92,0.88,0.78);' +
+        '  vec3 col = mix(stoneDeep, stoneMid, smoothstep(0.18,0.60,f+micro));' +
+        '  col = mix(col, stonePale, smoothstep(0.54,0.90,f+0.14*r.x+micro));' +
+        '  float e = 0.0018;' +
+        '  vec2 fp = p*1.9 + vec2(0.0,-uTime*0.62) + r*0.55;' +
+        '  float wx1 = fbm(fp+vec2(e,0.0)); float wx2 = fbm(fp-vec2(e,0.0));' +
+        '  float wy1 = fbm(fp+vec2(0.0,e)); float wy2 = fbm(fp-vec2(0.0,e));' +
+        '  vec3 normal = normalize(vec3(-(wx1-wx2)*13.0, -(wy1-wy2)*13.0, 1.0));' +
+        '  vec3 lightDir = normalize(vec3(0.30,0.60,0.70));' +
+        '  float nl = max(dot(normal,lightDir), 0.0);' +
+        '  float spec = pow(nl, 38.0);' +
+        '  float glint = pow(nl, 120.0);' +
+        '  float sheen = pow(nl, 4.0) * 0.16;' +
+        '  col += vec3(1.0,0.98,0.93) * (spec*0.6 + glint*0.8 + sheen);' +
+        '  float wet = smoothstep(0.42, 0.78, fbm(fp*0.9));' +
+        '  col = mix(col, col*0.86 + vec3(0.05,0.05,0.045), wet*0.5);' +
+        '  float vig = smoothstep(1.3, 0.34, length(uv-0.5));' +
+        '  col *= mix(0.72, 1.0, vig);' +
+        '  float grain = hash(gl_FragCoord.xy + uTime*57.0);' +
+        '  col += (grain-0.5) * 0.024;' +
+        '  gl_FragColor = vec4(col, 1.0);' +
+        '}';
+
+      function compile(type, src) {
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { return null; }
+        return s;
       }
+
+      var vs = compile(gl.VERTEX_SHADER, vertSrc);
+      var fs = compile(gl.FRAGMENT_SHADER, fragSrc);
+      if (!vs || !fs) return false;
+
+      var prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+      gl.useProgram(prog);
+
+      var quad = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+      var aPos = gl.getAttribLocation(prog, 'aPos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      var uRes = gl.getUniformLocation(prog, 'uRes');
+      var uTime = gl.getUniformLocation(prog, 'uTime');
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+
+      function resize() {
+        var w = Math.round(canvas.clientWidth * dpr);
+        var h = Math.round(canvas.clientHeight * dpr);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w; canvas.height = h;
+          gl.viewport(0, 0, w, h);
+        }
+      }
+
+      var start = performance.now();
+      function draw() {
+        resize();
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uTime, (performance.now() - start) / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        glRaf = requestAnimationFrame(draw);
+      }
+      draw();
+      return true;
+    }
+
+    function paintStillFallback(canvas) {
+      var ctx = canvas.getContext('2d');
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      canvas.width = w; canvas.height = h;
+      var g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#DED2B4');
+      g.addColorStop(0.5, '#B7AA88');
+      g.addColorStop(1, '#8F8267');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    var sceneStarted = false;
+    if (!reduce) {
+      sceneStarted = startStoneScene(sceneCanvas);
+      if (!sceneStarted) paintStillFallback(sceneCanvas);
+    } else {
+      paintStillFallback(sceneCanvas);
+    }
+
+    /* ---- Timeline d'ouverture (GSAP) ---- */
+    if (reduce) {
+      cine.style.display = 'none';
+    } else if (hasGSAP) {
+      gsap.set('#cine-logo', { opacity: 0, scale: 1.08 });
+      gsap.set('#cine-word', { opacity: 0, y: 8 });
+      gsap.set('#hero-title .line > span', { yPercent: 105 });
+      gsap.set(['#hero-sub', '#hero-actions', '#hero-meta'], { opacity: 0, y: 16 });
+      gsap.set('#hero-seal-wrap', { opacity: 0, scale: 0.94 });
+
+      var tl = gsap.timeline({ delay: 0.1 });
+      tl.to('#cine-logo', { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }, 1.5)
+        .to('#cine-word', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 1.8)
+        .to('#cine', { opacity: 0, scale: 1.05, duration: 0.9, ease: 'power2.inOut' }, 2.6)
+        .add(function () {
+          cine.style.display = 'none';
+          if (glRaf) cancelAnimationFrame(glRaf);
+        }, 3.5)
+        .to('#hero-seal-wrap', { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }, 3.35)
+        .to('#hero-title .line > span', { yPercent: 0, duration: 0.85, ease: 'power3.out', stagger: 0.11 }, 3.4)
+        .to('#hero-sub', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.75)
+        .to('#hero-actions', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.88)
+        .to('#hero-meta', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 4.0);
+    } else {
+      cine.style.display = 'none';
+    }
+
+    /* ---- Révélations au défilement (GSAP ScrollTrigger) ----
+       Règle de la maison : rien ne reste invisible en attendant un scroll.
+       On ne masque donc QUE ce qui est déjà hors de l'écran au chargement,
+       et un filet de sécurité rétablit tout si un déclencheur ne part pas. */
+    if (!reduce && hasGSAP && typeof ScrollTrigger !== 'undefined') {
+      var pending = [];
+
+      gsap.utils.toArray('.reveal, .stone-card').forEach(function (el, i) {
+        var box = el.getBoundingClientRect();
+        if (box.top < window.innerHeight * 0.92) return;
+
+        var tween = gsap.fromTo(el, { opacity: 0, y: 24 }, {
+          opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+          delay: (i % 3) * 0.07,
+          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+        });
+        pending.push({ el: el, tween: tween });
+      });
+
+      window.addEventListener('load', function () {
+        setTimeout(function () { ScrollTrigger.refresh(); }, 200);
+      });
+
+      setTimeout(function () {
+        pending.forEach(function (p) {
+          if (p.tween.progress() === 0 && !p.tween.isActive()) {
+            gsap.set(p.el, { opacity: 1, y: 0, clearProps: 'transform' });
+          }
+        });
+      }, 8000);
+    }
+
+    /* ---- Bandeau défilant (GSAP) ---- */
+    var track = document.getElementById('marquee-track');
+    if (!reduce && hasGSAP) {
+      var loopTween = gsap.to(track, { xPercent: -50, duration: 32, ease: 'none', repeat: -1 });
+      track.parentElement.addEventListener('mouseenter', function () { loopTween.pause(); });
+      track.parentElement.addEventListener('mouseleave', function () { loopTween.play(); });
     }
 
     /* ---- Atelier : composition du bracelet ---- */
     var stones = [
-      { name: 'Améthyste', note: 'Quartz violet', tones: ['#8E7BB5', '#6E5C96', '#B7A7D8', '#D9CFEC'] },
-      { name: 'Quartz rose', note: 'Quartz laiteux', tones: ['#D79FA3', '#C4848A', '#F0C7C9', '#F7E3E3'] },
-      { name: 'Citrine', note: 'Quartz miel', tones: ['#D9A94C', '#B98A34', '#F0CE84', '#F7E6BC'] },
-      { name: 'Labradorite', note: 'Feldspath', tones: ['#5F7B8E', '#445C6D', '#96B6C6', '#C6D6DE'] },
-      { name: 'Œil de tigre', note: 'Quartz chatoyant', tones: ['#9A6B3A', '#7A5228', '#C79355', '#E0BA85'] },
-      { name: 'Pierre de lune', note: 'Feldspath opalescent', tones: ['#C9CBC2', '#AFB2A8', '#EDEEE8', '#FFFFFF'] }
+      { name: 'Améthyste', note: 'Quartz violet', tones: ['#9C8FB8', '#7A6E93', '#C3B9D8', '#E4DEEF'] },
+      { name: 'Quartz rose', note: 'Quartz laiteux', tones: ['#CBA9A6', '#B08986', '#E3CAC7', '#F3E4E2'] },
+      { name: 'Citrine', note: 'Quartz miel', tones: ['#C7A25F', '#A88447', '#E2C288', '#F2E0B8'] },
+      { name: 'Labradorite', note: 'Feldspath', tones: ['#7E97A0', '#617882', '#AFC2C8', '#D6E1E4'] },
+      { name: 'Œil de tigre', note: 'Quartz chatoyant', tones: ['#93714A', '#785B39', '#BC9866', '#DABE8F'] }
     ];
 
-    var GOLD = '#D2AC63';
+    var CLAY = '#9C8557';
     var beadsGroup = document.getElementById('beads');
     var swatchWrap = document.getElementById('swatches');
     var nameEl = document.getElementById('stone-name');
@@ -1565,30 +1620,39 @@
       bead.setAttribute('cx', cx.toFixed(2));
       bead.setAttribute('cy', cy.toFixed(2));
       bead.setAttribute('r', rad);
-      bead.style.transitionDelay = (i * 26) + 'ms';
       beadsGroup.appendChild(bead);
 
       var shine = document.createElementNS(NS, 'circle');
       shine.setAttribute('cx', (cx - rad * 0.3).toFixed(2));
       shine.setAttribute('cy', (cy - rad * 0.36).toFixed(2));
       shine.setAttribute('r', (rad * 0.3).toFixed(2));
-      shine.setAttribute('fill', 'rgba(255,255,255,0.4)');
+      shine.setAttribute('fill', 'rgba(255,255,255,0.5)');
       beadsGroup.appendChild(shine);
 
       var shade = document.createElementNS(NS, 'circle');
       shade.setAttribute('cx', (cx + rad * 0.26).toFixed(2));
       shade.setAttribute('cy', (cy + rad * 0.32).toFixed(2));
       shade.setAttribute('r', (rad * 0.5).toFixed(2));
-      shade.setAttribute('fill', 'rgba(0,0,0,0.22)');
+      shade.setAttribute('fill', 'rgba(50,44,36,0.16)');
       beadsGroup.insertBefore(shade, shine);
 
-      beads.push(bead);
+      beads.push({ el: bead, index: i });
     }
 
-    function paint(stone) {
-      beads.forEach(function (bead, idx) {
-        var color = idx % 7 === 3 ? GOLD : stone.tones[idx % stone.tones.length];
-        bead.setAttribute('fill', color);
+    function paint(stone, animated) {
+      beads.forEach(function (b, idx) {
+        var color = idx % 7 === 3 ? CLAY : stone.tones[idx % stone.tones.length];
+        if (animated && hasGSAP && !reduce) {
+          gsap.to(b.el, {
+            duration: 0.5, ease: 'back.out(1.6)',
+            delay: Math.min(idx, COUNT - idx) * 0.018,
+            scale: 1.18,
+            onStart: function () { b.el.setAttribute('fill', color); },
+            yoyo: true, repeat: 1
+          });
+        } else {
+          b.el.setAttribute('fill', color);
+        }
       });
       nameEl.textContent = stone.name;
       noteEl.textContent = stone.note;
@@ -1603,81 +1667,71 @@
       btn.addEventListener('click', function () {
         swatchWrap.querySelectorAll('.swatch').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
         btn.setAttribute('aria-pressed', 'true');
-        paint(stone);
+        paint(stone, true);
       });
       swatchWrap.appendChild(btn);
     });
 
-    paint(stones[0]);
+    paint(stones[0], false);
 
-    /* ---- Poussière lumineuse ---- */
+    /* ---- Poussière lumineuse, discrète ---- */
     var canvas = document.getElementById('dust');
     var ctx = canvas.getContext('2d');
     var motes = [];
     var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function sizeCanvas() {
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      var target = w < 700 ? 26 : 58;
+      var target = w < 700 ? 14 : 30;
       motes = [];
       for (var i = 0; i < target; i++) {
         motes.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: Math.random() * 1.8 + 0.5,
-          sp: Math.random() * 0.22 + 0.06,
-          sway: Math.random() * 0.5 + 0.2,
-          ph: Math.random() * Math.PI * 2,
-          gold: Math.random() > 0.55
+          x: Math.random() * w, y: Math.random() * h,
+          r: Math.random() * 1.5 + 0.4,
+          sp: Math.random() * 0.14 + 0.04,
+          sway: Math.random() * 0.4 + 0.15,
+          ph: Math.random() * Math.PI * 2
         });
       }
     }
 
     var t = 0;
     function frame() {
-      t += 0.006;
+      t += 0.005;
       ctx.clearRect(0, 0, w, h);
       for (var i = 0; i < motes.length; i++) {
         var m = motes[i];
         m.y -= m.sp;
-        if (m.y < -12) { m.y = h + 12; m.x = Math.random() * w; }
-        var x = m.x + Math.sin(t * 1.4 + m.ph) * (m.sway * 22);
-        var alpha = 0.18 + Math.abs(Math.sin(t * 1.1 + m.ph)) * 0.42;
+        if (m.y < -10) { m.y = h + 10; m.x = Math.random() * w; }
+        var x = m.x + Math.sin(t * 1.2 + m.ph) * (m.sway * 18);
+        var alpha = 0.08 + Math.abs(Math.sin(t * 0.9 + m.ph)) * 0.16;
         ctx.beginPath();
         ctx.arc(x, m.y, m.r, 0, Math.PI * 2);
-        ctx.fillStyle = m.gold
-          ? 'rgba(210,172,99,' + alpha.toFixed(3) + ')'
-          : 'rgba(157,186,139,' + (alpha * 0.8).toFixed(3) + ')';
+        ctx.fillStyle = 'rgba(156,133,87,' + alpha.toFixed(3) + ')';
         ctx.fill();
       }
-      raf = requestAnimationFrame(frame);
+      dRaf = requestAnimationFrame(frame);
     }
 
-    var raf = null;
+    var dRaf = null;
     if (!reduce) {
       sizeCanvas();
       window.addEventListener('resize', sizeCanvas);
       frame();
       document.addEventListener('visibilitychange', function () {
-        if (document.hidden) { cancelAnimationFrame(raf); }
-        else { raf = requestAnimationFrame(frame); }
+        if (document.hidden) { cancelAnimationFrame(dRaf); }
+        else { dRaf = requestAnimationFrame(frame); }
       });
     } else {
       canvas.style.display = 'none';
     }
 
-    /* ---- Barre de progression + parallaxe ---- */
+    /* ---- Barre de progression ---- */
     var bar = document.getElementById('progress');
-    var layers = Array.prototype.slice.call(document.querySelectorAll('.foliage'));
-    var braceletSvg = document.querySelector('.bracelet');
-    var sealWrap = document.querySelector('.hero-seal-wrap');
     var ticking = false;
 
     function onScroll() {
@@ -1687,26 +1741,6 @@
         var max = document.documentElement.scrollHeight - window.innerHeight;
         var p = max > 0 ? window.scrollY / max : 0;
         bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
-
-        if (!reduce) {
-          for (var i = 0; i < layers.length; i++) {
-            var el = layers[i];
-            var d = parseFloat(el.dataset.depth || '0.1');
-            var base = el.style.transform.indexOf('scaleX(-1)') > -1 ? ' scaleX(-1)' : '';
-            el.style.transform = 'translate3d(0,' + (window.scrollY * d).toFixed(1) + 'px,0)' + base;
-          }
-
-          /* Le sceau s'éloigne doucement, le bracelet tourne avec le défilement */
-          if (sealWrap) {
-            var hf = Math.min(window.scrollY / window.innerHeight, 1);
-            sealWrap.style.transform = 'translate3d(0,' + (hf * 60).toFixed(1) + 'px,0) scale(' + (1 - hf * 0.08).toFixed(3) + ')';
-          }
-          if (braceletSvg) {
-            var r = braceletSvg.getBoundingClientRect();
-            var through = (window.innerHeight - r.top) / (window.innerHeight + r.height);
-            braceletSvg.style.transform = 'rotate(' + (through * 46).toFixed(2) + 'deg)';
-          }
-        }
         ticking = false;
       });
     }
@@ -1724,8 +1758,8 @@
           card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
           card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
           card.style.transform =
-            'perspective(900px) rotateY(' + ((px - 0.5) * 7).toFixed(2) + 'deg) rotateX(' +
-            ((0.5 - py) * 7).toFixed(2) + 'deg) translateY(-4px)';
+            'perspective(900px) rotateY(' + ((px - 0.5) * 6).toFixed(2) + 'deg) rotateX(' +
+            ((0.5 - py) * 6).toFixed(2) + 'deg) translateY(-4px)';
         });
         card.addEventListener('pointerleave', function () {
           card.style.transform = '';
