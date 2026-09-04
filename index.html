@@ -224,6 +224,22 @@
     white-space: nowrap;
   }
 
+  /* Repli sans GSAP : si la librairie n'est pas chargée (CDN bloqué, hors ligne),
+     l'ouverture se joue quand même, en CSS pur. */
+
+  .cine.no-gsap { animation: cine-out 900ms var(--ease) 2600ms forwards; }
+
+  .cine.no-gsap .cine-logo {
+    animation: cine-logo-in 1000ms var(--ease) 1500ms forwards;
+    scale: 1.08;
+  }
+
+  .cine.no-gsap .cine-word { animation: cine-word-in 700ms var(--ease) 1800ms forwards; }
+
+  @keyframes cine-logo-in { to { opacity: 1; scale: 1; } }
+  @keyframes cine-word-in { from { opacity: 0; translate: -50% 8px; } to { opacity: 1; translate: -50% 0; } }
+  @keyframes cine-out { to { opacity: 0; scale: 1.05; visibility: hidden; } }
+
   /* ============ Sceau / logo — géométrie inchangée, rendu affiné ============ */
 
   .seal {
@@ -1548,7 +1564,13 @@
         .to('#hero-actions', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.88)
         .to('#hero-meta', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 4.0);
     } else {
-      cine.style.display = 'none';
+      /* GSAP absent (CDN bloqué, hors ligne, file://) : on joue quand même
+         l'ouverture en CSS plutôt que de la sauter silencieusement. */
+      cine.classList.add('no-gsap');
+      setTimeout(function () {
+        cine.style.display = 'none';
+        if (glRaf) cancelAnimationFrame(glRaf);
+      }, 3600);
     }
 
     /* ---- Révélations au défilement (GSAP ScrollTrigger) ----
