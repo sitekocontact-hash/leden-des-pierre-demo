@@ -66,6 +66,19 @@ ils restent nets à toute taille et se colorent via les variables CSS.
 - Coordonnées : email et compte Instagram
 - Éventuellement : tarifs, délais de fabrication, conditions d'envoi
 
+## Skills de design installés
+
+Le dépôt embarque deux compétences sous `.claude/skills/` (voir leur README) :
+
+- **`impeccable`** — direction artistique et contrôle qualité, avec ses commandes
+  `/impeccable polish`, `audit`, `critique`, `animate`, `bolder`, `quieter`, `harden`.
+- **`ui-ux-pro-max`** — base consultable de styles, palettes, associations de polices,
+  règles UX, presets d'animation.
+
+Les utiliser pour toute nouvelle page ou refonte de ce projet : elles priment sur les
+réflexes par défaut, mais **jamais sur le brief de marque ci-dessus** (direction nocturne,
+animations obligatoires, logo reconstitué en SVG).
+
 ## Conventions techniques
 
 - HTML/CSS/JS autonome, sans framework ni build. Tout tient dans `index.html`.
