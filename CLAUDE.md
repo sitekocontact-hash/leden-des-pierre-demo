@@ -25,9 +25,11 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
 - **Ambiance** : nature et minéral, immersif, **clair et zen**. Lumière douce, contrastes
   bas, matière plutôt que couleur. Le site respire le bien-être, pas la bijouterie.
 - **Parti pris chromatique** : jour. Grès pâle, argile, taupe, or patiné très désaturé,
-  encre chaude pour le texte. **Jamais de fond vert**, jamais de couleur saturée ou
-  « boostée » — la marque vend des pierres **100 % naturellement teintées, non traitées**,
-  le visuel doit rester fidèle à ça.
+  encre chaude pour le texte. Jamais de couleur saturée ou « boostée » — la marque vend des
+  pierres **100 % naturellement teintées, non traitées**, le visuel doit rester fidèle à ça.
+  La couleur vient de l'**écart entre une lumière chaude et une ombre froide**, pas de la
+  saturation : c'est ce qui donne de la richesse à une scène naturelle sans la rendre criarde.
+  Le gris-vert de lichen est admis en accent (feuillage) ; pas d'aplat vert vif en fond.
 - **Un seul temps sombre** assumé dans la page : le bandeau de la phrase signature.
 - **Animations attendues** (le client en veut, explicitement), toutes en **GSAP** :
   - **Ouverture cinématographique** : une scène de pierre mouillée plein écran pendant
@@ -39,8 +41,16 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
     au survol, apparitions progressives au scroll via **ScrollTrigger**.
   - Une **interaction réelle** : l'atelier où l'on change la pierre et où les perles du
     bracelet se recomposent en cascade.
-  - **Profondeur du hero** : six plans (ciel, falaise et cascade, brume, feuillage, pierres
-    de premier plan, grain) qui glissent les uns sur les autres à la souris. Amplitude
+  - **Cascade en fond du hero** : une chute d'eau animée **en continu** derrière le texte,
+    générée par un shader WebGL (parois de roche, lèvre en haut, lame qui descend, écume au
+    pied). Elle ne s'arrête jamais tant que le visiteur reste sur la section. Écoulement lent
+    et discret : le texte doit rester lisible sans effort. Garde-fous obligatoires —
+    demi-résolution, 3 octaves de bruit, 30 images/seconde, arrêt par IntersectionObserver
+    dès que le hero sort de l'écran, et **repli automatique** qui fige l'eau sur sa dernière
+    image si la machine ne tient pas ~24 im/s. En `prefers-reduced-motion`, une seule image
+    est peinte puis plus rien.
+  - **Profondeur du hero** : les plans (cascade, brume, feuillage, pierres de premier plan,
+    grain) glissent les uns sur les autres à la souris. Amplitude
     maximale ~10 px sur le plan le plus profond, lissage à 6 % par image : la scène dérive
     avec une inertie de caméra, elle ne suit pas le curseur. Les plans avant partent à
     l'inverse des plans arrière. Sans souris, dérive lente et autonome.

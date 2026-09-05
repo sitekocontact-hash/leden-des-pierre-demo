@@ -480,42 +480,19 @@
      en CSS sur un calque qui bouge : un filter: blur() recalculé à chaque image
      sur une surface plein écran effondre la fluidité (et gèle GSAP au passage). */
   .layer-sky      { background: linear-gradient(178deg, #F4EEE0 0%, #EAE1CD 46%, #E0D6BE 100%); }
-  .layer-cliff    { opacity: 1; }
-  .layer-mist     { opacity: 0.72; }
-  .layer-canopy   { opacity: 0.6; }
+  .layer-water    { opacity: 1; }
+  .layer-mist     { opacity: 0.42; }
+  .layer-canopy   { opacity: 0.72; }
   .layer-stones   { opacity: 0.5; }
   .layer-grain    { opacity: 0.32; will-change: auto; }
-
-  /* La chute : fines veines qui descendent, seule chose réellement animée du décor */
-  .fall-flow {
-    position: absolute;
-    top: 6%;
-    left: 56.5%;
-    width: 11%;
-    height: 62%;
-    opacity: 0.5;
-    background-image: repeating-linear-gradient(
-      177deg,
-      rgba(255, 255, 255, 0) 0px,
-      rgba(255, 255, 255, 0.5) 2px,
-      rgba(255, 255, 255, 0) 7px,
-      rgba(255, 255, 255, 0) 15px);
-    background-size: 100% 90px;
-    filter: blur(2.4px);
-    animation: fall-run 2.6s linear infinite;
-    -webkit-mask-image: radial-gradient(58% 88% at 50% 42%, #000 30%, transparent 78%);
-    mask-image: radial-gradient(58% 88% at 50% 42%, #000 30%, transparent 78%);
-  }
-
-  @keyframes fall-run { to { background-position: 0 90px; } }
 
   /* Voile papier : garde le texte lisible et raccorde la scène au reste de la page */
   .scene-veil {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(96deg, rgba(250, 247, 239, 0.93) 0%, rgba(250, 247, 239, 0.66) 32%, rgba(250, 247, 239, 0.12) 60%, rgba(250, 247, 239, 0.22) 100%),
-      linear-gradient(180deg, rgba(250, 247, 239, 0.34) 0%, transparent 30%, rgba(250, 247, 239, 0.8) 93%, var(--paper) 100%);
+      linear-gradient(96deg, rgba(250, 247, 239, 0.92) 0%, rgba(250, 247, 239, 0.58) 30%, rgba(250, 247, 239, 0.04) 58%, rgba(250, 247, 239, 0.1) 100%),
+      linear-gradient(180deg, rgba(250, 247, 239, 0.26) 0%, transparent 32%, rgba(250, 247, 239, 0.74) 93%, var(--paper) 100%);
   }
 
   .hero > .shell { position: relative; z-index: 1; }
@@ -1173,7 +1150,7 @@
   <section class="hero">
     <div class="scene" id="scene" aria-hidden="true">
       <div class="scene-layer layer-sky"    data-depth="0"></div>
-      <div class="scene-layer layer-cliff"  data-depth="1.5"><canvas id="cv-cliff"></canvas><span class="fall-flow" id="fall-flow"></span></div>
+      <div class="scene-layer layer-water"  data-depth="1.5"><canvas id="cv-water"></canvas></div>
       <div class="scene-layer layer-mist"   data-depth="3"><canvas id="cv-mist"></canvas></div>
       <div class="scene-layer layer-canopy" data-depth="4.5"><canvas id="cv-canopy"></canvas></div>
       <div class="scene-layer layer-stones" data-depth="7"><canvas id="cv-stones"></canvas></div>
@@ -1830,76 +1807,192 @@
 
     /* Falaise et cascade : masses de roche qui pâlissent avec la distance,
        chute d'eau ouverte au milieu du massif. */
-    function paintCliff(cv) {
-      var W = 560, H = 320;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      var img = c.createImageData(W, H);
-      var d = img.data;
+    /* ================= La cascade : seule chose animée en continu =================
+       Un shader plein cadre coûterait cher sur une machine modeste. Trois choix
+       tiennent la charge : demi-résolution (quatre fois moins de pixels), trois
+       octaves de bruit au lieu de six, et 30 images/seconde — à cette lenteur
+       d'écoulement, l'œil ne fait pas la différence avec 60. */
+    var waterStop = null;
 
-      var fallX = 0.615, fallW = 0.055;
-      var poolY = 0.74;
+    function startWaterfall(canvas) {
+      var gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' })
+            || canvas.getContext('experimental-webgl');
+      if (!gl) return false;
 
-      for (var x = 0; x < W; x++) {
-        var u = x / W;
+      var vertSrc = 'attribute vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
 
-        /* Ligne de crête : c'est elle qui donne une silhouette de falaise
-           plutôt qu'un nuage de bruit. Elle s'affaisse là où l'eau a creusé. */
-        var crest = 0.24 + sceneFbm(u * 3.4, 0.7, 4) * 0.30;
-        var notch = Math.exp(-Math.pow((u - fallX) / (fallW * 2.4), 2));
-        crest += notch * 0.13;
+      var fragSrc = [
+        'precision mediump float;',
+        'uniform vec2 uRes;',
+        'uniform float uTime;',
+        'float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
+        'float noise(vec2 p){',
+        '  vec2 i = floor(p), f = fract(p);',
+        '  float a = hash(i), b = hash(i + vec2(1.0, 0.0));',
+        '  float c = hash(i + vec2(0.0, 1.0)), d = hash(i + vec2(1.0, 1.0));',
+        '  vec2 u = f * f * (3.0 - 2.0 * f);',
+        '  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;',
+        '}',
+        'float fbm(vec2 p){',
+        '  float v = 0.0, amp = 0.5;',
+        '  for (int i = 0; i < 3; i++) { v += amp * noise(p); p = p * 2.07 + 11.0; amp *= 0.55; }',
+        '  return v;',
+        '}',
+        'void main(){',
+        '  vec2 uv = gl_FragCoord.xy / uRes.xy;',
+        '  float y = 1.0 - uv.y;',           /* y = 0 en haut, 1 en bas */
+        '  float x = uv.x;',
+        /* Parois de roche : elles encadrent la chute et lui donnent son échelle */
+        '  float wallL = 0.235 + fbm(vec2(y * 2.6, 3.1)) * 0.075 + fbm(vec2(y * 9.0, 1.4)) * 0.028;',
+        '  float wallR = 0.765 - fbm(vec2(y * 2.4, 9.7)) * 0.075 - fbm(vec2(y * 8.4, 6.2)) * 0.028;',
+        '  float lip = 0.105 + fbm(vec2(x * 5.0, 21.0)) * 0.05 + fbm(vec2(x * 13.0, 4.5)) * 0.022;',
+        '  float edgeMist = fbm(vec2(x * 22.0, y * 4.0 - uTime * 0.35)) * 0.05;',
+        '  float inWater = smoothstep(wallL - edgeMist, wallL + 0.055, x) * (1.0 - smoothstep(wallR - 0.055, wallR + edgeMist, x));',
+        '  inWater *= smoothstep(lip, lip + 0.03, y);',
+        /* Écoulement : bruit très étiré en x, qui descend. Deux nappes à des
+           vitesses différentes donnent l'épaisseur de la lame d'eau. */
+        '  float t = uTime * 0.16;',
+        '  float s1 = fbm(vec2(x * 34.0, y * 2.6 - t * 3.2));',
+        '  float s2 = fbm(vec2(x * 17.0 + 40.0, y * 1.7 - t * 2.1));',
+        '  float flow = s1 * 0.62 + s2 * 0.48;',
+        /* La lame s'affine et accélère en tombant */
+        '  float sheet = 0.5 + (flow - 0.55) * (0.85 + y * 0.5);',
+        /* Voile d'écume au pied de la chute */
+        '  float spray = smoothstep(0.62, 1.0, y) * (0.45 + fbm(vec2(x * 7.0, y * 5.0 - t * 1.4)) * 0.55);',
+        /* Roche : strates horizontales, mates, nettement plus sombres que l eau */
+        '  float rock = fbm(vec2(x * 4.5, y * 3.4)) * 0.7 + fbm(vec2(x * 1.4, y * 20.0)) * 0.3;',
+        '  float rockTone = 0.46 + (rock - 0.5) * 0.78 - y * 0.12;',
+        /* La couleur d'une scène naturelle vient de l'écart entre une lumière
+           chaude et une ombre froide, pas d'une saturation poussée. */
+        '  vec3 rockLit  = vec3(0.86, 0.74, 0.55);',
+        '  vec3 rockDark = vec3(0.30, 0.30, 0.29);',
+        '  vec3 rockCol  = mix(rockDark, rockLit, clamp(rockTone * 1.5, 0.0, 1.0));',
+        '  vec3 waterLit = vec3(0.93, 0.93, 0.88);',
+        '  vec3 waterDim = vec3(0.50, 0.55, 0.55);',
+        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.35, 0.0, 1.0));',
+        '  vec3 col = mix(rockCol, waterCol, inWater);',
+        '  col = mix(col, vec3(0.97, 0.95, 0.89), spray * inWater * 0.55);',
+        '  col = mix(col, vec3(0.93, 0.91, 0.86), smoothstep(0.86, 1.0, y) * 0.5);',
+        /* Lumière rasante venue du haut : la scène s ouvre vers le ciel */
+        '  col += vec3(0.13, 0.10, 0.05) * pow(1.0 - y, 2.6);',
+        '  col *= mix(vec3(0.90, 0.92, 0.96), vec3(1.04, 1.0, 0.94), pow(1.0 - y, 1.4));',
+        /* Grain fin : sans lui, un dégradé calculé se voit tout de suite */
+        '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.022;',
+        '  gl_FragColor = vec4(col, 1.0);',
+        '}'
+      ].join('\n');
 
-        for (var y = 0; y < H; y++) {
-          var v = y / H;
-          var i = (y * W + x) * 4;
+      function compile(type, src) {
+        var sh = gl.createShader(type);
+        gl.shaderSource(sh, src); gl.compileShader(sh);
+        return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
+      }
+      var vs = compile(gl.VERTEX_SHADER, vertSrc), fs = compile(gl.FRAGMENT_SHADER, fragSrc);
+      if (!vs || !fs) return false;
 
-          /* Bord de crête adouci sur quelques pixels : une découpe franche
-             donnerait un escalier bien visible une fois le calque agrandi. */
-          var edge = (v - crest) / 0.012;
-          if (edge < -1) { d[i + 3] = 0; continue; }
-          var edgeAlpha = edge >= 1 ? 1 : (edge + 1) / 2;
+      var prog = gl.createProgram();
+      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+      gl.useProgram(prog);
 
-          var into = Math.max(0, (v - crest)) / (1 - crest);   /* 0 à la crête, 1 en bas */
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+      var aPos = gl.getAttribLocation(prog, 'aPos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-          var rock = sceneFbm(u * 6.5, v * 4.2, 5);
-          var strata = sceneFbm(u * 1.6, v * 26.0, 3);
+      var uRes = gl.getUniformLocation(prog, 'uRes');
+      var uTime = gl.getUniformLocation(prog, 'uTime');
 
-          /* La lumière vient d'en haut à gauche : les faces exposées s'éclaircissent */
-          var lit = 0.5 + (rock - 0.5) * 1.55 + (strata - 0.5) * 0.38;
-
-          /* Perspective atmosphérique, mais mesurée : la brume adoucit le haut
-             de la paroi sans effacer le relief. */
-          var haze = Math.pow(1 - into, 2.2) * 0.34;
-          var tone = lit * (1 - haze) + 0.86 * haze;
-
-          /* Le pied de paroi s'assombrit : c'est ce qui donne l'assise */
-          tone -= Math.pow(into, 2.0) * 0.20;
-
-          var toFall = Math.abs(u - fallX);
-          var inFall = Math.max(0, 1 - toFall / fallW);
-          var falling = Math.pow(inFall, 1.3) * (v > crest - 0.02 ? 1 : 0) * (v < poolY ? 1 : Math.max(0, 1 - (v - poolY) * 7));
-
-          /* Écume au pied de la chute */
-          var pool = Math.exp(-Math.pow((v - poolY) / 0.06, 2)) * Math.exp(-Math.pow((u - fallX) / 0.10, 2));
-
-          tone += falling * 0.40 + pool * 0.34;
-          tone = Math.max(0.04, Math.min(1, tone));
-
-          /* Grès et argile : rouge > vert > bleu. Jamais de bleu dominant. */
-          var r = 52 + tone * 186;
-          var g = 48 + tone * 172;
-          var b = 40 + tone * 148;
-
-          /* L'eau tire vers le blanc chaud */
-          var wash = falling * 0.5 + pool * 0.5;
-          r += wash * 22; g += wash * 22; b += wash * 18;
-
-          d[i] = r; d[i + 1] = g; d[i + 2] = b;
-          /* Le bas se fond dans la page */
-          d[i + 3] = 255 * edgeAlpha * Math.min(1, 1.35 - Math.pow(v, 3.2) * 1.4);
+      function resize() {
+        /* Demi-résolution : l'eau est douce, personne ne verra la différence. */
+        var w = Math.max(2, Math.round(canvas.clientWidth * 0.5));
+        var h = Math.max(2, Math.round(canvas.clientHeight * 0.5));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w; canvas.height = h;
+          gl.viewport(0, 0, w, h);
         }
       }
-      c.putImageData(img, 0, 0);
+
+      var start = performance.now();
+      function draw(now) {
+        resize();
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uTime, (now - start) / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
+
+      if (reduce) {
+        /* Mouvement réduit : une seule image, puis plus rien. */
+        requestAnimationFrame(function () { draw(performance.now() + 4200); });
+        return true;
+      }
+
+      var raf = null, last = 0, running = false;
+      var FRAME = 1000 / 30;   /* 30 images/seconde suffisent à cette lenteur */
+
+      /* Repli automatique : si la machine n'arrive pas à tenir la cadence,
+         on fige l'eau sur sa dernière image plutôt que de servir une animation
+         saccadée. Mieux vaut une belle image fixe qu'un mouvement qui rame. */
+      var probed = 0, spent = 0, degraded = false;
+
+      function loop(now) {
+        raf = requestAnimationFrame(loop);
+        if (now - last < FRAME) return;
+        var gap = last ? now - last : FRAME;
+        last = now;
+
+        var t0 = performance.now();
+        draw(now);
+        spent += performance.now() - t0 + Math.max(0, gap - FRAME);
+
+        if (!degraded && ++probed === 45) {
+          if (spent / probed > 42) {   /* moins de ~24 images/s réelles */
+            degraded = true;
+            pause();
+          }
+        }
+      }
+
+      function play() { if (!running) { running = true; last = 0; raf = requestAnimationFrame(loop); } }
+      function pause() { if (running) { running = false; cancelAnimationFrame(raf); } }
+
+      /* L'eau ne tourne que si le hero est à l'écran et l'onglet visible. */
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries[0].isIntersecting ? play() : pause();
+        }, { threshold: 0.01 }).observe(canvas);
+      } else { play(); }
+
+      document.addEventListener('visibilitychange', function () {
+        document.hidden ? pause() : play();
+      });
+
+      waterStop = pause;
+      play();
+      return true;
+    }
+
+    /* Repli sans WebGL : une image fixe, peinte une fois. */
+    function paintWaterStill(cv) {
+      var W = 420, H = 260;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      var g = c.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#D8CDB2'); g.addColorStop(1, '#BCAF92');
+      c.fillStyle = g; c.fillRect(0, 0, W, H);
+      var w = c.createLinearGradient(W * 0.16, 0, W * 0.84, 0);
+      w.addColorStop(0, 'rgba(120,110,90,0.55)');
+      w.addColorStop(0.16, 'rgba(246,242,232,0.94)');
+      w.addColorStop(0.84, 'rgba(246,242,232,0.94)');
+      w.addColorStop(1, 'rgba(120,110,90,0.55)');
+      c.fillStyle = w; c.fillRect(0, 0, W, H);
+      for (var i = 0; i < 90; i++) {
+        var x = W * (0.17 + Math.random() * 0.66);
+        c.fillStyle = 'rgba(255,255,255,' + (0.05 + Math.random() * 0.16).toFixed(3) + ')';
+        c.fillRect(x, Math.random() * H, 1 + Math.random() * 2, 30 + Math.random() * 90);
+      }
     }
 
     /* Brume : bandes horizontales molles qui traversent la vallée */
@@ -1945,7 +2038,7 @@
           var size = (7 + sceneNoise(i, k * 3.3) * 20);
           var shade = sceneNoise(i * 1.7, k);
           /* Gris-vert de lichen, très désaturé — jamais un vert de feuillage saturé */
-          var r = 118 + shade * 34, g = 128 + shade * 30, b = 104 + shade * 28;
+          var r = 104 + shade * 36, g = 124 + shade * 34, b = 88 + shade * 26;
           var g2 = c.createRadialGradient(px, py, 0, px, py, size);
           g2.addColorStop(0, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + (0.5 + shade * 0.3).toFixed(2) + ')');
           g2.addColorStop(1, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',0)');
@@ -1977,7 +2070,7 @@
         var g = c.createRadialGradient(px, py - rk.ry * H * 0.5, 0, px, py, rk.rx * W);
         var t = sceneNoise(i * 5.5, 3.3);
         var base = 78 + t * 30;
-        g.addColorStop(0, 'rgba(' + ((base + 26) | 0) + ',' + ((base + 20) | 0) + ',' + ((base + 8) | 0) + ',0.85)');
+        g.addColorStop(0, 'rgba(' + ((base + 34) | 0) + ',' + ((base + 22) | 0) + ',' + ((base + 2) | 0) + ',0.88)');
         g.addColorStop(1, 'rgba(' + (base | 0) + ',' + ((base - 6) | 0) + ',' + ((base - 18) | 0) + ',0)');
         c.fillStyle = g;
         c.beginPath();
@@ -2006,7 +2099,7 @@
       /* Peinture différée, un calque par image : pendant l'ouverture, le fil
          principal doit rester libre, sinon la timeline GSAP se fige. */
       var paintJobs = [
-        function () { var c = document.getElementById('cv-cliff'); paintCliff(c); bakeBlur(c, 0.35); },
+        function () { var c = document.getElementById('cv-water'); if (!startWaterfall(c)) paintWaterStill(c); },
         function () { var c = document.getElementById('cv-mist'); paintMist(c); bakeBlur(c, 5); },
         function () { var c = document.getElementById('cv-canopy'); paintCanopy(c); bakeBlur(c, 2); },
         function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 4); },
@@ -2026,7 +2119,6 @@
 
       if (reduce) {
         /* Mouvement coupé : la scène reste, figée et centrée. */
-        document.getElementById('fall-flow').style.animation = 'none';
       } else {
         var pointer = { x: 0, y: 0 };   /* cible, entre -1 et 1 */
         var eased = { x: 0, y: 0 };     /* position lissée */
