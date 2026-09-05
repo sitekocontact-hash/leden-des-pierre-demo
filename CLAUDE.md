@@ -48,11 +48,15 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
     (roche mouillée, volontairement moins éclairée que l'eau) et la **vasque** en bas, avec
     sa ligne de choc claire et ses ondes horizontales. Le domaine du bruit est déformé en x
     pour casser la rigidité des filets — sans cette déformation, on lit un code-barres.
-    **Aucun lavis clair par-dessus la scène** — la lisibilité du texte est
-    assurée par un appui local sous la seule colonne de texte, mesuré au contraste :
-    une ellipse serrée (~20 % de largeur) en écran large, une montée verticale sous 860 px
-    où le texte occupe toute la largeur. Un lavis pleine largeur, lui, efface la cascade :
-    c'est l'erreur qui a été corrigée, ne pas y revenir.
+    **AUCUN lavis clair par-dessus la scène, d'aucune sorte.** Demande explicite et répétée
+    de la cliente : la cascade est le **fond d'écran** du hero, on la voit en entier, d'un
+    bord à l'autre. Pas de voile pleine largeur, pas d'appui local, pas d'ellipse sous la
+    colonne de texte — tout cela a été essayé et refusé. Il ne reste que le raccord du bas
+    vers la section suivante, qui est une transition entre sections, pas un voile sur
+    l'image. La lisibilité passe **uniquement par le texte lui-même** : une ombre portée
+    claire sous `.hero-copy`, plus serrée et plus dense sur les petites capitales
+    (`.kicker`, `.hero-meta`) qui ont peu de matière par lettre. Ne jamais « régler » un
+    problème de contraste du hero en reposant quelque chose sur la scène.
     Elle ne s'arrête jamais tant que le visiteur reste sur la section. Garde-fous obligatoires —
     demi-résolution, 3 octaves de bruit, 30 images/seconde, arrêt par IntersectionObserver
     dès que le hero sort de l'écran, et **repli automatique** qui fige l'eau sur sa dernière

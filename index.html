@@ -492,37 +492,41 @@
      colonne de texte : le lavis pleine largeur qu'on avait avant effaçait la
      cascade sur toute la moitié gauche. Les arrêts sont calés sur la boîte
      réelle du titre (x ≈ 5 %–43 %), et le contraste du texte est mesuré. */
+  /* AUCUN lavis sur la scène. La cascade est le fond d'écran du hero : on la
+     voit en entier, d'un bord à l'autre, du haut du cadre jusqu'à la vasque.
+     Il ne reste ici que le raccord du bas vers la section suivante — c'est une
+     transition entre deux sections, pas un voile posé sur l'image.
+     La lisibilité du texte est assurée sur le texte lui-même (ombre portée
+     sous .hero-copy), jamais en délavant le décor. */
   .scene-veil {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(48% 68% at 20% 42%,
-        rgba(237, 230, 214, 0.94) 0%,
-        rgba(237, 230, 214, 0.91) 46%,
-        rgba(237, 230, 214, 0.86) 64%,
-        rgba(237, 230, 214, 0.48) 80%,
-        rgba(237, 230, 214, 0.12) 92%,
-        rgba(237, 230, 214, 0) 100%),
-      linear-gradient(180deg, rgba(235, 228, 212, 0.34) 0%, transparent 12%, transparent 88%, var(--sand-deep) 100%);
-  }
-
-  /* En une colonne, le texte occupe toute la largeur : une ellipse calée à
-     gauche ne soutient plus rien. L'appui devient une montée verticale, la
-     cascade gardant le tiers haut du cadre pour elle. */
-  @media (max-width: 860px) {
-    .scene-veil {
-      background:
-        linear-gradient(180deg,
-          rgba(237, 230, 214, 0) 0%,
-          rgba(237, 230, 214, 0.18) 15%,
-          rgba(237, 230, 214, 0.8) 28%,
-          rgba(237, 230, 214, 0.93) 35%,
-          rgba(237, 230, 214, 0.95) 100%),
-        linear-gradient(180deg, rgba(235, 228, 212, 0.3) 0%, transparent 14%, transparent 90%, var(--sand-deep) 100%);
-    }
+    background: linear-gradient(180deg, transparent 0%, transparent 90%, var(--sand-deep) 100%);
   }
 
   .hero > .shell { position: relative; z-index: 1; }
+
+  /* Le texte tient sa lisibilité tout seul, sans rien poser sur la scène :
+     une ombre claire et large, calée sur le grès du fond, épaissit le blanc
+     autour des lettres. Elle suit les glyphes, donc elle ne masque presque
+     aucun pixel de la cascade. */
+  .hero-copy {
+    text-shadow:
+      0 1px 2px rgba(247, 243, 233, 0.95),
+      0 0 12px rgba(247, 243, 233, 0.9),
+      0 0 30px rgba(247, 243, 233, 0.75);
+  }
+
+  /* Les petites capitales espacées sont le point faible : peu de matière par
+     lettre, et elles tombent sur le feuillage sombre du haut de cadre. Leur
+     halo est donc plus serré et plus dense que celui du titre. */
+  .hero-copy .kicker,
+  .hero-copy .hero-meta {
+    text-shadow:
+      0 0 4px rgba(247, 243, 233, 1),
+      0 0 9px rgba(247, 243, 233, 0.98),
+      0 0 20px rgba(247, 243, 233, 0.92);
+  }
 
   .hero-grid {
     display: grid;
