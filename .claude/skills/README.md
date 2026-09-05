@@ -8,10 +8,12 @@ modifient rien toutes seules.
 | --- | --- | --- | --- |
 | `impeccable` | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) v4.1.3 | Apache 2.0 | Direction artistique exigeante + 23 commandes (`polish`, `audit`, `critique`, `animate`, `bolder`, `quieter`, `harden`…) et un détecteur d'anti-patterns qui scanne le HTML/CSS produit. |
 | `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | Base de données locale consultable : 79 styles visuels, 192 palettes produit, 74 associations de polices, 119 règles UX, 105 icônes, 17 presets GSAP, 25 types de graphiques, 22 stacks. |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Apache 2.0 | Direction visuelle : ancrer le design dans le sujet réel, choisir typographies et palette de façon délibérée, éviter les tics de mise en page qui trahissent une page générée. Contient une liste explicite de ces tics. |
 
 ## Comment s'en servir
 
 - Elles se déclenchent d'elles-mêmes quand la demande porte sur du design d'interface.
+- `frontend-design` n'a pas de commande : elle s'applique en arrière-plan à toute création d'interface.
 - Elles peuvent aussi être appelées à la main : `/impeccable polish index.html`,
   `/impeccable audit`, `/impeccable animate`, `/ui-ux-pro-max`.
 - `ui-ux-pro-max` se consulte en ligne de commande, par exemple :

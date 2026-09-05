@@ -97,12 +97,20 @@ ils restent nets à toute taille et se colorent via les variables CSS.
 
 ## Skills de design installés
 
-Le dépôt embarque deux compétences sous `.claude/skills/` (voir leur README) :
+Le dépôt embarque trois compétences sous `.claude/skills/` (voir leur README) :
 
 - **`impeccable`** — direction artistique et contrôle qualité, avec ses commandes
   `/impeccable polish`, `audit`, `critique`, `animate`, `bolder`, `quieter`, `harden`.
 - **`ui-ux-pro-max`** — base consultable de styles, palettes, associations de polices,
   règles UX, presets d'animation.
+- **`frontend-design`** (Anthropic) — direction visuelle : ancrer le design dans le sujet,
+  choisir la typographie de façon délibérée, repérer les tics de mise en page qui trahissent
+  une page générée.
+
+  **Note pour les prochaines sessions** : `frontend-design` signale le combo « fond crème
+  chaud + serif contrasté + accent terre cuite » comme un tic d'IA. La direction de ce site
+  en est proche — mais elle est **tirée du logo réel de la cliente** (or patiné, sauge, grès),
+  pas d'un réflexe par défaut. C'est une exception justifiée, à ne pas « corriger ».
 
 Les utiliser pour toute nouvelle page ou refonte de ce projet : elles priment sur les
 réflexes par défaut, mais **jamais sur le brief de marque ci-dessus** (direction claire et
