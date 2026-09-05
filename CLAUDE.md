@@ -39,6 +39,13 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
     au survol, apparitions progressives au scroll via **ScrollTrigger**.
   - Une **interaction réelle** : l'atelier où l'on change la pierre et où les perles du
     bracelet se recomposent en cascade.
+  - **Profondeur du hero** : six plans (ciel, falaise et cascade, brume, feuillage, pierres
+    de premier plan, grain) qui glissent les uns sur les autres à la souris. Amplitude
+    maximale ~10 px sur le plan le plus profond, lissage à 6 % par image : la scène dérive
+    avec une inertie de caméra, elle ne suit pas le curseur. Les plans avant partent à
+    l'inverse des plans arrière. Sans souris, dérive lente et autonome.
+    Ce qui crée la profondeur, c'est d'abord la perspective atmosphérique et le flou de
+    mise au point, pas la vitesse.
 - **Règle non négociable** : aucune section ne doit rester invisible en attendant un scroll.
   Conciliation avec ScrollTrigger : on ne masque **que** les éléments déjà hors écran au
   chargement, et un filet de sécurité (8 s) rétablit tout élément dont le déclencheur n'est
@@ -94,6 +101,19 @@ zen, teintes naturelles non saturées, animations obligatoires, logo reconstitu�
 - HTML/CSS/JS autonome, sans framework ni build. Tout tient dans `index.html`.
 - Seule dépendance externe : **GSAP + ScrollTrigger** (CDN cdnjs, version épinglée).
   Toutes les animations passent par GSAP, pas par des `@keyframes` dispersés.
+- **L'ouverture doit toujours se fermer**, quoi qu'il arrive : `endIntro()` est idempotente
+  et appelée par la timeline GSAP, par le repli CSS, et par un garde-fou à 5,2 s. Sur une
+  machine lente, l'horloge de GSAP peut être affamée et la timeline ne jamais atteindre son
+  terme — le visiteur ne doit pas rester bloqué sur l'écran d'ouverture.
+- **Jamais deux moteurs d'animation lourds en même temps** : le shader WebGL de l'ouverture
+  s'arrête avant que la boucle de parallaxe démarre. Ils se disputaient le GPU et gelaient
+  la timeline (mesuré : 15 images en 7 s).
+- **Pas de `filter: blur()` sur une grande surface animée.** Le flou est cuit dans le canvas
+  au moment de la peinture. Deux halos floutés en plein écran coûtaient à eux seuls la
+  moitié de la fluidité de la page (17 → 61 images/s une fois retirés). Un dégradé radial
+  est déjà doux, il n'a pas besoin d'être flouté.
+- Les calques du décor sont peints **une seule fois**, en basse résolution, un par image,
+  et seulement après l'ouverture : la peinture ne doit jamais bloquer le fil principal.
 - Polices via Google Fonts, images et icônes en SVG intégré.
 - Toujours respecter `prefers-reduced-motion` : couper rideau, particules, parallaxe et
   rotations, garder la page lisible.

@@ -120,25 +120,27 @@
       var(--paper);
   }
 
+  /* Un dégradé radial est déjà parfaitement doux : le filter: blur(80px) qui
+     était appliqué ici n'ajoutait presque rien à l'œil et coûtait la moitié
+     de la fluidité de la page (mesuré : 17 → 61 images/s sans lui). */
   .bloom {
     position: fixed;
     z-index: -1;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.55;
+    opacity: 0.75;
     pointer-events: none;
     will-change: transform;
   }
 
   .bloom-a {
     width: 42vw; height: 42vw; left: -8vw; top: 2vh;
-    background: radial-gradient(circle, rgba(193, 170, 128, 0.32), transparent 68%);
+    background: radial-gradient(circle, rgba(193, 170, 128, 0.3) 0%, rgba(193, 170, 128, 0.12) 42%, transparent 72%);
     animation: driftA 40s ease-in-out infinite;
   }
 
   .bloom-b {
     width: 36vw; height: 36vw; right: -6vw; top: 30vh;
-    background: radial-gradient(circle, rgba(126, 136, 113, 0.16), transparent 68%);
+    background: radial-gradient(circle, rgba(126, 136, 113, 0.15) 0%, rgba(126, 136, 113, 0.06) 44%, transparent 72%);
     animation: driftB 50s ease-in-out infinite;
   }
 
@@ -452,6 +454,71 @@
     padding-block: clamp(3rem, 7vw, 6rem) clamp(4rem, 9vw, 7rem);
     overflow: hidden;
   }
+
+  /* ---- Décor en profondeur : six plans qui glissent les uns sur les autres ---- */
+
+  .scene {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .scene-layer {
+    position: absolute;
+    inset: -6%;
+    width: 112%;
+    height: 112%;
+    will-change: transform;
+  }
+
+  .scene-layer canvas { width: 100%; height: 100%; display: block; }
+
+  /* Perspective atmosphérique et profondeur de champ.
+     Le flou est CUIT dans le canvas au moment de la peinture, jamais appliqué
+     en CSS sur un calque qui bouge : un filter: blur() recalculé à chaque image
+     sur une surface plein écran effondre la fluidité (et gèle GSAP au passage). */
+  .layer-sky      { background: linear-gradient(178deg, #F4EEE0 0%, #EAE1CD 46%, #E0D6BE 100%); }
+  .layer-cliff    { opacity: 1; }
+  .layer-mist     { opacity: 0.72; }
+  .layer-canopy   { opacity: 0.6; }
+  .layer-stones   { opacity: 0.5; }
+  .layer-grain    { opacity: 0.32; will-change: auto; }
+
+  /* La chute : fines veines qui descendent, seule chose réellement animée du décor */
+  .fall-flow {
+    position: absolute;
+    top: 6%;
+    left: 56.5%;
+    width: 11%;
+    height: 62%;
+    opacity: 0.5;
+    background-image: repeating-linear-gradient(
+      177deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.5) 2px,
+      rgba(255, 255, 255, 0) 7px,
+      rgba(255, 255, 255, 0) 15px);
+    background-size: 100% 90px;
+    filter: blur(2.4px);
+    animation: fall-run 2.6s linear infinite;
+    -webkit-mask-image: radial-gradient(58% 88% at 50% 42%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(58% 88% at 50% 42%, #000 30%, transparent 78%);
+  }
+
+  @keyframes fall-run { to { background-position: 0 90px; } }
+
+  /* Voile papier : garde le texte lisible et raccorde la scène au reste de la page */
+  .scene-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(96deg, rgba(250, 247, 239, 0.93) 0%, rgba(250, 247, 239, 0.66) 32%, rgba(250, 247, 239, 0.12) 60%, rgba(250, 247, 239, 0.22) 100%),
+      linear-gradient(180deg, rgba(250, 247, 239, 0.34) 0%, transparent 30%, rgba(250, 247, 239, 0.8) 93%, var(--paper) 100%);
+  }
+
+  .hero > .shell { position: relative; z-index: 1; }
 
   .hero-grid {
     display: grid;
@@ -1104,6 +1171,16 @@
 <main id="accueil">
 
   <section class="hero">
+    <div class="scene" id="scene" aria-hidden="true">
+      <div class="scene-layer layer-sky"    data-depth="0"></div>
+      <div class="scene-layer layer-cliff"  data-depth="1.5"><canvas id="cv-cliff"></canvas><span class="fall-flow" id="fall-flow"></span></div>
+      <div class="scene-layer layer-mist"   data-depth="3"><canvas id="cv-mist"></canvas></div>
+      <div class="scene-layer layer-canopy" data-depth="4.5"><canvas id="cv-canopy"></canvas></div>
+      <div class="scene-layer layer-stones" data-depth="7"><canvas id="cv-stones"></canvas></div>
+      <div class="scene-layer layer-grain"  data-depth="0"><canvas id="cv-grain"></canvas></div>
+      <div class="scene-veil"></div>
+    </div>
+
     <div class="shell hero-grid">
       <div class="hero-copy">
         <p class="kicker" id="hero-kicker">Bracelets en pierres naturelles</p>
@@ -1540,6 +1617,19 @@
       paintStillFallback(sceneCanvas);
     }
 
+    /* Fermeture de l'ouverture : idempotente, et c'est elle qui libère
+       la scène du hero. Appelée soit par la timeline, soit par le garde-fou. */
+    var introDone = false;
+    var onIntroEnd = [];
+
+    function endIntro() {
+      if (introDone) return;
+      introDone = true;
+      cine.style.display = 'none';
+      if (glRaf) cancelAnimationFrame(glRaf);   /* le shader s'arrête : il ne sert plus à rien */
+      while (onIntroEnd.length) onIntroEnd.shift()();
+    }
+
     /* ---- Timeline d'ouverture (GSAP) ---- */
     if (reduce) {
       cine.style.display = 'none';
@@ -1554,10 +1644,7 @@
       tl.to('#cine-logo', { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }, 1.5)
         .to('#cine-word', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 1.8)
         .to('#cine', { opacity: 0, scale: 1.05, duration: 0.9, ease: 'power2.inOut' }, 2.6)
-        .add(function () {
-          cine.style.display = 'none';
-          if (glRaf) cancelAnimationFrame(glRaf);
-        }, 3.5)
+        .add(endIntro, 3.5)
         .to('#hero-seal-wrap', { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }, 3.35)
         .to('#hero-title .line > span', { yPercent: 0, duration: 0.85, ease: 'power3.out', stagger: 0.11 }, 3.4)
         .to('#hero-sub', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.75)
@@ -1567,11 +1654,12 @@
       /* GSAP absent (CDN bloqué, hors ligne, file://) : on joue quand même
          l'ouverture en CSS plutôt que de la sauter silencieusement. */
       cine.classList.add('no-gsap');
-      setTimeout(function () {
-        cine.style.display = 'none';
-        if (glRaf) cancelAnimationFrame(glRaf);
-      }, 3600);
+      setTimeout(endIntro, 3600);
     }
+
+    /* Garde-fou : si l'horloge de GSAP est affamée (machine lente, GPU logiciel),
+       la timeline peut ne jamais atteindre son terme. L'ouverture se ferme quand même. */
+    if (!reduce) setTimeout(endIntro, 5200);
 
     /* ---- Révélations au défilement (GSAP ScrollTrigger) ----
        Règle de la maison : rien ne reste invisible en attendant un scroll.
@@ -1696,6 +1784,304 @@
 
     paint(stones[0], false);
 
+    /* ================= Décor du hero : profondeur en six plans =================
+       Chaque plan est peint une seule fois au chargement, puis glisse en CSS.
+       Ce qui fait la profondeur, ce n'est pas la vitesse : c'est la perspective
+       atmosphérique (le lointain pâlit) et la profondeur de champ (le lointain et
+       le premier plan sont flous, le plan médian est net). */
+
+    function sceneNoise(x, y) {
+      var n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+      return n - Math.floor(n);
+    }
+
+    function sceneSmooth(x, y) {
+      var xi = Math.floor(x), yi = Math.floor(y);
+      var xf = x - xi, yf = y - yi;
+      var u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+      var a = sceneNoise(xi, yi), b = sceneNoise(xi + 1, yi);
+      var c = sceneNoise(xi, yi + 1), d = sceneNoise(xi + 1, yi + 1);
+      return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
+    }
+
+    function sceneFbm(x, y, octaves) {
+      var v = 0, amp = 0.5, fx = x, fy = y;
+      for (var o = 0; o < octaves; o++) {
+        v += amp * sceneSmooth(fx, fy);
+        fx = fx * 2.03 + 7.1; fy = fy * 2.03 + 3.7;
+        amp *= 0.52;
+      }
+      return v;
+    }
+
+    /* Cuit un flou dans le canvas lui-même. Les navigateurs sans ctx.filter
+       gardent le calque net : la basse résolution agrandie adoucit déjà beaucoup. */
+    function bakeBlur(cv, radius) {
+      var c = cv.getContext('2d');
+      if (typeof c.filter === 'undefined') return;
+      var tmp = document.createElement('canvas');
+      tmp.width = cv.width; tmp.height = cv.height;
+      tmp.getContext('2d').drawImage(cv, 0, 0);
+      c.clearRect(0, 0, cv.width, cv.height);
+      c.filter = 'blur(' + radius + 'px)';
+      c.drawImage(tmp, 0, 0);
+      c.filter = 'none';
+    }
+
+    /* Falaise et cascade : masses de roche qui pâlissent avec la distance,
+       chute d'eau ouverte au milieu du massif. */
+    function paintCliff(cv) {
+      var W = 560, H = 320;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      var img = c.createImageData(W, H);
+      var d = img.data;
+
+      var fallX = 0.615, fallW = 0.055;
+      var poolY = 0.74;
+
+      for (var x = 0; x < W; x++) {
+        var u = x / W;
+
+        /* Ligne de crête : c'est elle qui donne une silhouette de falaise
+           plutôt qu'un nuage de bruit. Elle s'affaisse là où l'eau a creusé. */
+        var crest = 0.24 + sceneFbm(u * 3.4, 0.7, 4) * 0.30;
+        var notch = Math.exp(-Math.pow((u - fallX) / (fallW * 2.4), 2));
+        crest += notch * 0.13;
+
+        for (var y = 0; y < H; y++) {
+          var v = y / H;
+          var i = (y * W + x) * 4;
+
+          /* Bord de crête adouci sur quelques pixels : une découpe franche
+             donnerait un escalier bien visible une fois le calque agrandi. */
+          var edge = (v - crest) / 0.012;
+          if (edge < -1) { d[i + 3] = 0; continue; }
+          var edgeAlpha = edge >= 1 ? 1 : (edge + 1) / 2;
+
+          var into = Math.max(0, (v - crest)) / (1 - crest);   /* 0 à la crête, 1 en bas */
+
+          var rock = sceneFbm(u * 6.5, v * 4.2, 5);
+          var strata = sceneFbm(u * 1.6, v * 26.0, 3);
+
+          /* La lumière vient d'en haut à gauche : les faces exposées s'éclaircissent */
+          var lit = 0.5 + (rock - 0.5) * 1.55 + (strata - 0.5) * 0.38;
+
+          /* Perspective atmosphérique, mais mesurée : la brume adoucit le haut
+             de la paroi sans effacer le relief. */
+          var haze = Math.pow(1 - into, 2.2) * 0.34;
+          var tone = lit * (1 - haze) + 0.86 * haze;
+
+          /* Le pied de paroi s'assombrit : c'est ce qui donne l'assise */
+          tone -= Math.pow(into, 2.0) * 0.20;
+
+          var toFall = Math.abs(u - fallX);
+          var inFall = Math.max(0, 1 - toFall / fallW);
+          var falling = Math.pow(inFall, 1.3) * (v > crest - 0.02 ? 1 : 0) * (v < poolY ? 1 : Math.max(0, 1 - (v - poolY) * 7));
+
+          /* Écume au pied de la chute */
+          var pool = Math.exp(-Math.pow((v - poolY) / 0.06, 2)) * Math.exp(-Math.pow((u - fallX) / 0.10, 2));
+
+          tone += falling * 0.40 + pool * 0.34;
+          tone = Math.max(0.04, Math.min(1, tone));
+
+          /* Grès et argile : rouge > vert > bleu. Jamais de bleu dominant. */
+          var r = 52 + tone * 186;
+          var g = 48 + tone * 172;
+          var b = 40 + tone * 148;
+
+          /* L'eau tire vers le blanc chaud */
+          var wash = falling * 0.5 + pool * 0.5;
+          r += wash * 22; g += wash * 22; b += wash * 18;
+
+          d[i] = r; d[i + 1] = g; d[i + 2] = b;
+          /* Le bas se fond dans la page */
+          d[i + 3] = 255 * edgeAlpha * Math.min(1, 1.35 - Math.pow(v, 3.2) * 1.4);
+        }
+      }
+      c.putImageData(img, 0, 0);
+    }
+
+    /* Brume : bandes horizontales molles qui traversent la vallée */
+    function paintMist(cv) {
+      var W = 420, H = 240;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      c.clearRect(0, 0, W, H);
+      for (var i = 0; i < 7; i++) {
+        var y = H * (0.18 + i * 0.11) + sceneSmooth(i * 3.1, 1.7) * 26;
+        var h = 22 + sceneSmooth(i * 1.3, 5.2) * 40;
+        var g = c.createLinearGradient(0, y - h, 0, y + h);
+        g.addColorStop(0, 'rgba(250,246,236,0)');
+        g.addColorStop(0.5, 'rgba(250,246,236,' + (0.3 + i * 0.045).toFixed(3) + ')');
+        g.addColorStop(1, 'rgba(250,246,236,0)');
+        c.fillStyle = g;
+        c.fillRect(0, y - h, W, h * 2);
+      }
+    }
+
+    /* Feuillage : des taches molles, comme un feuillage hors mise au point.
+       C'est exactement ce qu'est un bokeh de végétation — pas des feuilles dessinées. */
+    function paintCanopy(cv) {
+      var W = 520, H = 300;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      c.clearRect(0, 0, W, H);
+
+      var clusters = [
+        { x: 0.04, y: 0.02, r: 0.30, n: 90 },
+        { x: 0.28, y: -0.06, r: 0.22, n: 60 },
+        { x: 0.97, y: 0.05, r: 0.28, n: 80 },
+        { x: 0.78, y: -0.04, r: 0.20, n: 50 }
+      ];
+
+      for (var k = 0; k < clusters.length; k++) {
+        var cl = clusters[k];
+        for (var i = 0; i < cl.n; i++) {
+          var a = sceneNoise(k * 13 + i, 2.7) * Math.PI * 2;
+          var rad = Math.pow(sceneNoise(k * 7 + i, 9.1), 0.6) * cl.r;
+          var px = (cl.x + Math.cos(a) * rad * 0.9) * W;
+          var py = (cl.y + Math.sin(a) * rad * 1.15) * H;
+          var size = (7 + sceneNoise(i, k * 3.3) * 20);
+          var shade = sceneNoise(i * 1.7, k);
+          /* Gris-vert de lichen, très désaturé — jamais un vert de feuillage saturé */
+          var r = 118 + shade * 34, g = 128 + shade * 30, b = 104 + shade * 28;
+          var g2 = c.createRadialGradient(px, py, 0, px, py, size);
+          g2.addColorStop(0, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + (0.5 + shade * 0.3).toFixed(2) + ')');
+          g2.addColorStop(1, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',0)');
+          c.fillStyle = g2;
+          c.beginPath();
+          c.ellipse(px, py, size, size * 0.78, a, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
+    }
+
+    /* Pierres au premier plan : masses sombres en bas de cadre, très floutées */
+    function paintStones(cv) {
+      var W = 520, H = 300;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      c.clearRect(0, 0, W, H);
+
+      var rocks = [
+        { x: 0.06, y: 1.04, rx: 0.30, ry: 0.20 },
+        { x: 0.34, y: 1.10, rx: 0.26, ry: 0.17 },
+        { x: 0.66, y: 1.06, rx: 0.28, ry: 0.19 },
+        { x: 0.94, y: 1.12, rx: 0.32, ry: 0.22 }
+      ];
+
+      for (var i = 0; i < rocks.length; i++) {
+        var rk = rocks[i];
+        var px = rk.x * W, py = rk.y * H;
+        var g = c.createRadialGradient(px, py - rk.ry * H * 0.5, 0, px, py, rk.rx * W);
+        var t = sceneNoise(i * 5.5, 3.3);
+        var base = 78 + t * 30;
+        g.addColorStop(0, 'rgba(' + ((base + 26) | 0) + ',' + ((base + 20) | 0) + ',' + ((base + 8) | 0) + ',0.85)');
+        g.addColorStop(1, 'rgba(' + (base | 0) + ',' + ((base - 6) | 0) + ',' + ((base - 18) | 0) + ',0)');
+        c.fillStyle = g;
+        c.beginPath();
+        c.ellipse(px, py, rk.rx * W, rk.ry * H, 0, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+
+    /* Grain d'objectif : immobile. Un grain qui bouge avec la scène trahit le numérique. */
+    function paintGrain(cv) {
+      var W = 260, H = 150;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      var img = c.createImageData(W, H);
+      var d = img.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var n = 118 + (Math.random() - 0.5) * 46;
+        d[i] = d[i + 1] = d[i + 2] = n;
+        d[i + 3] = 30;
+      }
+      c.putImageData(img, 0, 0);
+    }
+
+    var sceneEl = document.getElementById('scene');
+    if (sceneEl) {
+      /* Peinture différée, un calque par image : pendant l'ouverture, le fil
+         principal doit rester libre, sinon la timeline GSAP se fige. */
+      var paintJobs = [
+        function () { var c = document.getElementById('cv-cliff'); paintCliff(c); bakeBlur(c, 0.35); },
+        function () { var c = document.getElementById('cv-mist'); paintMist(c); bakeBlur(c, 5); },
+        function () { var c = document.getElementById('cv-canopy'); paintCanopy(c); bakeBlur(c, 2); },
+        function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 4); },
+        function () { paintGrain(document.getElementById('cv-grain')); }
+      ];
+
+      function runNextPaint() {
+        var job = paintJobs.shift();
+        if (!job) return;
+        job();
+        requestAnimationFrame(runNextPaint);
+      }
+      if (reduce) { requestAnimationFrame(runNextPaint); }
+      else { onIntroEnd.push(function () { requestAnimationFrame(runNextPaint); }); }
+
+      var sceneLayers = Array.prototype.slice.call(sceneEl.querySelectorAll('.scene-layer'));
+
+      if (reduce) {
+        /* Mouvement coupé : la scène reste, figée et centrée. */
+        document.getElementById('fall-flow').style.animation = 'none';
+      } else {
+        var pointer = { x: 0, y: 0 };   /* cible, entre -1 et 1 */
+        var eased = { x: 0, y: 0 };     /* position lissée */
+        var sceneRaf = null;
+        var sceneIdle = 0;
+        var pointerSeen = false;
+
+        window.addEventListener('pointermove', function (e) {
+          pointerSeen = true;
+          pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+          pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
+        }, { passive: true });
+
+        function sceneFrame() {
+          /* Tant qu'aucune souris ne s'est manifestée (mobile, tablette),
+             la scène dérive doucement toute seule. */
+          if (!pointerSeen) {
+            sceneIdle += 0.0035;
+            pointer.x = Math.sin(sceneIdle) * 0.8;
+            pointer.y = Math.sin(sceneIdle * 0.6) * 0.5;
+          }
+
+          /* Inertie de caméra lourde : on rejoint la cible à 6 % par image */
+          var prevX = eased.x, prevY = eased.y;
+          eased.x += (pointer.x - eased.x) * 0.06;
+          eased.y += (pointer.y - eased.y) * 0.06;
+
+          if (Math.abs(eased.x - prevX) < 0.0004 && Math.abs(eased.y - prevY) < 0.0004) {
+            sceneRaf = requestAnimationFrame(sceneFrame);
+            return;
+          }
+
+          for (var i = 0; i < sceneLayers.length; i++) {
+            var el = sceneLayers[i];
+            var depth = parseFloat(el.dataset.depth || '0');
+            if (depth === 0) continue;
+            /* Les plans avant partent à l'inverse des plans arrière : c'est ça, le signal de profondeur */
+            var dir = depth >= 4 ? -1 : 1;
+            var tx = -eased.x * depth * 1.5 * dir;
+            var ty = -eased.y * depth * 0.9 * dir;
+            el.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px,0)';
+          }
+          sceneRaf = requestAnimationFrame(sceneFrame);
+        }
+        /* On attend la fin de l'ouverture : faire tourner le shader WebGL et
+           six calques en parallaxe en même temps affame les deux. */
+        if (introDone) sceneFrame(); else onIntroEnd.push(sceneFrame);
+
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) { cancelAnimationFrame(sceneRaf); }
+          else if (introDone) { sceneRaf = requestAnimationFrame(sceneFrame); }
+        });
+      }
+    }
+
     /* ---- Poussière lumineuse, discrète ---- */
     var canvas = document.getElementById('dust');
     var ctx = canvas.getContext('2d');
@@ -1722,8 +2108,11 @@
     }
 
     var t = 0;
+    var dustSkip = 0;
     function frame() {
-      t += 0.005;
+      dRaf = requestAnimationFrame(frame);
+      if ((dustSkip = (dustSkip + 1) % 2) !== 0) return;   /* une image sur deux suffit à cette lenteur */
+      t += 0.01;
       ctx.clearRect(0, 0, w, h);
       for (var i = 0; i < motes.length; i++) {
         var m = motes[i];
@@ -1736,7 +2125,6 @@
         ctx.fillStyle = 'rgba(156,133,87,' + alpha.toFixed(3) + ')';
         ctx.fill();
       }
-      dRaf = requestAnimationFrame(frame);
     }
 
     var dRaf = null;
