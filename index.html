@@ -481,7 +481,7 @@
      sur une surface plein écran effondre la fluidité (et gèle GSAP au passage). */
   .layer-sky      { background: linear-gradient(178deg, #F4EEE0 0%, #EAE1CD 46%, #E0D6BE 100%); }
   .layer-water    { opacity: 1; }
-  .layer-mist     { opacity: 0.42; }
+  .layer-mist     { opacity: 0.26; }
   .layer-canopy   { opacity: 0.72; }
   .layer-stones   { opacity: 0.5; }
   .layer-grain    { opacity: 0.32; will-change: auto; }
@@ -491,8 +491,8 @@
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(96deg, rgba(250, 247, 239, 0.92) 0%, rgba(250, 247, 239, 0.58) 30%, rgba(250, 247, 239, 0.04) 58%, rgba(250, 247, 239, 0.1) 100%),
-      linear-gradient(180deg, rgba(250, 247, 239, 0.26) 0%, transparent 32%, rgba(250, 247, 239, 0.74) 93%, var(--paper) 100%);
+      linear-gradient(96deg, rgba(250, 247, 239, 0.9) 0%, rgba(250, 247, 239, 0.44) 28%, rgba(250, 247, 239, 0) 52%, rgba(250, 247, 239, 0.06) 100%),
+      linear-gradient(180deg, rgba(250, 247, 239, 0.2) 0%, transparent 34%, rgba(250, 247, 239, 0.7) 94%, var(--paper) 100%);
   }
 
   .hero > .shell { position: relative; z-index: 1; }
@@ -518,7 +518,7 @@
     color: var(--clay-deep);
   }
 
-  .hero-sub { margin-top: 1.9rem; max-width: 34ch; color: var(--ink-soft); font-size: 1.06rem; }
+  .hero-sub { margin-top: 1.9rem; max-width: 34ch; color: var(--ink); font-size: 1.06rem; }
 
   .hero-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.6rem; }
 
@@ -544,7 +544,7 @@
     font-size: 0.68rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--ink-soft);
+    color: var(--ink);
   }
 
   .hero-seal-wrap {
@@ -1843,8 +1843,8 @@
         '  float y = 1.0 - uv.y;',           /* y = 0 en haut, 1 en bas */
         '  float x = uv.x;',
         /* Parois de roche : elles encadrent la chute et lui donnent son échelle */
-        '  float wallL = 0.235 + fbm(vec2(y * 2.6, 3.1)) * 0.075 + fbm(vec2(y * 9.0, 1.4)) * 0.028;',
-        '  float wallR = 0.765 - fbm(vec2(y * 2.4, 9.7)) * 0.075 - fbm(vec2(y * 8.4, 6.2)) * 0.028;',
+        '  float wallL = 0.175 + fbm(vec2(y * 2.6, 3.1)) * 0.075 + fbm(vec2(y * 9.0, 1.4)) * 0.028;',
+        '  float wallR = 0.825 - fbm(vec2(y * 2.4, 9.7)) * 0.075 - fbm(vec2(y * 8.4, 6.2)) * 0.028;',
         '  float lip = 0.105 + fbm(vec2(x * 5.0, 21.0)) * 0.05 + fbm(vec2(x * 13.0, 4.5)) * 0.022;',
         '  float edgeMist = fbm(vec2(x * 22.0, y * 4.0 - uTime * 0.35)) * 0.05;',
         '  float inWater = smoothstep(wallL - edgeMist, wallL + 0.055, x) * (1.0 - smoothstep(wallR - 0.055, wallR + edgeMist, x));',
@@ -1854,9 +1854,9 @@
         '  float t = uTime * 0.16;',
         '  float s1 = fbm(vec2(x * 34.0, y * 2.6 - t * 3.2));',
         '  float s2 = fbm(vec2(x * 17.0 + 40.0, y * 1.7 - t * 2.1));',
-        '  float flow = s1 * 0.62 + s2 * 0.48;',
+        '  float flow = s1 * 0.72 + s2 * 0.56;',
         /* La lame s'affine et accélère en tombant */
-        '  float sheet = 0.5 + (flow - 0.55) * (0.85 + y * 0.5);',
+        '  float sheet = 0.5 + (flow - 0.62) * (1.45 + y * 0.7);',
         /* Voile d'écume au pied de la chute */
         '  float spray = smoothstep(0.62, 1.0, y) * (0.45 + fbm(vec2(x * 7.0, y * 5.0 - t * 1.4)) * 0.55);',
         /* Roche : strates horizontales, mates, nettement plus sombres que l eau */
@@ -1867,11 +1867,11 @@
         '  vec3 rockLit  = vec3(0.86, 0.74, 0.55);',
         '  vec3 rockDark = vec3(0.30, 0.30, 0.29);',
         '  vec3 rockCol  = mix(rockDark, rockLit, clamp(rockTone * 1.5, 0.0, 1.0));',
-        '  vec3 waterLit = vec3(0.93, 0.93, 0.88);',
-        '  vec3 waterDim = vec3(0.50, 0.55, 0.55);',
-        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.35, 0.0, 1.0));',
+        '  vec3 waterLit = vec3(0.99, 0.99, 0.95);',
+        '  vec3 waterDim = vec3(0.42, 0.48, 0.50);',
+        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.5, 0.0, 1.0));',
         '  vec3 col = mix(rockCol, waterCol, inWater);',
-        '  col = mix(col, vec3(0.97, 0.95, 0.89), spray * inWater * 0.55);',
+        '  col = mix(col, vec3(0.99, 0.98, 0.93), spray * inWater * 0.72);',
         '  col = mix(col, vec3(0.93, 0.91, 0.86), smoothstep(0.86, 1.0, y) * 0.5);',
         /* Lumière rasante venue du haut : la scène s ouvre vers le ciel */
         '  col += vec3(0.13, 0.10, 0.05) * pow(1.0 - y, 2.6);',
