@@ -42,9 +42,11 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
   - Une **interaction réelle** : l'atelier où l'on change la pierre et où les perles du
     bracelet se recomposent en cascade.
   - **Cascade en fond du hero** : une chute d'eau animée **en continu** derrière le texte,
-    générée par un shader WebGL (parois de roche, lèvre en haut, lame qui descend, écume au
-    pied). Elle ne s'arrête jamais tant que le visiteur reste sur la section. Écoulement lent
-    et discret : le texte doit rester lisible sans effort. Garde-fous obligatoires —
+    générée par un shader WebGL. Elle occupe **tout le fond du hero**, d'un bord à l'autre :
+    pas de parois qui la bordent, seule la lèvre du haut reste pour qu'on comprenne d'où
+    l'eau bascule. **Aucun lavis clair par-dessus la scène** — la lisibilité du texte est
+    assurée par un appui local sous la seule colonne de texte, mesuré au contraste.
+    Elle ne s'arrête jamais tant que le visiteur reste sur la section. Garde-fous obligatoires —
     demi-résolution, 3 octaves de bruit, 30 images/seconde, arrêt par IntersectionObserver
     dès que le hero sort de l'écran, et **repli automatique** qui fige l'eau sur sa dernière
     image si la machine ne tient pas ~24 im/s. En `prefers-reduced-motion`, une seule image
@@ -72,7 +74,7 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
 
 | Rôle | Valeur |
 | --- | --- |
-| Papier / fond | `#FAF7EF` — fond alterné `#F1EBDE`, creux `#E4DBC6` |
+| Papier / fond | `#EDE6D6` — fond alterné `#E5DCC8`, creux `#D9CEB4`. **Jamais de blanc ni de quasi-blanc** : le fond est une teinte pierre assumée. |
 | Pierre (traits, bordures) | `#CFC5AC` — profond `#A99C7C` |
 | Or patiné (accent) | `#9C8557` — clair `#C1AA80`, texte `#6C5A3A` |
 | Mousse (accent rare, jamais en fond) | `#7E8871` — profond `#545C48` |
