@@ -488,6 +488,28 @@
   .layer-stones   { opacity: 0.78; }
   .layer-grain    { opacity: 0.32; will-change: auto; }
 
+  /* ---- Fond photographique ----
+     Une vraie photo de cascade bat toute scène calculée sur le terrain du
+     réalisme : c'est le fond voulu. Le shader WebGL n'est plus qu'un repli,
+     le temps que le fichier soit livré. Le jour où il l'est, ce plan prend la
+     main et les quatre calques calculés (eau, écume, feuillage, pierres)
+     disparaissent : la photo porte déjà sa propre végétation et sa propre
+     roche, les redoubler la salirait. */
+  .layer-photo {
+    opacity: 0;
+    background-image: url("assets/hero-cascade.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .scene.has-photo .layer-photo { opacity: 1; }
+
+  .scene.has-photo .layer-water,
+  .scene.has-photo .layer-mist,
+  .scene.has-photo .layer-canopy,
+  .scene.has-photo .layer-stones { display: none; }
+
   /* Appui de lisibilité, et rien d'autre. Une ellipse serrée sous la seule
      colonne de texte : le lavis pleine largeur qu'on avait avant effaçait la
      cascade sur toute la moitié gauche. Les arrêts sont calés sur la boîte
@@ -1220,6 +1242,9 @@
   <section class="hero">
     <div class="scene" id="scene" aria-hidden="true">
       <div class="scene-layer layer-sky"    data-depth="0"></div>
+      <!-- Photo réelle de cascade. Dès que assets/hero-cascade.jpg existe, ce
+           plan prend la main et toute la scène calculée s'efface. -->
+      <div class="scene-layer layer-photo"  data-depth="1.5"></div>
       <div class="scene-layer layer-water"  data-depth="1.5"><canvas id="cv-water"></canvas></div>
       <div class="scene-layer layer-mist"   data-depth="3"><canvas id="cv-mist"></canvas></div>
       <div class="scene-layer layer-canopy" data-depth="4.5"><canvas id="cv-canopy"></canvas></div>
@@ -2205,6 +2230,24 @@
         function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 3); },
         function () { paintGrain(document.getElementById('cv-grain')); }
       ];
+      /* Le grain reste dans tous les cas : c'est lui qui empêche un aplat
+         numérique, photo ou pas. Les quatre autres ne servent qu'au repli. */
+      var grainJob = paintJobs[paintJobs.length - 1];
+      var photoWins = false;
+
+      /* Y a-t-il une vraie photo à afficher ? On la précharge avant de peindre
+         quoi que ce soit : si elle répond, rien d'autre n'a besoin d'exister,
+         et le shader WebGL — de loin le poste le plus cher de la page — n'est
+         même jamais démarré. */
+      var probe = new Image();
+      probe.onload = function () {
+        photoWins = true;
+        sceneEl.classList.add('has-photo');
+        if (waterStop) waterStop();
+        paintJobs.length = 0;
+        paintJobs.push(grainJob);
+      };
+      probe.src = 'assets/hero-cascade.jpg';
 
       function runNextPaint() {
         var job = paintJobs.shift();
@@ -2212,8 +2255,15 @@
         job();
         requestAnimationFrame(runNextPaint);
       }
-      if (reduce) { requestAnimationFrame(runNextPaint); }
-      else { onIntroEnd.push(function () { requestAnimationFrame(runNextPaint); }); }
+      /* On laisse au préchargement une chance de trancher avant de lancer le
+         shader pour rien ; passé ce délai, le repli démarre sans plus attendre
+         (une photo qui arrive après se contentera de le remplacer). */
+      function startPainting() {
+        if (photoWins || probe.complete) { requestAnimationFrame(runNextPaint); return; }
+        setTimeout(function () { requestAnimationFrame(runNextPaint); }, 220);
+      }
+      if (reduce) { startPainting(); }
+      else { onIntroEnd.push(startPainting); }
 
       var sceneLayers = Array.prototype.slice.call(sceneEl.querySelectorAll('.scene-layer'));
 

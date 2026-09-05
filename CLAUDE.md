@@ -114,6 +114,17 @@ ils restent nets à toute taille et se colorent via les variables CSS.
 
 ## À faire fournir par la cliente
 
+- **`assets/hero-cascade.jpg` — la photo de cascade du hero. Priorité haute.**
+  Le fond voulu est une **vraie photo**, pas une scène calculée : le shader WebGL a été
+  jugé « peint par un peintre, pas réaliste » et n'est plus qu'un repli en attendant le
+  fichier. Il suffit de déposer l'image à ce chemin : le plan `.layer-photo` la détecte au
+  chargement, prend la main, et les quatre calques calculés (eau, écume, feuillage,
+  pierres) s'effacent — le shader n'est alors même jamais démarré, ce qui fait presque
+  doubler la fluidité du hero (mesuré 24 → 45 im/s en rendu logiciel).
+  Cadrage : format paysage, chute plutôt à droite pour laisser respirer la colonne de
+  texte à gauche, teintes naturelles désaturées, pas de bleu vif ni de vert saturé.
+  **Licence** : le site est commercial, donc pas d'image prise au hasard sur le web.
+  Unsplash ou Pexels conviennent (usage commercial autorisé, sans attribution obligatoire).
 - Photos réelles des créations (les pierres sont pour l'instant des illustrations SVG)
 - Coordonnées : email et compte Instagram
 - Éventuellement : tarifs, délais de fabrication, conditions d'envoi
