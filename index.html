@@ -481,19 +481,45 @@
      sur une surface plein écran effondre la fluidité (et gèle GSAP au passage). */
   .layer-sky      { background: linear-gradient(178deg, #F4EEE0 0%, #EAE1CD 46%, #E0D6BE 100%); }
   .layer-water    { opacity: 1; }
-  .layer-mist     { opacity: 0.26; }
-  .layer-canopy   { opacity: 0.72; }
-  .layer-stones   { opacity: 0.5; }
+  /* La brume ne doit plus délaver la scène : elle se limite à l'écume qui monte
+     du pied de la chute, peinte sur le seul tiers bas du calque. */
+  .layer-mist     { opacity: 0.14; }
+  .layer-canopy   { opacity: 0.9; }
+  .layer-stones   { opacity: 0.78; }
   .layer-grain    { opacity: 0.32; will-change: auto; }
 
-  /* Plus de lavis blanc sur la scène : seulement un appui local sous la colonne
-     de texte (pour la lisibilité) et un raccord en bas vers la section suivante. */
+  /* Appui de lisibilité, et rien d'autre. Une ellipse serrée sous la seule
+     colonne de texte : le lavis pleine largeur qu'on avait avant effaçait la
+     cascade sur toute la moitié gauche. Les arrêts sont calés sur la boîte
+     réelle du titre (x ≈ 5 %–43 %), et le contraste du texte est mesuré. */
   .scene-veil {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(100deg, rgba(235, 228, 212, 0.96) 0%, rgba(235, 228, 212, 0.9) 22%, rgba(235, 228, 212, 0.55) 38%, rgba(235, 228, 212, 0.12) 52%, rgba(235, 228, 212, 0) 64%),
-      linear-gradient(180deg, rgba(235, 228, 212, 0.28) 0%, transparent 18%, transparent 74%, var(--sand-deep) 100%);
+      radial-gradient(48% 68% at 20% 42%,
+        rgba(237, 230, 214, 0.94) 0%,
+        rgba(237, 230, 214, 0.91) 46%,
+        rgba(237, 230, 214, 0.86) 64%,
+        rgba(237, 230, 214, 0.48) 80%,
+        rgba(237, 230, 214, 0.12) 92%,
+        rgba(237, 230, 214, 0) 100%),
+      linear-gradient(180deg, rgba(235, 228, 212, 0.34) 0%, transparent 12%, transparent 88%, var(--sand-deep) 100%);
+  }
+
+  /* En une colonne, le texte occupe toute la largeur : une ellipse calée à
+     gauche ne soutient plus rien. L'appui devient une montée verticale, la
+     cascade gardant le tiers haut du cadre pour elle. */
+  @media (max-width: 860px) {
+    .scene-veil {
+      background:
+        linear-gradient(180deg,
+          rgba(237, 230, 214, 0) 0%,
+          rgba(237, 230, 214, 0.18) 15%,
+          rgba(237, 230, 214, 0.8) 28%,
+          rgba(237, 230, 214, 0.93) 35%,
+          rgba(237, 230, 214, 0.95) 100%),
+        linear-gradient(180deg, rgba(235, 228, 212, 0.3) 0%, transparent 14%, transparent 90%, var(--sand-deep) 100%);
+    }
   }
 
   .hero > .shell { position: relative; z-index: 1; }
@@ -594,7 +620,46 @@
   /* ============ Sections ============ */
 
   section { position: relative; scroll-margin-top: 92px; }
-  .pad { padding-block: clamp(4.5rem, 9vw, 8rem); }
+  .pad { padding-block: clamp(4.5rem, 9vw, 8rem); overflow: hidden; }
+  .pad > .shell { position: relative; z-index: 1; }
+
+  /* ---- Décor de section : le paysage se poursuit sous le contenu ----
+     Le hero n'est pas une parenthèse : en descendant, le feuillage revient et
+     des bracelets affleurent en fond. Chaque motif est peint UNE fois, en basse
+     résolution, et son flou est cuit dans le canvas — jamais de filter: blur()
+     sur une surface qui bouge au scroll. */
+
+  .sec-decor { position: absolute; z-index: 0; pointer-events: none; }
+
+  /* L'enveloppe qui dérive (parallaxe en scrub) et celle qui apparaît (fondu)
+     sont séparées : deux tweens sur la même propriété d'un même élément se
+     marchent dessus et l'un des deux est perdu. */
+  .decor-drift { width: 100%; height: 100%; will-change: transform; }
+
+  .decor-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Opacité de repos posée en CSS : sans GSAP, ou si un déclencheur ne part
+       jamais, le décor est là. Rien n'attend un scroll pour exister. */
+    opacity: var(--decor-op, 0.45);
+  }
+
+  /* Chaque ancrage est calé sur la zone creuse de SA section : le décor occupe
+     les marges que le contenu laisse libres, il ne passe jamais sous un bloc
+     de texte courant. */
+  .d-bl      { bottom: -8%;  left: -7%;  width: min(44%, 560px); aspect-ratio: 5 / 4; }
+  .d-bl-lo   { bottom: -17%; left: -11%; width: min(38%, 480px); aspect-ratio: 5 / 4; }
+  .d-br-sm   { bottom: -11%; right: -6%; width: min(30%, 400px); aspect-ratio: 5 / 4; }
+  .d-r       { top: 50%; right: -3%; translate: 0 -50%; width: min(36%, 470px); aspect-ratio: 1; }
+  .d-bl-deep { bottom: -26%; left: -13%; width: min(36%, 460px); aspect-ratio: 1; }
+
+  /* En une colonne, le contenu occupe toute la largeur : le décor recule
+     encore pour ne jamais concurrencer le texte. */
+  @media (max-width: 860px) {
+    .decor-art { opacity: calc(var(--decor-op, 0.45) * 0.55); }
+    .d-r { width: min(58%, 340px); }
+  }
 
   /* Histoire */
 
@@ -1843,39 +1908,63 @@
         '  vec2 uv = gl_FragCoord.xy / uRes.xy;',
         '  float y = 1.0 - uv.y;',           /* y = 0 en haut, 1 en bas */
         '  float x = uv.x;',
-        /* Parois de roche : elles encadrent la chute et lui donnent son échelle */
-        '  float lip = 0.105 + fbm(vec2(x * 5.0, 21.0)) * 0.05 + fbm(vec2(x * 13.0, 4.5)) * 0.022;',
-        /* La chute occupe tout le cadre : seule la lèvre du haut reste,
-           pour qu'on comprenne d'où l'eau bascule. */
-        '  float inWater = smoothstep(lip, lip + 0.045, y);',
+        /* Lèvre de bascule : la roche mouillée d'où l'eau part. C'est le premier
+           des deux repères qui font lire « chute d'eau » plutôt que « stries ». */
+        /* Un fbm pour la grande ondulation, un simple noise pour la cassure
+           fine : deux fbm ici coûtaient trois fois plus pour un galbe
+           identique à l'œil sur une bande qui fait 12 % de la hauteur. */
+        '  float lip = 0.125 + fbm(vec2(x * 5.0, 21.0)) * 0.05 + noise(vec2(x * 13.0, 4.5)) * 0.022;',
+        '  float inWater = smoothstep(lip, lip + 0.026, y);',
+        /* Second repère : la vasque au pied, sa ligne d'eau et ses ondes
+           horizontales, qui coupent net la verticalité de la lame. */
+        '  float poolY = 0.76 + noise(vec2(x * 3.0, 60.0)) * 0.035;',
+        '  float inPool = smoothstep(poolY, poolY + 0.018, y);',
         /* Écoulement : bruit très étiré en x, qui descend. Deux nappes à des
            vitesses différentes donnent l'épaisseur de la lame d'eau. */
         '  float t = uTime * 0.16;',
-        '  float s1 = fbm(vec2(x * 34.0, y * 2.6 - t * 3.2));',
-        '  float s2 = fbm(vec2(x * 17.0 + 40.0, y * 1.7 - t * 2.1));',
-        '  float veins = fbm(vec2(x * 62.0, y * 1.4 - t * 4.4));',
+        /* Déformation du domaine : sans elle, le bruit étiré en x produit des
+           barres verticales rigides — on lit un code-barres, pas de l'eau.
+           Un simple noise (pas un fbm) suffit et coûte trois fois moins cher. */
+        '  float xw = x + (noise(vec2(y * 2.4, 9.0)) - 0.5) * 0.05;',
+        '  float s1 = fbm(vec2(xw * 30.0, y * 2.5 - t * 3.2));',
+        '  float s2 = fbm(vec2(xw * 15.0 + 40.0, y * 1.6 - t * 2.1));',
+        '  float veins = fbm(vec2(xw * 58.0, y * 1.3 - t * 4.4));',
         '  float flow = s1 * 0.66 + s2 * 0.52 + veins * 0.34;',
-        /* La lame s'affine et accélère en tombant */
-        '  float sheet = 0.5 + (flow - 0.74) * (2.1 + y * 0.9);',
-        /* Voile d'écume au pied de la chute */
-        '  float spray = smoothstep(0.62, 1.0, y) * (0.45 + fbm(vec2(x * 7.0, y * 5.0 - t * 1.4)) * 0.55);',
+        /* Bandes de turbulence qui descendent : elles interrompent les filets
+           d'eau en cours de chute, comme un vrai rideau qui se déchire. */
+        '  float band = 0.82 + (noise(vec2(x * 2.0, y * 5.0 - t * 2.8))) * 0.36;',
+        /* La lame s'affine et accélère en tombant. Contraste dosé : trop fort,
+           les creux virent au noir et la chute se fige en rayures. */
+        '  float sheet = (0.52 + (flow - 0.72) * (2.2 + y * 1.1)) * band;',
+        /* Écume : concentrée là où l'eau frappe la vasque, pas sur toute la
+           hauteur — un voile pleine hauteur délave la scène entière. */
+        '  float spray = smoothstep(0.54, 0.80, y) * (0.35 + noise(vec2(x * 7.0, y * 5.0 - t * 1.4)) * 0.65);',
         /* Roche : strates horizontales, mates, nettement plus sombres que l eau */
-        '  float rock = fbm(vec2(x * 4.5, y * 3.4)) * 0.7 + fbm(vec2(x * 1.4, y * 20.0)) * 0.3;',
-        '  float rockTone = 0.46 + (rock - 0.5) * 0.78 - y * 0.12;',
+        '  float rock = fbm(vec2(x * 4.5, y * 3.4)) * 0.7 + noise(vec2(x * 1.4, y * 20.0)) * 0.3;',
+        '  float rockTone = 0.44 + (rock - 0.5) * 1.15 - y * 0.10;',
         /* La couleur d'une scène naturelle vient de l'écart entre une lumière
            chaude et une ombre froide, pas d'une saturation poussée. */
-        '  vec3 rockLit  = vec3(0.86, 0.74, 0.55);',
-        '  vec3 rockDark = vec3(0.30, 0.30, 0.29);',
-        '  vec3 rockCol  = mix(rockDark, rockLit, clamp(rockTone * 1.5, 0.0, 1.0));',
-        '  vec3 waterLit = vec3(0.99, 0.99, 0.95);',
-        '  vec3 waterDim = vec3(0.37, 0.42, 0.45);',
-        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.15, 0.0, 1.0));',
+        '  vec3 rockLit  = vec3(0.82, 0.72, 0.55);',
+        '  vec3 rockDark = vec3(0.22, 0.21, 0.19);',
+        '  vec3 rockCol  = mix(rockDark, rockLit, clamp(rockTone * 1.55, 0.0, 1.0));',
+        '  vec3 waterLit = vec3(0.99, 0.98, 0.93);',
+        /* Ombre de l'eau : neutre chaude, jamais noire. Un bleu franc trahirait
+           une eau « boostée » — la marque vend des teintes naturelles. */
+        '  vec3 waterDim = vec3(0.52, 0.51, 0.47);',
+        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.25, 0.0, 1.0));',
         '  vec3 col = mix(rockCol, waterCol, inWater);',
-        '  col = mix(col, vec3(0.99, 0.98, 0.93), spray * inWater * 0.72);',
-        '  col = mix(col, vec3(0.93, 0.91, 0.86), smoothstep(0.86, 1.0, y) * 0.5);',
-        /* Lumière rasante venue du haut : la scène s ouvre vers le ciel */
-        '  col += vec3(0.13, 0.10, 0.05) * pow(1.0 - y, 2.6);',
-        '  col *= mix(vec3(0.90, 0.92, 0.96), vec3(1.04, 1.0, 0.94), pow(1.0 - y, 1.4));',
+        '  col = mix(col, vec3(0.98, 0.97, 0.93), spray * inWater * 0.6);',
+        /* La vasque : plus sombre que la lame, striée horizontalement, avec un
+           bourrelet clair à la ligne de choc. */
+        '  float ripple = noise(vec2(x * 5.0, (y - poolY) * 52.0 - t * 1.6));',
+        '  vec3 poolCol = mix(vec3(0.34, 0.36, 0.34), vec3(0.74, 0.75, 0.70), clamp(ripple * 1.5, 0.0, 1.0));',
+        '  poolCol = mix(poolCol, vec3(0.93, 0.93, 0.89), (1.0 - smoothstep(0.0, 0.045, y - poolY)) * 0.55);',
+        '  col = mix(col, poolCol, inPool * 0.92);',
+        /* Lumière rasante venue du haut : la scène s ouvre vers le ciel. Elle
+           porte surtout sur l'eau — en éclairant autant la lèvre, elle effaçait
+           le seul morceau de roche visible de la scène. */
+        '  col += vec3(0.13, 0.10, 0.05) * pow(1.0 - y, 2.6) * (0.32 + 0.68 * inWater);',
+        '  col *= mix(vec3(0.93, 0.94, 0.95), vec3(1.05, 1.0, 0.93), pow(1.0 - y, 1.4));',
         /* Grain fin : sans lui, un dégradé calculé se voit tout de suite */
         '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.022;',
         '  gl_FragColor = vec4(col, 1.0);',
@@ -1996,17 +2085,20 @@
     }
 
     /* Brume : bandes horizontales molles qui traversent la vallée */
+    /* Écume : elle monte du pied de la chute, elle ne flotte pas devant elle.
+       Les bandes restent sous 55 % de hauteur — au-dessus, la lame doit rester
+       nette, sinon toute la scène redevient un voile blanc. */
     function paintMist(cv) {
       var W = 420, H = 240;
       cv.width = W; cv.height = H;
       var c = cv.getContext('2d');
       c.clearRect(0, 0, W, H);
-      for (var i = 0; i < 7; i++) {
-        var y = H * (0.18 + i * 0.11) + sceneSmooth(i * 3.1, 1.7) * 26;
-        var h = 22 + sceneSmooth(i * 1.3, 5.2) * 40;
+      for (var i = 0; i < 6; i++) {
+        var y = H * (0.6 + i * 0.075) + sceneSmooth(i * 3.1, 1.7) * 18;
+        var h = 16 + sceneSmooth(i * 1.3, 5.2) * 32;
         var g = c.createLinearGradient(0, y - h, 0, y + h);
         g.addColorStop(0, 'rgba(250,246,236,0)');
-        g.addColorStop(0.5, 'rgba(250,246,236,' + (0.3 + i * 0.045).toFixed(3) + ')');
+        g.addColorStop(0.5, 'rgba(250,246,236,' + (0.34 + i * 0.05).toFixed(3) + ')');
         g.addColorStop(1, 'rgba(250,246,236,0)');
         c.fillStyle = g;
         c.fillRect(0, y - h, W, h * 2);
@@ -2037,10 +2129,12 @@
           var py = (cl.y + Math.sin(a) * rad * 1.15) * H;
           var size = (7 + sceneNoise(i, k * 3.3) * 20);
           var shade = sceneNoise(i * 1.7, k);
-          /* Gris-vert de lichen, très désaturé — jamais un vert de feuillage saturé */
-          var r = 104 + shade * 36, g = 124 + shade * 34, b = 88 + shade * 26;
+          /* Gris-vert de lichen, très désaturé — jamais un vert de feuillage
+             saturé. Assombri par rapport aux taupes du fond : sans cet écart,
+             le feuillage se confond avec la roche et ne se lit plus. */
+          var r = 78 + shade * 40, g = 98 + shade * 38, b = 66 + shade * 28;
           var g2 = c.createRadialGradient(px, py, 0, px, py, size);
-          g2.addColorStop(0, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + (0.5 + shade * 0.3).toFixed(2) + ')');
+          g2.addColorStop(0, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + (0.62 + shade * 0.3).toFixed(2) + ')');
           g2.addColorStop(1, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',0)');
           c.fillStyle = g2;
           c.beginPath();
@@ -2069,8 +2163,10 @@
         var px = rk.x * W, py = rk.y * H;
         var g = c.createRadialGradient(px, py - rk.ry * H * 0.5, 0, px, py, rk.rx * W);
         var t = sceneNoise(i * 5.5, 3.3);
-        var base = 78 + t * 30;
-        g.addColorStop(0, 'rgba(' + ((base + 34) | 0) + ',' + ((base + 22) | 0) + ',' + ((base + 2) | 0) + ',0.88)');
+        /* Masses franchement sombres : ce sont elles qui donnent l'échelle du
+           premier plan. Trop claires, elles disparaissent dans l'écume. */
+        var base = 58 + t * 28;
+        g.addColorStop(0, 'rgba(' + ((base + 34) | 0) + ',' + ((base + 22) | 0) + ',' + ((base + 2) | 0) + ',0.92)');
         g.addColorStop(1, 'rgba(' + (base | 0) + ',' + ((base - 6) | 0) + ',' + ((base - 18) | 0) + ',0)');
         c.fillStyle = g;
         c.beginPath();
@@ -2101,8 +2197,8 @@
       var paintJobs = [
         function () { var c = document.getElementById('cv-water'); if (!startWaterfall(c)) paintWaterStill(c); },
         function () { var c = document.getElementById('cv-mist'); paintMist(c); bakeBlur(c, 5); },
-        function () { var c = document.getElementById('cv-canopy'); paintCanopy(c); bakeBlur(c, 2); },
-        function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 4); },
+        function () { var c = document.getElementById('cv-canopy'); paintCanopy(c); bakeBlur(c, 1.4); },
+        function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 3); },
         function () { paintGrain(document.getElementById('cv-grain')); }
       ];
 
@@ -2171,6 +2267,184 @@
           if (document.hidden) { cancelAnimationFrame(sceneRaf); }
           else if (introDone) { sceneRaf = requestAnimationFrame(sceneFrame); }
         });
+      }
+    }
+
+    /* ================= Décor de section : le paysage continue =================
+       Une branche d'eucalyptus (celle du logo) et le cercle de perles du
+       bracelet reviennent en fond au fil de la descente. Peinture différée,
+       un motif par image, exactement comme les plans du hero. */
+
+    /* Feuillage : tiges courbes et feuilles ovales par paires. Gris-vert de
+       lichen, jamais un vert saturé — la palette du site tient à ça. */
+    function paintLeaves(cv, seed) {
+      var W = 440, H = 352;
+      cv.width = W; cv.height = H;
+      var c = cv.getContext('2d');
+      c.clearRect(0, 0, W, H);
+
+      for (var b = 0; b < 3; b++) {
+        var s = seed + b * 6.7;
+        var x0 = W * (0.10 + sceneNoise(s, 1.1) * 0.34);
+        var y0 = -H * 0.06;
+        var ang = 1.15 + (sceneNoise(s, 2.2) - 0.5) * 0.7;
+        var len = H * (0.78 + sceneNoise(s, 3.3) * 0.34);
+        var bend = (sceneNoise(s, 4.4) - 0.5) * 0.85;
+        var steps = 24, pts = [], i;
+
+        for (i = 0; i <= steps; i++) {
+          var t = i / steps, a = ang + bend * t;
+          pts.push([x0 + Math.cos(a) * len * t * 0.6, y0 + Math.sin(a) * len * t]);
+        }
+
+        c.beginPath();
+        c.moveTo(pts[0][0], pts[0][1]);
+        for (i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+        c.strokeStyle = 'rgba(84, 92, 72, 0.45)';
+        c.lineWidth = 1.5;
+        c.stroke();
+
+        for (i = 3; i < pts.length; i += 2) {
+          var p = pts[i], q = pts[i - 1];
+          var dir = Math.atan2(p[1] - q[1], p[0] - q[0]);
+          var rr = (10 + sceneNoise(s + i, 5.5) * 13) * (0.55 + (i / steps) * 0.8);
+          for (var side = -1; side <= 1; side += 2) {
+            var la = dir + side * (0.72 + sceneNoise(s + i, side + 6) * 0.45);
+            var lx = p[0] + Math.cos(la) * rr * 0.85;
+            var ly = p[1] + Math.sin(la) * rr * 0.85;
+            var sh = sceneNoise(i * 1.9, s + side);
+            var cr = (86 + sh * 42) | 0, cg = (104 + sh * 40) | 0, cb = (74 + sh * 32) | 0;
+            var grad = c.createRadialGradient(lx, ly, 0, lx, ly, rr);
+            grad.addColorStop(0, 'rgba(' + cr + ',' + cg + ',' + cb + ',0.62)');
+            grad.addColorStop(1, 'rgba(' + cr + ',' + cg + ',' + cb + ',0.05)');
+            c.fillStyle = grad;
+            c.beginPath();
+            c.ellipse(lx, ly, rr, rr * 0.64, la, 0, Math.PI * 2);
+            c.fill();
+          }
+        }
+      }
+    }
+
+    /* Bracelet fantôme : la même géométrie que le cercle de perles de l'atelier.
+       En SVG plutôt qu'en canvas — il reste net à toute taille et se colore
+       avec les variables de la palette. */
+    function buildGhostBracelet(host) {
+      var svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 400 400');
+      svg.setAttribute('class', 'decor-art');
+      svg.setAttribute('aria-hidden', 'true');
+      var n = 34, R = 150;
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+        var accent = i % 6 === 0;
+        var cir = document.createElementNS(NS, 'circle');
+        cir.setAttribute('cx', (200 + Math.cos(a) * R).toFixed(1));
+        cir.setAttribute('cy', (200 + Math.sin(a) * R).toFixed(1));
+        cir.setAttribute('r', accent ? 15 : 11.5);
+        cir.setAttribute('fill', accent ? 'var(--clay-soft)' : 'var(--stone-deep)');
+        cir.setAttribute('opacity', accent ? 0.55 : 0.36);
+        svg.appendChild(cir);
+      }
+      host.appendChild(svg);
+      return svg;
+    }
+
+    var decorPlan = [
+      { sel: '#histoire',   kind: 'leaves',   pos: 'd-bl',      op: 0.5,  seed: 1.7 },
+      { sel: '#atelier',    kind: 'leaves',   pos: 'd-bl-lo',   op: 0.4,  seed: 5.1 },
+      { sel: '#selection',  kind: 'bracelet', pos: 'd-r',       op: 0.5 },
+      { sel: '#pierres',    kind: 'leaves',   pos: 'd-br-sm',   op: 0.34, seed: 9.4 },
+      { sel: '#sur-mesure', kind: 'bracelet', pos: 'd-bl-deep', op: 0.44 }
+    ];
+
+    var decorItems = [];
+    var decorPaint = [];
+
+    decorPlan.forEach(function (plan) {
+      var section = document.querySelector(plan.sel);
+      if (!section) return;
+
+      var box = document.createElement('div');
+      box.className = 'sec-decor ' + plan.pos;
+      box.setAttribute('aria-hidden', 'true');
+
+      var drift = document.createElement('div');
+      drift.className = 'decor-drift';
+      box.appendChild(drift);
+
+      var art;
+      if (plan.kind === 'bracelet') {
+        art = buildGhostBracelet(drift);
+      } else {
+        art = document.createElement('canvas');
+        art.className = 'decor-art';
+        drift.appendChild(art);
+        decorPaint.push(function () { paintLeaves(art, plan.seed); bakeBlur(art, 1.6); });
+      }
+      art.style.setProperty('--decor-op', plan.op);
+
+      section.insertBefore(box, section.firstChild);
+      decorItems.push({ section: section, drift: drift, art: art, op: plan.op });
+    });
+
+    function runNextDecorPaint() {
+      var job = decorPaint.shift();
+      if (!job) return;
+      job();
+      requestAnimationFrame(runNextDecorPaint);
+    }
+    /* Comme les plans du hero : jamais pendant l'ouverture, le fil principal
+       doit rester libre pour la timeline GSAP. */
+    if (introDone || reduce) requestAnimationFrame(runNextDecorPaint);
+    else onIntroEnd.push(function () { requestAnimationFrame(runNextDecorPaint); });
+
+    if (!reduce && hasGSAP && typeof ScrollTrigger !== 'undefined') {
+      decorItems.forEach(function (d) {
+        /* Dérive lente : le décor descend un peu moins vite que la page. */
+        gsap.fromTo(d.drift, { yPercent: -5 }, {
+          yPercent: 5, ease: 'none',
+          scrollTrigger: {
+            trigger: d.section, start: 'top bottom', end: 'bottom top',
+            scrub: 1.2, invalidateOnRefresh: true
+          }
+        });
+
+        /* Même règle que les révélations de contenu : on ne part de zéro que
+           pour ce qui est déjà hors écran au chargement. */
+        if (d.section.getBoundingClientRect().top < window.innerHeight * 0.92) return;
+
+        gsap.fromTo(d.art, { opacity: 0 }, {
+          opacity: d.op, duration: 1.7, ease: 'power2.out',
+          scrollTrigger: { trigger: d.section, start: 'top 80%', toggleActions: 'play none none none' }
+        });
+        d.guarded = true;
+      });
+
+      /* Filet de sécurité. Un simple délai ne convient pas ici : à huit
+         secondes, le visiteur est encore souvent dans le hero, et rétablir le
+         décor à ce moment-là supprimerait justement le fondu qu'on veut. Le
+         filet ne se déclenche donc que si la section est réellement à l'écran
+         et que le décor y est toujours invisible — et il reste valable à tout
+         moment de la visite, pas seulement au chargement. */
+      if ('IntersectionObserver' in window) {
+        var decorGuard = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var item = null;
+            for (var i = 0; i < decorItems.length; i++) {
+              if (decorItems[i].section === entry.target) { item = decorItems[i]; break; }
+            }
+            if (!item) return;
+            setTimeout(function () {
+              if (parseFloat(getComputedStyle(item.art).opacity) < item.op * 0.5) {
+                gsap.set(item.art, { opacity: item.op });
+              }
+            }, 2400);
+          });
+        }, { threshold: 0.2 });
+
+        decorItems.forEach(function (d) { if (d.guarded) decorGuard.observe(d.section); });
       }
     }
 

@@ -43,9 +43,16 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
     bracelet se recomposent en cascade.
   - **Cascade en fond du hero** : une chute d'eau animée **en continu** derrière le texte,
     générée par un shader WebGL. Elle occupe **tout le fond du hero**, d'un bord à l'autre :
-    pas de parois qui la bordent, seule la lèvre du haut reste pour qu'on comprenne d'où
-    l'eau bascule. **Aucun lavis clair par-dessus la scène** — la lisibilité du texte est
-    assurée par un appui local sous la seule colonne de texte, mesuré au contraste.
+    pas de parois qui la bordent. Deux repères la font lire comme une chute et non comme
+    des stries verticales, et ils ne sont pas négociables : la **lèvre de bascule** en haut
+    (roche mouillée, volontairement moins éclairée que l'eau) et la **vasque** en bas, avec
+    sa ligne de choc claire et ses ondes horizontales. Le domaine du bruit est déformé en x
+    pour casser la rigidité des filets — sans cette déformation, on lit un code-barres.
+    **Aucun lavis clair par-dessus la scène** — la lisibilité du texte est
+    assurée par un appui local sous la seule colonne de texte, mesuré au contraste :
+    une ellipse serrée (~20 % de largeur) en écran large, une montée verticale sous 860 px
+    où le texte occupe toute la largeur. Un lavis pleine largeur, lui, efface la cascade :
+    c'est l'erreur qui a été corrigée, ne pas y revenir.
     Elle ne s'arrête jamais tant que le visiteur reste sur la section. Garde-fous obligatoires —
     demi-résolution, 3 octaves de bruit, 30 images/seconde, arrêt par IntersectionObserver
     dès que le hero sort de l'écran, et **repli automatique** qui fige l'eau sur sa dernière
@@ -58,10 +65,22 @@ Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath 
     l'inverse des plans arrière. Sans souris, dérive lente et autonome.
     Ce qui crée la profondeur, c'est d'abord la perspective atmosphérique et le flou de
     mise au point, pas la vitesse.
+  - **Décor de section** : le paysage ne s'arrête pas au hero. En descendant, une branche
+    d'eucalyptus (celle du logo) et le cercle de perles du bracelet reviennent en fond,
+    en fondu doux à l'entrée plus une légère dérive en **ScrollTrigger** (`scrub`). Deux
+    enveloppes imbriquées : l'extérieure dérive, l'intérieure fond — deux tweens sur la
+    même propriété du même élément se marchent dessus. Chaque motif est ancré dans la zone
+    creuse de SA section, jamais sous un bloc de texte courant, et son opacité de repos est
+    posée en CSS pour qu'il existe même sans GSAP.
 - **Règle non négociable** : aucune section ne doit rester invisible en attendant un scroll.
   Conciliation avec ScrollTrigger : on ne masque **que** les éléments déjà hors écran au
   chargement, et un filet de sécurité (8 s) rétablit tout élément dont le déclencheur n'est
   jamais parti. Le premier écran est toujours complet.
+  **Exception pour le décor de section** : un délai fixe y serait contre-productif — à 8 s
+  le visiteur est encore souvent dans le hero, et rétablir le décor à ce moment-là
+  supprimerait justement le fondu voulu. Son filet est un IntersectionObserver : il ne
+  rétablit un motif que si sa section est réellement à l'écran et le motif toujours
+  invisible, et il reste valable à tout moment de la visite.
 
 
 ## Typographie
@@ -134,6 +153,12 @@ zen, teintes naturelles non saturées, animations obligatoires, logo reconstitu�
   est déjà doux, il n'a pas besoin d'être flouté.
 - Les calques du décor sont peints **une seule fois**, en basse résolution, un par image,
   et seulement après l'ouverture : la peinture ne doit jamais bloquer le fil principal.
+  Les motifs de section suivent la même file différée.
+- **Budget du shader de la cascade.** Chaque `fbm` coûte trois `noise`. Réserver le `fbm`
+  aux grandes structures (la lame, la grande ondulation de la lèvre, les strates de roche)
+  et se contenter d'un `noise` partout où le motif est déjà écrasé ou masqué : écume,
+  ondes de la vasque, cassure fine de la lèvre. Mesuré en rendu logiciel : 23,6 im/s avant,
+  18,2 avec des `fbm` partout, 28,1 après ce tri — à qualité visuelle identique.
 - Polices via Google Fonts, images et icônes en SVG intégré.
 - Toujours respecter `prefers-reduced-motion` : couper rideau, particules, parallaxe et
   rotations, garder la page lisible.
