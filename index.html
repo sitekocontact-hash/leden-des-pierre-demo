@@ -10,42 +10,36 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
-<!-- Pose l'état de départ de l'animation avant le premier rendu. Sans JS, la
-     règle ne s'applique pas et la page est simplement visible : rien n'attend
-     un script pour exister. -->
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
   :root {
-    /* Écrin à bijoux : le fond est le velours, le laiton est la monture. */
-    --ink:        #241F29;
-    --ink-deep:   #1C1821;
-    --panel:      #2C2632;
-    --brass:      #B98A4D;
-    --brass-lit:  #D7AD75;
-    --ivory:      #F3EDE3;
-    --muted:      #B3A7AE;
+    /* L'eau tient la page. Le laiton et l'ivoire du logo restent la seule
+       couleur chaude, posée dessus comme une monture sur une pierre. */
+    --abyss:     #0B1013;
+    --deep:      #101A1E;
+    --slate:     #1A2328;
+    --foam:      #C9D3D2;
 
-    --rule:       rgba(243, 237, 227, 0.11);
-    --rule-brass: rgba(185, 138, 77, 0.32);
+    --brass:     #B98A4D;
+    --brass-lit: #D7AD75;
+    --ivory:     #F3EDE3;
+    --muted:     #A9B4B6;
 
-    /* Le logo se recolore par variables : mêmes tracés, monture adaptée au fond sombre. */
-    --logo-gem:        #D7AD75;
-    --logo-leaf:       #8B9A82;
-    --logo-leaf-deep:  #5E6B57;
+    --rule:      rgba(243, 237, 227, 0.13);
+    --slab:      rgba(9, 14, 17, 0.72);
+    --slab-deep: rgba(6, 10, 12, 0.85);
 
-    --measure: 64ch;
     --gutter: clamp(1.25rem, 4vw, 3rem);
     --shell: min(1180px, 100% - (var(--gutter) * 2));
   }
 
   * { box-sizing: border-box; }
-
   html { -webkit-text-size-adjust: 100%; }
 
   body {
     margin: 0;
-    background: var(--ink);
+    background: var(--abyss);
     color: var(--ivory);
     font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-weight: 300;
@@ -58,19 +52,16 @@
     font-family: "Fraunces", "Iowan Old Style", Georgia, serif;
     font-weight: 400;
     font-variation-settings: "SOFT" 30, "WONK" 1;
-    line-height: 1.12;
-    letter-spacing: -0.012em;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
     margin: 0;
     text-wrap: balance;
   }
 
   p { margin: 0; }
   img, svg { max-width: 100%; }
-
   a { color: inherit; }
 
-  /* Le focus se voit toujours, et se voit bien : c'est du laiton plein, pas un
-     halo timide qui disparaît sur le velours. */
   :focus-visible {
     outline: 2px solid var(--brass-lit);
     outline-offset: 3px;
@@ -81,14 +72,43 @@
 
   .skip {
     position: absolute;
-    left: -9999px;
-    top: 0;
+    left: -9999px; top: 0;
     background: var(--brass-lit);
-    color: var(--ink-deep);
+    color: #17120C;
     padding: 0.7rem 1.1rem;
     z-index: 60;
   }
   .skip:focus { left: 1rem; top: 1rem; }
+
+  /* ===================== La cascade, fond de tout le site =====================
+     Le canvas est fixe et couvre le viewport : ce n'est pas un décor de hero,
+     c'est le sol de la page. Le contenu passe dessus, et l'eau continue de
+     descendre derrière lui du haut jusqu'au pied du site. */
+
+  #falls {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    display: block;
+    /* Tant que le shader n'a pas peint sa première image, on regarde déjà de
+       l'eau profonde plutôt qu'un rectangle vide. */
+    background: linear-gradient(180deg, #070B0D 0%, #101A1E 45%, #16232A 100%);
+  }
+
+  /* Assise sombre sous le contenu long : l'eau reste visible, mais elle cesse
+     de scintiller juste derrière un paragraphe. */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(180deg, rgba(7, 11, 13, 0) 0%, rgba(7, 11, 13, 0.55) 40%, rgba(7, 11, 13, 0.62) 100%);
+    transition: opacity 0.5s linear;
+  }
+  .scrim.on { opacity: 1; }
 
   /* ============================ Navigation ============================ */
 
@@ -96,8 +116,7 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(36, 31, 41, 0.86);
-    backdrop-filter: blur(10px);
+    background: rgba(8, 12, 15, 0.62);
     border-bottom: 1px solid var(--rule);
   }
 
@@ -106,31 +125,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    padding-block: 0.9rem;
+    padding-block: 0.85rem;
   }
 
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-    line-height: 1.15;
-  }
-
+  .brand { display: inline-flex; align-items: center; gap: 0.75rem; text-decoration: none; line-height: 1.15; }
   .brand svg { width: 38px; height: 38px; flex: none; }
-
-  .brand-name {
-    font-family: "Fraunces", Georgia, serif;
-    font-size: 1.2rem;
-    letter-spacing: 0.005em;
-  }
-
-  .brand-who {
-    display: block;
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    color: var(--muted);
-  }
+  .brand-name { font-family: "Fraunces", Georgia, serif; font-size: 1.2rem; }
+  .brand-who { display: block; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--muted); }
 
   .nav { display: flex; align-items: center; gap: clamp(1.25rem, 3vw, 2.25rem); }
 
@@ -142,7 +143,6 @@
     border-bottom: 1px solid transparent;
     transition: color 0.18s ease, border-color 0.18s ease;
   }
-
   .nav a:hover { color: var(--ivory); border-bottom-color: var(--brass); }
 
   .nav-toggle {
@@ -172,75 +172,97 @@
 
   .btn-brass {
     background: var(--brass);
-    color: #211B16;
+    color: #17120C;
     border: 1px solid var(--brass);
     font-weight: 500;
   }
   .btn-brass:hover { background: var(--brass-lit); border-color: var(--brass-lit); }
 
   .btn-line {
-    background: none;
+    background: rgba(8, 12, 15, 0.5);
     color: var(--ivory);
-    border: 1px solid var(--rule-brass);
+    border: 1px solid rgba(215, 173, 117, 0.45);
   }
   .btn-line:hover { border-color: var(--brass-lit); color: var(--brass-lit); }
 
-  /* =============================== Hero =============================== */
+  /* =============================== Hero ===============================
+     Rien que du texte sur l'eau. Pas de panneau, pas de voile : l'ivoire sur
+     l'eau sombre tient tout seul, avec une ombre portée qui suit les lettres. */
 
-  .hero { padding-block: clamp(3.5rem, 8vw, 7rem) clamp(3rem, 7vw, 6rem); }
-
-  .hero-in {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-    gap: clamp(2rem, 6vw, 4.5rem);
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
     align-items: center;
+    padding-block: clamp(4rem, 10vh, 8rem) clamp(6rem, 14vh, 10rem);
+  }
+
+  .hero-copy {
+    max-width: min(46rem, 100%);
+    text-shadow:
+      0 1px 3px rgba(4, 8, 10, 0.9),
+      0 0 22px rgba(4, 8, 10, 0.8),
+      0 0 60px rgba(4, 8, 10, 0.7);
   }
 
   .hero h1 {
-    font-size: clamp(2.6rem, 6vw, 4.4rem);
-    max-width: 15ch;
+    font-size: clamp(2.3rem, 4.6vw, 4.1rem);
+    line-height: 1.04;
   }
 
   .hero-lede {
-    margin-top: 1.6rem;
-    max-width: 46ch;
+    margin-top: 1.9rem;
+    max-width: 42ch;
+    color: #DCE2E1;
+    font-size: clamp(1.05rem, 1.5vw, 1.22rem);
+  }
+
+  .hero-actions { margin-top: 2.6rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
+
+  /* Repère de défilement : l'eau descend, la page aussi. */
+  .scroll-cue {
+    position: absolute;
+    left: var(--gutter);
+    bottom: clamp(1.5rem, 4vh, 2.5rem);
     color: var(--muted);
-    font-size: 1.12rem;
-    line-height: 1.7;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .scroll-cue::before {
+    content: "";
+    width: 1px;
+    height: 2.4rem;
+    background: linear-gradient(180deg, transparent, var(--brass));
   }
 
-  .hero-actions { margin-top: 2.4rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
+  /* ============================= Sections ============================= */
 
-  .hero-art { position: relative; }
-  .hero-art svg { display: block; width: 100%; height: auto; }
+  .band { padding-block: clamp(4rem, 9vw, 7.5rem); }
 
-  /* =========================== Sections ============================== */
-
-  .band { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
-  .band-deep { background: var(--ink-deep); }
-
-  .band h2 {
-    font-size: clamp(1.9rem, 3.6vw, 2.7rem);
-    max-width: 18ch;
+  .slab {
+    background: var(--slab);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: clamp(1.75rem, 4vw, 3.25rem);
   }
 
-  .band-intro {
-    margin-top: 1.1rem;
-    max-width: 54ch;
-    color: var(--muted);
-  }
+  .band h2 { font-size: clamp(2rem, 4vw, 3.1rem); max-width: 17ch; }
+
+  .band-intro { margin-top: 1.2rem; max-width: 56ch; color: var(--muted); }
 
   /* ====================== Collection : un écrin ======================
-     Pas quatre cartes flottantes avec la même ombre grise : un seul plateau,
-     divisé par des filets, comme les logements d'un écrin de bijoutier. Les
-     pièces appartiennent visiblement au même coffret. */
+     Un plateau unique divisé par des filets, comme les logements d'un écrin
+     de bijoutier — jamais quatre cartes flottant chacune sur son ombre. */
 
   .tray {
     margin-top: clamp(2rem, 4vw, 3rem);
-    background: var(--panel);
-    border: 1px solid var(--rule);
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: var(--slab-deep);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
   }
 
   .slot {
@@ -251,8 +273,6 @@
   }
   .slot:first-child { border-left: 0; }
 
-  /* Emplacement de la photo à venir. Le dégradé reprend la pierre de la pièce,
-     assez sourd pour se lire comme une réserve et non comme une image ratée. */
   .plate {
     aspect-ratio: 4 / 5;
     border: 1px solid var(--rule);
@@ -264,29 +284,18 @@
 
   .plate span {
     font-size: 0.85rem;
-    color: rgba(243, 237, 227, 0.72);
-    text-shadow: 0 1px 6px rgba(24, 20, 28, 0.65);
+    color: rgba(243, 237, 227, 0.78);
+    text-shadow: 0 1px 6px rgba(4, 8, 10, 0.8);
   }
 
-  .p-amethyste   { background: radial-gradient(120% 100% at 32% 24%, #6F4F91 0%, #4A3564 46%, #2E2340 100%); }
-  .p-tigre       { background: radial-gradient(120% 100% at 32% 24%, #A67836 0%, #74542A 46%, #43301A 100%); }
-  .p-rose        { background: radial-gradient(120% 100% at 32% 24%, #B08084 0%, #7E5A62 46%, #4B3540 100%); }
-  .p-labradorite { background: radial-gradient(120% 100% at 32% 24%, #6E8794 0%, #4B6070 46%, #2C3945 100%); }
+  .p-amethyste   { background: radial-gradient(120% 100% at 32% 24%, #6B4A8C 0%, #402C58 46%, #241A33 100%); }
+  .p-tigre       { background: radial-gradient(120% 100% at 32% 24%, #A0722F 0%, #6B4C24 46%, #3A2914 100%); }
+  .p-rose        { background: radial-gradient(120% 100% at 32% 24%, #AB787D 0%, #755159 46%, #402D36 100%); }
+  .p-labradorite { background: radial-gradient(120% 100% at 32% 24%, #61808E 0%, #405564 46%, #24313C 100%); }
 
   .slot h3 { margin-top: 1.15rem; font-size: 1.3rem; }
-
-  .slot-stone {
-    margin-top: 0.35rem;
-    font-size: 0.95rem;
-    color: var(--muted);
-  }
-
-  .slot-price {
-    margin-top: auto;
-    padding-top: 1.1rem;
-    font-size: 0.95rem;
-    color: var(--brass-lit);
-  }
+  .slot-stone { margin-top: 0.35rem; font-size: 0.95rem; color: var(--muted); }
+  .slot-price { margin-top: auto; padding-top: 1.1rem; font-size: 0.95rem; color: var(--brass-lit); }
 
   /* ========================== Savoir-faire ========================== */
 
@@ -297,8 +306,10 @@
     align-items: start;
   }
 
-  /* Le titre tient seul dans sa colonne : un filet de laiton lui donne un pied
-     et évite que la colonne se lise comme un trou. */
+  /* « Le savoir-faire » doit tenir d'un bloc : coupé après le trait d'union,
+     le mot composé se lit mal. */
+  .craft-in h2 { max-width: none; font-size: clamp(1.9rem, 3.1vw, 2.5rem); }
+
   .craft-in h2::after {
     content: "";
     display: block;
@@ -308,14 +319,13 @@
     background: var(--brass);
   }
 
+  .craft-body { max-width: 64ch; }
   .craft-body p + p { margin-top: 1.1rem; }
-  .craft-body { max-width: var(--measure); }
 
   .craft-note {
     margin-top: 2rem;
     padding-left: 1.25rem;
     border-left: 2px solid var(--brass);
-    color: var(--ivory);
     font-family: "Fraunces", Georgia, serif;
     font-size: 1.2rem;
     line-height: 1.5;
@@ -325,26 +335,23 @@
 
   .contact-in { display: grid; gap: clamp(1.8rem, 4vw, 3rem); max-width: 62ch; }
   .contact-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; }
-
   .btn-ico { display: inline-flex; align-items: center; gap: 0.6rem; }
   .btn-ico svg { width: 19px; height: 19px; flex: none; }
 
   /* ============================== Footer ============================= */
 
   .foot {
+    background: rgba(5, 9, 11, 0.88);
     border-top: 1px solid var(--rule);
     padding-block: 2.25rem;
     color: var(--muted);
     font-size: 0.92rem;
   }
-
   .foot-in { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; }
 
   /* =========================== Responsive =========================== */
 
   @media (max-width: 940px) {
-    .hero-in { grid-template-columns: 1fr; }
-    .hero-art { order: -1; max-width: 460px; }
     .craft-in { grid-template-columns: 1fr; }
     .tray { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .slot:nth-child(3) { border-left: 0; }
@@ -356,56 +363,42 @@
     .nav {
       display: none;
       position: absolute;
-      left: 0; right: 0;
-      top: 100%;
+      left: 0; right: 0; top: 100%;
       flex-direction: column;
       align-items: flex-start;
       gap: 0;
       padding: 0.5rem var(--gutter) 1rem;
-      background: var(--ink-deep);
+      background: rgba(6, 10, 12, 0.96);
       border-bottom: 1px solid var(--rule);
     }
     .nav.open { display: flex; }
     .nav a { width: 100%; padding-block: 0.7rem; }
-
     .topbar-in { position: relative; }
 
     .tray { grid-template-columns: minmax(0, 1fr); }
     .slot { border-left: 0; }
     .slot + .slot { border-top: 1px solid var(--rule); }
     .plate { aspect-ratio: 3 / 2; }
+    .scroll-cue { display: none; }
   }
 
-  /* ===================== L'unique animation de la page =====================
-     Une seule ouverture, sur le hero. Rien ailleurs : ni apparition au scroll,
-     ni effet au survol des pièces. */
+  /* ===================== L'unique animation d'interface =====================
+     L'eau, elle, ne s'arrête jamais : c'est le fond, pas un effet. Cette
+     ouverture-ci concerne le seul texte du hero, et ne joue qu'une fois. */
 
-  .js .lift { opacity: 0; transform: translateY(16px); }
-
+  .js .lift { opacity: 0; transform: translateY(18px); }
   .js .lift.ready {
     opacity: 1;
     transform: none;
-    transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
-
-  .js .lift:nth-child(2).ready { transition-delay: 0.09s; }
-  .js .lift:nth-child(3).ready { transition-delay: 0.18s; }
-
-  .js .hero-art { opacity: 0; transform: scale(0.985); }
-  .js .hero-art.ready {
-    opacity: 1;
-    transform: none;
-    transition: opacity 1s ease 0.1s, transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
-  }
+  .js .lift:nth-child(2).ready { transition-delay: 0.1s; }
+  .js .lift:nth-child(3).ready { transition-delay: 0.2s; }
 
   @media (prefers-reduced-motion: reduce) {
-    .js .lift,
-    .js .hero-art {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
+    .js .lift { opacity: 1; transform: none; transition: none; }
+    .scrim { transition: none; }
   }
 </style>
 </head>
@@ -413,72 +406,19 @@
 
 <a class="skip" href="#collection">Aller à la collection</a>
 
+<canvas id="falls" aria-hidden="true"></canvas>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <g id="leaf-shape">
       <path d="M0 0C6.5-8.5 17.5-12.5 25.5-12.5C24.5-4.5 15.5 5.5 0 0Z"/>
     </g>
-    <g id="sparkle-shape">
-      <path d="M0-10C1.4-3.2 3.2-1.4 10 0C3.2 1.4 1.4 3.2 0 10C-1.4 3.2-3.2 1.4-10 0C-3.2-1.4-1.4-3.2 0-10Z"/>
-    </g>
-
     <linearGradient id="brass-facet" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#D7AD75"/>
       <stop offset="0.45" stop-color="#B98A4D"/>
       <stop offset="1" stop-color="#8A6534"/>
     </linearGradient>
-
-    <!-- Logo de la maison, repris tel quel du dessin d'origine : le cercle
-         gravé, les cristaux et la branche d'eucalyptus. Seule la monture
-         change de teinte pour tenir sur le velours sombre. -->
-    <symbol id="seal-decor" viewBox="0 0 240 240">
-      <g fill="none" stroke="url(#brass-facet)" stroke-width="1.3" stroke-linecap="round">
-        <path d="M11.8 149 A112 112 0 1 1 228.2 149"/>
-        <path d="M16.4 110.9 A104 104 0 0 1 210.1 68" opacity="0.7"/>
-        <path d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
-        <path d="M192.8 192.8 A103 103 0 0 1 111 222.6" opacity="0.65"/>
-      </g>
-      <g fill="var(--logo-gem)">
-        <circle cx="223.8" cy="78" r="2.6"/><circle cx="227.6" cy="89.1" r="2.2"/>
-        <circle cx="230.3" cy="100.5" r="1.9"/><circle cx="231.7" cy="112.2" r="1.5"/>
-        <circle cx="231.9" cy="123.9" r="1.2"/>
-      </g>
-      <g fill="none" stroke="url(#brass-facet)" stroke-width="1.25" stroke-linejoin="round">
-        <path d="M120 42 134 66 132 104 108 104 106 66Z"/>
-        <path d="M106 66H134M120 42V104" opacity="0.6"/>
-        <path d="M92 74 104 92 100 110 82 110 80 92Z"/>
-        <path d="M80 92H104M92 74V110" opacity="0.55"/>
-        <path d="M150 66 160 88 157 110 140 110 138 88Z"/>
-        <path d="M138 88H160M150 66V110" opacity="0.55"/>
-      </g>
-      <g fill="var(--logo-gem)">
-        <use href="#sparkle-shape" transform="translate(170 62) scale(0.5)" opacity="0.7"/>
-        <use href="#sparkle-shape" transform="translate(88 50) scale(0.32)" opacity="0.55"/>
-        <use href="#sparkle-shape" transform="translate(176 98) scale(0.34)" opacity="0.6"/>
-      </g>
-      <g stroke="var(--logo-leaf-deep)" stroke-width="1.4" fill="none" stroke-linecap="round">
-        <path d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48"/>
-      </g>
-      <g fill="var(--logo-leaf)" stroke="var(--logo-leaf-deep)" stroke-width="0.9" opacity="0.92">
-        <use href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
-        <use href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
-        <use href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
-        <use href="#leaf-shape" transform="translate(48 163) rotate(-148) scale(-1 1)"/>
-        <use href="#leaf-shape" transform="translate(43 148) rotate(-48) scale(1.1)"/>
-        <use href="#leaf-shape" transform="translate(41 132) rotate(-142) scale(-1 1)"/>
-        <use href="#leaf-shape" transform="translate(40 116) rotate(-54) scale(1.05)"/>
-        <use href="#leaf-shape" transform="translate(43 100) rotate(-136) scale(-0.95 0.95)"/>
-        <use href="#leaf-shape" transform="translate(48 86) rotate(-60)"/>
-        <use href="#leaf-shape" transform="translate(56 71) rotate(-130) scale(-0.9 0.9)"/>
-        <use href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
-        <use href="#leaf-shape" transform="translate(78 49) rotate(-124) scale(-0.8 0.8)"/>
-      </g>
-      <g fill="var(--logo-gem)">
-        <circle cx="67" cy="197" r="3"/><circle cx="53" cy="171" r="2.4"/>
-        <circle cx="45" cy="141" r="3.2"/><circle cx="46" cy="105" r="2.3"/>
-        <circle cx="61" cy="74" r="2.8"/><circle cx="82" cy="53" r="2"/>
-      </g>
-    </symbol>
 
     <symbol id="mark-small" viewBox="0 0 240 240">
       <g fill="none" stroke="url(#brass-facet)" stroke-width="5" stroke-linecap="round">
@@ -490,7 +430,7 @@
         <path d="M108 88H156" opacity="0.5"/>
         <path d="M92 96 106 120 103 168 78 168 76 120Z"/>
       </g>
-      <g fill="var(--logo-leaf)" stroke="var(--logo-leaf-deep)" stroke-width="2.4">
+      <g fill="#8B9A82" stroke="#5E6B57" stroke-width="2.4">
         <use href="#leaf-shape" transform="translate(66 196) rotate(-46) scale(1.35)"/>
         <use href="#leaf-shape" transform="translate(52 160) rotate(-134) scale(-1.35 1.35)"/>
         <use href="#leaf-shape" transform="translate(50 122) rotate(-58) scale(1.3)"/>
@@ -522,7 +462,7 @@
 <main id="top">
 
   <section class="hero">
-    <div class="shell hero-in">
+    <div class="shell">
       <div class="hero-copy">
         <h1 class="lift">Des pierres choisies une par une, montées à la main</h1>
         <p class="hero-lede lift">
@@ -535,106 +475,20 @@
           <a class="btn btn-line" href="#savoir-faire">Comment je travaille</a>
         </div>
       </div>
-
-      <div class="hero-art">
-        <svg viewBox="0 0 560 520" role="img" aria-label="Illustration de quatre pierres facettées : améthyste, œil-de-tigre, quartz rose et labradorite">
-          <defs>
-            <radialGradient id="glow" cx="0.46" cy="0.44" r="0.6">
-              <stop offset="0" stop-color="#B98A4D" stop-opacity="0.3"/>
-              <stop offset="0.55" stop-color="#B98A4D" stop-opacity="0.08"/>
-              <stop offset="1" stop-color="#B98A4D" stop-opacity="0"/>
-            </radialGradient>
-
-            <radialGradient id="amethyste" cx="0.34" cy="0.24" r="0.86">
-              <stop offset="0" stop-color="#CDA9EA"/>
-              <stop offset="0.46" stop-color="#8059A8"/>
-              <stop offset="1" stop-color="#432B62"/>
-            </radialGradient>
-            <radialGradient id="tigre" cx="0.34" cy="0.24" r="0.86">
-              <stop offset="0" stop-color="#EDC57E"/>
-              <stop offset="0.46" stop-color="#B4823A"/>
-              <stop offset="1" stop-color="#63431B"/>
-            </radialGradient>
-            <radialGradient id="rose" cx="0.34" cy="0.24" r="0.86">
-              <stop offset="0" stop-color="#F2CFCF"/>
-              <stop offset="0.46" stop-color="#CE979C"/>
-              <stop offset="1" stop-color="#7E545E"/>
-            </radialGradient>
-            <radialGradient id="labradorite" cx="0.34" cy="0.24" r="0.86">
-              <stop offset="0" stop-color="#C6D8E0"/>
-              <stop offset="0.46" stop-color="#7A94A6"/>
-              <stop offset="1" stop-color="#374C5C"/>
-            </radialGradient>
-          </defs>
-
-          <ellipse cx="262" cy="252" rx="270" ry="248" fill="url(#glow)"/>
-
-          <!-- Améthyste : taille hexagonale, la pièce maîtresse -->
-          <g stroke="rgba(243,237,227,0.34)" stroke-width="1" stroke-linejoin="round">
-            <path d="M188 96 282 152 274 288 188 366 100 288 94 152Z" fill="url(#amethyste)"/>
-            <path d="M188 152 246 186 240 276 188 320 134 276 128 186Z" fill="#F3EDE3" fill-opacity="0.14"/>
-            <g stroke-opacity="0.5">
-              <path d="M188 96 188 152M282 152 246 186M274 288 240 276M188 366 188 320M100 288 134 276M94 152 128 186"/>
-            </g>
-            <path d="M94 152 128 186 134 276 100 288Z" fill="#1C1821" fill-opacity="0.26" stroke="none"/>
-            <path d="M282 152 274 288 240 276 246 186Z" fill="#F3EDE3" fill-opacity="0.07" stroke="none"/>
-          </g>
-
-          <!-- Œil-de-tigre : taille marquise, posée en biais -->
-          <g stroke="rgba(243,237,227,0.32)" stroke-width="1" stroke-linejoin="round">
-            <path d="M382 214 446 300 382 412 318 300Z" fill="url(#tigre)"/>
-            <path d="M382 258 414 302 382 362 350 302Z" fill="#F3EDE3" fill-opacity="0.15"/>
-            <g stroke-opacity="0.5">
-              <path d="M382 214 382 258M446 300 414 302M382 412 382 362M318 300 350 302"/>
-            </g>
-            <path d="M318 300 350 302 382 362 382 412Z" fill="#1C1821" fill-opacity="0.24" stroke="none"/>
-          </g>
-
-          <!-- Quartz rose : petite taille pentagonale -->
-          <g stroke="rgba(243,237,227,0.3)" stroke-width="1" stroke-linejoin="round">
-            <path d="M436 92 490 130 470 194 402 194 382 130Z" fill="url(#rose)"/>
-            <path d="M436 126 464 146 454 178 418 178 408 146Z" fill="#F3EDE3" fill-opacity="0.16"/>
-            <g stroke-opacity="0.45">
-              <path d="M436 92 436 126M490 130 464 146M470 194 454 178M402 194 418 178M382 130 408 146"/>
-            </g>
-            <path d="M382 130 408 146 418 178 402 194Z" fill="#1C1821" fill-opacity="0.28" stroke="none"/>
-            <path d="M490 130 470 194 454 178 464 146Z" fill="#F3EDE3" fill-opacity="0.09" stroke="none"/>
-            <path d="M436 92 490 130 464 146Z" fill="#F3EDE3" fill-opacity="0.12" stroke="none"/>
-          </g>
-
-          <!-- Labradorite : taille émeraude, presque à plat -->
-          <g stroke="rgba(243,237,227,0.3)" stroke-width="1" stroke-linejoin="round">
-            <path d="M198 400 312 386 330 446 220 468Z" fill="url(#labradorite)"/>
-            <path d="M222 410 296 401 308 438 238 452Z" fill="#F3EDE3" fill-opacity="0.13"/>
-            <g stroke-opacity="0.45">
-              <path d="M198 400 222 410M312 386 296 401M330 446 308 438M220 468 238 452"/>
-            </g>
-            <path d="M198 400 222 410 238 452 220 468Z" fill="#1C1821" fill-opacity="0.3" stroke="none"/>
-            <path d="M220 468 238 452 308 438 330 446Z" fill="#1C1821" fill-opacity="0.16" stroke="none"/>
-            <path d="M198 400 312 386 296 401 222 410Z" fill="#F3EDE3" fill-opacity="0.1" stroke="none"/>
-            <!-- Le reflet bleu-vert qui donne son nom à la labradorescence -->
-            <path d="M240 404 292 399 300 428 250 438Z" fill="#8FC7C0" fill-opacity="0.18" stroke="none"/>
-          </g>
-
-          <!-- Éclats de laiton, très peu nombreux -->
-          <g fill="var(--brass-lit)" opacity="0.75">
-            <use href="#sparkle-shape" transform="translate(316 128) scale(0.62)"/>
-            <use href="#sparkle-shape" transform="translate(486 262) scale(0.4)"/>
-            <use href="#sparkle-shape" transform="translate(126 402) scale(0.34)"/>
-          </g>
-        </svg>
-      </div>
+      <p class="scroll-cue">L'eau descend, la collection suit</p>
     </div>
   </section>
 
-  <section class="band band-deep" id="collection">
+  <section class="band" id="collection">
     <div class="shell">
-      <h2>La collection</h2>
-      <p class="band-intro">
-        Quatre modèles montés cet hiver. Les photos arrivent bientôt ; en
-        attendant, écrivez-moi pour voir les pièces disponibles et leur tour de
-        poignet.
-      </p>
+      <div class="slab">
+        <h2>La collection</h2>
+        <p class="band-intro">
+          Quatre modèles montés cet hiver. Les photos arrivent bientôt ; en
+          attendant, écrivez-moi pour voir les pièces disponibles et leur tour
+          de poignet.
+        </p>
+      </div>
 
       <div class="tray">
         <article class="slot">
@@ -669,63 +523,66 @@
   </section>
 
   <section class="band" id="savoir-faire">
-    <div class="shell craft-in">
-      <h2>Le savoir-faire</h2>
+    <div class="shell">
+      <div class="slab craft-in">
+        <h2>Le savoir-faire</h2>
 
-      <div class="craft-body">
-        <p>
-          Je choisis mes pierres une par une, chez des fournisseurs que je
-          connais, et j'écarte celles dont la teinte a été forcée. Une pierre
-          naturelle porte des inclusions, des veines, des variations de
-          transparence : ce ne sont pas des défauts à corriger, c'est ce qui
-          distingue une pierre d'une perle de verre.
-        </p>
-        <p>
-          Le montage se fait perle à perle, sur fil d'acier gainé pour les
-          pièces lourdes et sur élastique double pour celles qui doivent
-          s'enfiler sans fermoir. Les nœuds sont noyés dans une perle à écraser,
-          jamais laissés apparents, et chaque bracelet est porté quelques jours
-          avant d'être envoyé, le temps de vérifier que rien ne bouge.
-        </p>
+        <div class="craft-body">
+          <p>
+            Je choisis mes pierres une par une, chez des fournisseurs que je
+            connais, et j'écarte celles dont la teinte a été forcée. Une pierre
+            naturelle porte des inclusions, des veines, des variations de
+            transparence : ce ne sont pas des défauts à corriger, c'est ce qui
+            distingue une pierre d'une perle de verre.
+          </p>
+          <p>
+            Le montage se fait perle à perle, sur fil d'acier gainé pour les
+            pièces lourdes et sur élastique double pour celles qui doivent
+            s'enfiler sans fermoir. Les nœuds sont noyés dans une perle à
+            écraser, jamais laissés apparents, et chaque bracelet est porté
+            quelques jours avant d'être envoyé, le temps de vérifier que rien
+            ne bouge.
+          </p>
 
-        <p class="craft-note">
-          Deux bracelets ne peuvent pas être identiques. C'est la raison d'être
-          de l'atelier, pas une limite.
-        </p>
+          <p class="craft-note">
+            Deux bracelets ne peuvent pas être identiques. C'est la raison
+            d'être de l'atelier, pas une limite.
+          </p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="band band-deep" id="contact">
+  <section class="band" id="contact">
     <div class="shell">
-     <div class="contact-in">
-      <div>
-        <h2>Parlons de votre pièce</h2>
-        <p class="band-intro">
-          Dites-moi la pierre qui vous attire, votre tour de poignet et
-          l'occasion, et je vous propose une composition. Je réponds
-          moi-même, en général dans la journée.
-        </p>
-      </div>
+      <div class="slab contact-in">
+        <div>
+          <h2>Parlons de votre pièce</h2>
+          <p class="band-intro">
+            Dites-moi la pierre qui vous attire, votre tour de poignet et
+            l'occasion, et je vous propose une composition. Je réponds
+            moi-même, en général dans la journée.
+          </p>
+        </div>
 
-      <div class="contact-actions">
-        <!-- À compléter : numéro WhatsApp au format international, sans espaces. -->
-        <a class="btn btn-brass btn-ico" href="https://wa.me/33600000000">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5 0a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.5s-.5-1.3-.7-1.7-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4 5.3 5.3 0 0 0 3.2.7 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/>
-          </svg>
-          Écrire sur WhatsApp
-        </a>
+        <div class="contact-actions">
+          <!-- À compléter : numéro WhatsApp au format international, sans espaces. -->
+          <a class="btn btn-brass btn-ico" href="https://wa.me/33600000000">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5 0a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.5s-.5-1.3-.7-1.7-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4 5.3 5.3 0 0 0 3.2.7 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/>
+            </svg>
+            Écrire sur WhatsApp
+          </a>
 
-        <!-- À compléter : adresse de la page Facebook de la marque. -->
-        <a class="btn btn-line btn-ico" href="https://www.facebook.com/">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9a15 15 0 0 1 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/>
+          <!-- À compléter : adresse de la page Facebook de la marque. -->
+          <a class="btn btn-line btn-ico" href="https://www.facebook.com/">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9a15 15 0 0 1 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/>
           </svg>
-          Voir la page Facebook
-        </a>
+            Voir la page Facebook
+          </a>
+        </div>
       </div>
-     </div>
     </div>
   </section>
 
@@ -740,7 +597,9 @@
 
 <script>
 (function () {
-  /* Menu replié sur petit écran. */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------------------- Menu ---------------------------- */
   var toggle = document.getElementById('nav-toggle');
   var nav = document.getElementById('nav');
 
@@ -748,7 +607,6 @@
     var open = nav.classList.toggle('open');
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
-
   nav.addEventListener('click', function (e) {
     if (e.target.tagName === 'A') {
       nav.classList.remove('open');
@@ -756,16 +614,275 @@
     }
   });
 
-  /* L'unique animation : l'ouverture du hero, jouée une fois.
-     Le déclenchement est immédiat plutôt que lié au scroll — il n'y a rien à
-     attendre, le hero est déjà à l'écran. */
-  var opening = document.querySelectorAll('.hero-copy .lift, .hero-art');
-
+  /* ------------------- Ouverture du texte du hero ------------------- */
+  var opening = document.querySelectorAll('.hero-copy .lift');
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       for (var i = 0; i < opening.length; i++) opening[i].classList.add('ready');
     });
   });
+
+  /* =========================== La cascade ===========================
+     Ce qui fait lire « eau » plutôt que « rayures », c'est trois choses, et
+     aucune n'est la quantité de bruit :
+
+     1. du bruit RIDGED (1 - |2n-1|) plutôt qu'un fbm ordinaire. Un fbm étiré
+        donne des bandes molles ; le ridged donne des filaments à crête nette,
+        qui est exactement la forme d'une lame d'eau qui se déchire.
+     2. TROIS nappes à des échelles et des vitesses différentes. Une seule
+        nappe, si détaillée soit-elle, reste un plan : c'est le glissement
+        entre les nappes qui donne l'épaisseur du rideau.
+     3. une LUMIÈRE. L'eau ne se lit pas à sa texture mais à ses reflets :
+        une lumière chaude rasante venue de la droite, et des éclats
+        spéculaires calculés en puissance sur les crêtes.
+  ================================================================== */
+
+  var canvas = document.getElementById('falls');
+
+  function startFalls() {
+    var gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' })
+          || canvas.getContext('experimental-webgl');
+    if (!gl) return false;
+
+    var vert = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}';
+
+    var frag = [
+      'precision highp float;',
+      'uniform vec2 uRes;',
+      'uniform float uTime;',
+      'uniform float uScroll;',
+
+      'float hash(vec2 p){',
+      '  p = fract(p * vec2(127.1, 311.7));',
+      '  p += dot(p, p + 34.53);',
+      '  return fract(p.x * p.y);',
+      '}',
+
+      'float noise(vec2 p){',
+      '  vec2 i = floor(p), f = fract(p);',
+      '  vec2 u = f * f * (3.0 - 2.0 * f);',
+      '  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),',
+      '             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);',
+      '}',
+
+      /* Crête nette au lieu d'une bosse molle : c'est ce profil qui donne le
+         filament d'eau. */
+      'float ridge(vec2 p){ return 1.0 - abs(noise(p) * 2.0 - 1.0); }',
+
+      'float ridgeFbm(vec2 p){',
+      '  float v = 0.0, a = 0.55, w = 0.0;',
+      '  for (int i = 0; i < 3; i++) {',
+      '    v += a * ridge(p);',
+      '    w += a;',
+      '    p = p * 2.17 + 9.1;',
+      '    a *= 0.5;',
+      '  }',
+      '  return v / w;',
+      '}',
+
+      /* Une nappe qui tombe. sx/sy : l'échelle, donc l'éloignement. spd : la
+         vitesse de chute. sharp : la finesse des filets, qui augmente quand on
+         se rapproche. */
+      'float sheet(vec2 p, float sx, float sy, float spd, float sharp, float seed){',
+      '  vec2 q = vec2(p.x * sx + seed, p.y * sy - uTime * spd - uScroll * spd * 2.2);',
+      /* Sans cette ondulation, les filets tombent parfaitement droits et on
+         relit un code-barres. */
+      '  q.x += sin(q.y * 0.30 + uTime * 0.35 + seed) * 0.45;',
+      '  q.x += (noise(vec2(q.y * 0.5, seed)) - 0.5) * 1.1;',
+      /* Une chute n'est pas d'épaisseur constante : certaines colonnes portent
+         plus d'eau que d'autres, et ce dessin dérive très lentement. Sans cette
+         enveloppe, le rideau est régulier comme un tissu imprimé. */
+      '  float envelope = 0.45 + 0.55 * noise(vec2(p.x * 1.7 + seed, uTime * 0.045));',
+      '  return pow(clamp(ridgeFbm(q), 0.0, 1.0), sharp) * envelope;',
+      '}',
+
+      'void main(){',
+      '  vec2 uv = gl_FragCoord.xy / uRes;',
+      '  float asp = uRes.x / uRes.y;',
+      '  vec2 p = vec2(uv.x * asp, uv.y);',
+      '  float y = 1.0 - uv.y;',
+
+      /* La lame accélère en tombant : les nappes sont étirées vers le bas. */
+      '  float fall = 1.0 - y * 0.35;',
+
+      /* L'anisotropie est TOUT : une cellule de bruit doit être vingt fois plus
+         haute que large, sinon on obtient de la fumée marbrée et pas une lame
+         d'eau. C'est le rapport sx/sy qui fait la chute, pas le nombre
+         d'octaves. */
+      '  float far  = sheet(p, 40.0, 2.4 * fall, 0.55, 1.7, 0.0);',
+      '  float mid  = sheet(p, 24.0, 1.7 * fall, 1.00, 2.4, 17.3);',
+      '  float near = sheet(p, 13.0, 1.1 * fall, 1.70, 3.4, 41.7);',
+
+      '  vec3 abyss = vec3(0.030, 0.048, 0.056);',
+      '  vec3 wFar  = vec3(0.115, 0.170, 0.185);',
+      '  vec3 wMid  = vec3(0.300, 0.375, 0.395);',
+      '  vec3 wNear = vec3(0.720, 0.780, 0.780);',
+
+      '  vec3 col = abyss;',
+      '  col = mix(col, wFar,  far  * 0.72);',
+      '  col = mix(col, wMid,  mid  * 0.68);',
+      '  col = mix(col, wNear, near * 0.60);',
+
+      /* Lumière chaude rasante venue de la droite. Les éclats se calculent en
+         puissance sur les crêtes : c'est le reflet, pas la texture, qui fait
+         reconnaître de l'eau. */
+      '  float lit = smoothstep(0.05, 0.95, uv.x);',
+      '  float glint = pow(near, 6.0) * 2.1 + pow(mid, 8.0) * 0.95;',
+      '  col += vec3(0.80, 0.60, 0.33) * glint * lit;',
+
+      /* Un souffle plus froid du côté opposé, pour que la scène ne vire pas
+         monochrome dorée. */
+      '  col += vec3(0.16, 0.26, 0.30) * pow(mid, 5.0) * (1.0 - lit) * 0.5;',
+
+      /* Embruns : ils montent du pied de la chute, ils ne flottent pas devant. */
+      '  float mist = smoothstep(0.58, 1.0, y) * (0.45 + 0.55 * noise(vec2(p.x * 2.2, y * 3.4 - uTime * 0.22)));',
+      '  col = mix(col, vec3(0.245, 0.300, 0.315), mist * 0.6);',
+
+      /* La lumière vient de la droite, donc le côté gauche du rideau est dans
+         son ombre. C'est ce qui porte le texte du hero : pas un voile posé sur
+         l'image, mais l'éclairage de la scène elle-même. */
+      '  col *= mix(0.52, 1.0, smoothstep(0.0, 0.58, uv.x));',
+
+      /* La lèvre du haut reste dans l'ombre : la chute vient de quelque part. */
+      '  col *= mix(0.30, 1.0, smoothstep(0.0, 0.30, y));',
+
+      /* Vignette : elle referme le cadre et pousse l'œil vers le texte. */
+      '  float vig = 1.0 - 0.44 * pow(clamp(length(uv - 0.5) * 1.25, 0.0, 1.0), 2.0);',
+      '  col *= vig;',
+
+      '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.018;',
+      '  gl_FragColor = vec4(col, 1.0);',
+      '}'
+    ].join('\n');
+
+    function compile(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    }
+
+    var vs = compile(gl.VERTEX_SHADER, vert), fs = compile(gl.FRAGMENT_SHADER, frag);
+    if (!vs || !fs) return false;
+
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    var aPos = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    var uRes = gl.getUniformLocation(prog, 'uRes');
+    var uTime = gl.getUniformLocation(prog, 'uTime');
+    var uScroll = gl.getUniformLocation(prog, 'uScroll');
+
+    /* Demi-résolution : l'eau est douce, et cela divise par quatre le nombre
+       de pixels à calculer. */
+    var scale = 0.5;
+
+    function resize() {
+      var w = Math.max(2, Math.round(canvas.clientWidth * scale));
+      var h = Math.max(2, Math.round(canvas.clientHeight * scale));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w; canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    var scroll = 0;
+    function readScroll() {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      scroll = max > 0 ? window.scrollY / max : 0;
+    }
+    readScroll();
+    window.addEventListener('scroll', readScroll, { passive: true });
+    window.addEventListener('resize', readScroll);
+
+    var start = performance.now();
+    function draw(now) {
+      resize();
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, (now - start) / 1000);
+      gl.uniform1f(uScroll, scroll);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    if (reduce) {
+      /* Mouvement réduit : une seule image, choisie à un instant où la lame
+         est déjà formée, puis plus rien ne bouge. */
+      requestAnimationFrame(function () { draw(performance.now() + 6000); });
+      return true;
+    }
+
+    var raf = null, last = 0, running = false;
+    var FRAME = 1000 / 30;
+    var probed = 0, spent = 0, degraded = false;
+
+    function loop(now) {
+      raf = requestAnimationFrame(loop);
+      if (now - last < FRAME) return;
+      var gap = last ? now - last : FRAME;
+      last = now;
+
+      var t0 = performance.now();
+      draw(now);
+      spent += performance.now() - t0 + Math.max(0, gap - FRAME);
+
+      /* Repli en deux temps plutôt qu'un arrêt sec : d'abord on baisse la
+         résolution, et seulement si cela ne suffit pas on fige l'image. Une
+         eau immobile derrière tout un site se voit beaucoup plus qu'une eau
+         un peu moins fine. */
+      if (++probed === 45) {
+        var avg = spent / probed;
+        probed = 0; spent = 0;
+        if (avg > 40) {
+          if (!degraded) {
+            degraded = true;
+            scale = 0.34;
+            canvas.width = 0;
+          } else {
+            pause();
+          }
+        }
+      }
+    }
+
+    function play() { if (!running) { running = true; last = 0; raf = requestAnimationFrame(loop); } }
+    function pause() { if (running) { running = false; cancelAnimationFrame(raf); } }
+
+    document.addEventListener('visibilitychange', function () {
+      document.hidden ? pause() : play();
+    });
+
+    play();
+    return true;
+  }
+
+  if (!startFalls()) {
+    /* Sans WebGL, le dégradé CSS du canvas reste : on regarde de l'eau
+       profonde immobile plutôt qu'un trou noir. */
+    canvas.style.display = 'block';
+  }
+
+  /* Assise sombre : elle ne s'allume qu'une fois le hero passé, là où il y a
+     des paragraphes à lire. */
+  var scrim = document.getElementById('scrim');
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      scrim.classList.toggle('on', window.scrollY > window.innerHeight * 0.55);
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 })();
 </script>
 
