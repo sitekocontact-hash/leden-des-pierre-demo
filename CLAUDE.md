@@ -8,101 +8,72 @@ Il sert de mémoire : plus besoin de réexpliquer la direction à chaque fois.
 - **Nom** : L'Eden des Pierres · **Créatrice** : Sonia
 - **Produit** : bracelets et créations en **pierres naturelles et perles**, montés à la main,
   perle par perle. Jamais de série : chaque pièce est unique.
+- **Vend aujourd'hui sur Facebook** ; le site est la vitrine qui prend le relais.
 - **Positionnement** : artisanal, sincère, haut de gamme sans ostentation. La créatrice parle
   à la première personne ("je sélectionne", "j'aime ces différences").
 - **Argument central** : une pierre naturelle n'est jamais identique à une autre. Les
   différences de teinte, de dessin, d'inclusion et de transparence ne sont pas des défauts,
   c'est la signature de la pierre.
-- **Signature** : « Des pierres naturelles. Des créations qui ont leur propre identité. »
 
 ## Pierres travaillées (référence)
 
 Améthyste (quartz violet) · Quartz rose (laiteux) · Citrine (quartz miel) ·
 Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath opalescent).
 
-## Direction artistique voulue
+## Direction artistique — écrin à bijoux, fond sombre
 
-- **Ambiance** : nature et minéral, immersif, **clair et zen**. Lumière douce, contrastes
-  bas, matière plutôt que couleur. Le site respire le bien-être, pas la bijouterie.
-- **Parti pris chromatique** : jour. Grès pâle, argile, taupe, or patiné très désaturé,
-  encre chaude pour le texte. Jamais de couleur saturée ou « boostée » — la marque vend des
-  pierres **100 % naturellement teintées, non traitées**, le visuel doit rester fidèle à ça.
-  La couleur vient de l'**écart entre une lumière chaude et une ombre froide**, pas de la
-  saturation : c'est ce qui donne de la richesse à une scène naturelle sans la rendre criarde.
-  Le gris-vert de lichen est admis en accent (feuillage) ; pas d'aplat vert vif en fond.
-- **Un seul temps sombre** assumé dans la page : le bandeau de la phrase signature.
-- **Animations attendues** (le client en veut, explicitement), toutes en **GSAP** :
-  - **Ouverture cinématographique** : une scène de pierre mouillée plein écran pendant
-    ~2,5 s, puis le logo émerge en fondu + léger zoom, puis la scène se retire vers le hero.
-    La scène est **générée en WebGL** (shader de bruit fractal avec domaine déformé,
-    reflets spéculaires d'eau, grain fin) — aucun fichier vidéo ni photo à fournir. Repli
-    en dégradé Canvas 2D si WebGL est indisponible.
-  - Titres qui montent ligne par ligne, bandeau de pierres défilant, cartes qui s'inclinent
-    au survol, apparitions progressives au scroll via **ScrollTrigger**.
-  - Une **interaction réelle** : l'atelier où l'on change la pierre et où les perles du
-    bracelet se recomposent en cascade.
-  - **Cascade en fond du hero** : une chute d'eau animée **en continu** derrière le texte,
-    générée par un shader WebGL. Elle occupe **tout le fond du hero**, d'un bord à l'autre :
-    pas de parois qui la bordent. Deux repères la font lire comme une chute et non comme
-    des stries verticales, et ils ne sont pas négociables : la **lèvre de bascule** en haut
-    (roche mouillée, volontairement moins éclairée que l'eau) et la **vasque** en bas, avec
-    sa ligne de choc claire et ses ondes horizontales. Le domaine du bruit est déformé en x
-    pour casser la rigidité des filets — sans cette déformation, on lit un code-barres.
-    **AUCUN lavis clair par-dessus la scène, d'aucune sorte.** Demande explicite et répétée
-    de la cliente : la cascade est le **fond d'écran** du hero, on la voit en entier, d'un
-    bord à l'autre. Pas de voile pleine largeur, pas d'appui local, pas d'ellipse sous la
-    colonne de texte — tout cela a été essayé et refusé. Il ne reste que le raccord du bas
-    vers la section suivante, qui est une transition entre sections, pas un voile sur
-    l'image. La lisibilité passe **uniquement par le texte lui-même** : une ombre portée
-    claire sous `.hero-copy`, plus serrée et plus dense sur les petites capitales
-    (`.kicker`, `.hero-meta`) qui ont peu de matière par lettre. Ne jamais « régler » un
-    problème de contraste du hero en reposant quelque chose sur la scène.
-    Elle ne s'arrête jamais tant que le visiteur reste sur la section. Garde-fous obligatoires —
-    demi-résolution, 3 octaves de bruit, 30 images/seconde, arrêt par IntersectionObserver
-    dès que le hero sort de l'écran, et **repli automatique** qui fige l'eau sur sa dernière
-    image si la machine ne tient pas ~24 im/s. En `prefers-reduced-motion`, une seule image
-    est peinte puis plus rien.
-  - **Profondeur du hero** : les plans (cascade, brume, feuillage, pierres de premier plan,
-    grain) glissent les uns sur les autres à la souris. Amplitude
-    maximale ~10 px sur le plan le plus profond, lissage à 6 % par image : la scène dérive
-    avec une inertie de caméra, elle ne suit pas le curseur. Les plans avant partent à
-    l'inverse des plans arrière. Sans souris, dérive lente et autonome.
-    Ce qui crée la profondeur, c'est d'abord la perspective atmosphérique et le flou de
-    mise au point, pas la vitesse.
-  - **Décor de section** : le paysage ne s'arrête pas au hero. En descendant, une branche
-    d'eucalyptus (celle du logo) et le cercle de perles du bracelet reviennent en fond,
-    en fondu doux à l'entrée plus une légère dérive en **ScrollTrigger** (`scrub`). Deux
-    enveloppes imbriquées : l'extérieure dérive, l'intérieure fond — deux tweens sur la
-    même propriété du même élément se marchent dessus. Chaque motif est ancré dans la zone
-    creuse de SA section, jamais sous un bloc de texte courant, et son opacité de repos est
-    posée en CSS pour qu'il existe même sans GSAP.
-- **Règle non négociable** : aucune section ne doit rester invisible en attendant un scroll.
-  Conciliation avec ScrollTrigger : on ne masque **que** les éléments déjà hors écran au
-  chargement, et un filet de sécurité (8 s) rétablit tout élément dont le déclencheur n'est
-  jamais parti. Le premier écran est toujours complet.
-  **Exception pour le décor de section** : un délai fixe y serait contre-productif — à 8 s
-  le visiteur est encore souvent dans le hero, et rétablir le décor à ce moment-là
-  supprimerait justement le fondu voulu. Son filet est un IntersectionObserver : il ne
-  rétablit un motif que si sa section est réellement à l'écran et le motif toujours
-  invisible, et il reste valable à tout moment de la visite.
+**Cette direction remplace la précédente** (claire, zen, cascade WebGL, ouverture
+cinématographique GSAP). Elle a été demandée explicitement par la cliente. L'ancienne
+version reste consultable dans l'historique git et sur la branche
+`claude/website-design-creation-yodgt1` — ne pas y revenir sans demande.
 
+- **Ambiance** : l'intérieur d'un écrin. Le fond est le velours, le laiton est la monture,
+  les pierres sont la seule vraie couleur de la page.
+- **Un seul écran, un seul fichier** : `index.html` contient le HTML, le CSS et le JS.
+  Aucun framework, aucune étape de build, aucune dépendance externe hors polices.
 
-## Typographie
-
-- Titres : **Cormorant Garamond** (serif, capitales fines, italique pour les mots accentués)
-- Script de marque : **Mrs Saint Delafield** (reprend le « des Pierres » du logo, usage rare)
-- Texte courant : **Jost** en graisse légère (200–400)
-
-## Palette (version claire, pierre naturelle)
+### Palette (obligatoire, fixée par la cliente)
 
 | Rôle | Valeur |
 | --- | --- |
-| Papier / fond | `#EDE6D6` — fond alterné `#E5DCC8`, creux `#D9CEB4`. **Jamais de blanc ni de quasi-blanc** : le fond est une teinte pierre assumée. |
-| Pierre (traits, bordures) | `#CFC5AC` — profond `#A99C7C` |
-| Or patiné (accent) | `#9C8557` — clair `#C1AA80`, texte `#6C5A3A` |
-| Mousse (accent rare, jamais en fond) | `#7E8871` — profond `#545C48` |
-| Encre (texte) | `#322C24` — secondaire `#6C6353`, titres `#211D18` |
+| Fond principal | `#241F29` (aubergine/charbon) — creux `#1C1821` |
+| Panneaux | `#2C2632` |
+| Laiton (accent) | `#B98A4D` — clair `#D7AD75` |
+| Texte | `#F3EDE3` (ivoire) — secondaire `#B3A7AE` |
 
+### Typographie
+
+- Titres : **Fraunces** (serif chaleureux, axes `SOFT` et `WONK` utilisés)
+- Texte courant : **Inter**, graisse légère (300–500)
+
+## Tics de page générée — à ne jamais réintroduire
+
+La cliente a rejeté ces réflexes nommément. Ils sont interdits sur ce projet :
+
+- fond crème + accent terracotta (c'était l'ancienne direction, elle est abandonnée) ;
+- cartes identiques à coins arrondis avec la même ombre grise douce, façon SaaS ;
+- labels en CAPITALES espacées, eyebrows au-dessus de chaque titre ;
+- flèche `→` accolée au texte des boutons et des liens ;
+- numérotation `01 / 02 / 03` sur du contenu qui n'est pas une séquence ;
+- chaînes de méta jointes par des points médians (`A · B · C`).
+
+**La collection ne se fait pas en cartes.** Elle est un **plateau unique** (`.tray`), divisé
+par des filets, comme les logements d'un écrin de bijoutier : les pièces appartiennent
+visiblement au même coffret. Ne pas la refactoriser en quatre cartes flottantes.
+
+## Animation
+
+**Une seule animation dans toute la page** : l'ouverture du hero (le texte monte, les
+pierres apparaissent), jouée une fois au chargement. Rien d'autre — ni apparition au
+défilement, ni effet au survol des pièces. C'est une contrainte de la cliente, pas un
+manque.
+
+Elle est en CSS pur, déclenchée par une classe posée en JS. Le principe : le script ajoute
+`js` sur `<html>` avant le premier rendu, ce qui seul active l'état de départ. Sans JS, la
+règle ne s'applique pas et la page est simplement visible. Rien n'attend un script pour
+exister.
+
+`prefers-reduced-motion` annule l'état de départ : tout est visible d'emblée.
 
 ## Logo
 
@@ -110,72 +81,45 @@ Le logo original est un cercle doré avec branche d'eucalyptus, cristaux gravés
 en serif, « des Pierres » en anglaise dorée, puis « Sonia ». Il est **reconstitué en SVG**
 dans `index.html` (symboles `#seal-decor` pour la version complète et `#mark-small` pour
 l'icône de navigation). Réutiliser ces symboles plutôt que de repartir d'une image bitmap :
-ils restent nets à toute taille et se colorent via les variables CSS.
+ils restent nets à toute taille et se colorent via les variables `--logo-gem`,
+`--logo-leaf` et `--logo-leaf-deep`, plus le dégradé `#brass-facet`.
+
+## Illustration des pierres
+
+Le hero n'a pas de photo : quatre pierres facettées en SVG (améthyste, œil-de-tigre, quartz
+rose, labradorite), en polygones avec dégradés radiaux. Chaque pierre a une table centrale
+plus claire et des facettes latérales assombries ou éclaircies — sans ces facettes, on lit
+un polygone plat et non une pierre taillée.
 
 ## À faire fournir par la cliente
 
-- **`assets/hero-cascade.jpg` — la photo de cascade du hero. Priorité haute.**
-  Le fond voulu est une **vraie photo**, pas une scène calculée : le shader WebGL a été
-  jugé « peint par un peintre, pas réaliste » et n'est plus qu'un repli en attendant le
-  fichier. Il suffit de déposer l'image à ce chemin : le plan `.layer-photo` la détecte au
-  chargement, prend la main, et les quatre calques calculés (eau, écume, feuillage,
-  pierres) s'effacent — le shader n'est alors même jamais démarré, ce qui fait presque
-  doubler la fluidité du hero (mesuré 24 → 45 im/s en rendu logiciel).
-  Cadrage : format paysage, chute plutôt à droite pour laisser respirer la colonne de
-  texte à gauche, teintes naturelles désaturées, pas de bleu vif ni de vert saturé.
-  **Licence** : le site est commercial, donc pas d'image prise au hasard sur le web.
-  Unsplash ou Pexels conviennent (usage commercial autorisé, sans attribution obligatoire).
-- Photos réelles des créations (les pierres sont pour l'instant des illustrations SVG)
-- Coordonnées : email et compte Instagram
-- Éventuellement : tarifs, délais de fabrication, conditions d'envoi
+- **Le lien WhatsApp et l'adresse de la page Facebook** : les deux boutons de la section
+  contact portent des URL de remplacement, signalées par un commentaire dans le HTML.
+- **Photos réelles des créations.** Les quatre emplacements `.plate` affichent « Photo à
+  venir » sur un dégradé aux teintes de la pierre concernée.
+- Éventuellement : tarifs (aujourd'hui « Prix sur demande »), délais, conditions d'envoi.
 
 ## Skills de design installés
 
 Le dépôt embarque trois compétences sous `.claude/skills/` (voir leur README) :
 
-- **`impeccable`** — direction artistique et contrôle qualité, avec ses commandes
-  `/impeccable polish`, `audit`, `critique`, `animate`, `bolder`, `quieter`, `harden`.
-- **`ui-ux-pro-max`** — base consultable de styles, palettes, associations de polices,
-  règles UX, presets d'animation.
-- **`frontend-design`** (Anthropic) — direction visuelle : ancrer le design dans le sujet,
-  choisir la typographie de façon délibérée, repérer les tics de mise en page qui trahissent
-  une page générée.
+- **`impeccable`** — direction artistique et contrôle qualité.
+- **`ui-ux-pro-max`** — base consultable de styles, palettes, associations de polices.
+- **`frontend-design`** (Anthropic) — direction visuelle, repérage des tics de mise en page.
 
-  **Note pour les prochaines sessions** : `frontend-design` signale le combo « fond crème
-  chaud + serif contrasté + accent terre cuite » comme un tic d'IA. La direction de ce site
-  en est proche — mais elle est **tirée du logo réel de la cliente** (or patiné, sauge, grès),
-  pas d'un réflexe par défaut. C'est une exception justifiée, à ne pas « corriger ».
-
-Les utiliser pour toute nouvelle page ou refonte de ce projet : elles priment sur les
-réflexes par défaut, mais **jamais sur le brief de marque ci-dessus** (direction claire et
-zen, teintes naturelles non saturées, animations obligatoires, logo reconstitué en SVG).
+Les utiliser pour toute nouvelle page ou refonte, mais **jamais contre le brief ci-dessus** :
+la palette, la typographie et la liste des tics interdits viennent de la cliente.
 
 ## Conventions techniques
 
 - HTML/CSS/JS autonome, sans framework ni build. Tout tient dans `index.html`.
-- Seule dépendance externe : **GSAP + ScrollTrigger** (CDN cdnjs, version épinglée).
-  Toutes les animations passent par GSAP, pas par des `@keyframes` dispersés.
-- **L'ouverture doit toujours se fermer**, quoi qu'il arrive : `endIntro()` est idempotente
-  et appelée par la timeline GSAP, par le repli CSS, et par un garde-fou à 5,2 s. Sur une
-  machine lente, l'horloge de GSAP peut être affamée et la timeline ne jamais atteindre son
-  terme — le visiteur ne doit pas rester bloqué sur l'écran d'ouverture.
-- **Jamais deux moteurs d'animation lourds en même temps** : le shader WebGL de l'ouverture
-  s'arrête avant que la boucle de parallaxe démarre. Ils se disputaient le GPU et gelaient
-  la timeline (mesuré : 15 images en 7 s).
-- **Pas de `filter: blur()` sur une grande surface animée.** Le flou est cuit dans le canvas
-  au moment de la peinture. Deux halos floutés en plein écran coûtaient à eux seuls la
-  moitié de la fluidité de la page (17 → 61 images/s une fois retirés). Un dégradé radial
-  est déjà doux, il n'a pas besoin d'être flouté.
-- Les calques du décor sont peints **une seule fois**, en basse résolution, un par image,
-  et seulement après l'ouverture : la peinture ne doit jamais bloquer le fil principal.
-  Les motifs de section suivent la même file différée.
-- **Budget du shader de la cascade.** Chaque `fbm` coûte trois `noise`. Réserver le `fbm`
-  aux grandes structures (la lame, la grande ondulation de la lèvre, les strates de roche)
-  et se contenter d'un `noise` partout où le motif est déjà écrasé ou masqué : écume,
-  ondes de la vasque, cassure fine de la lèvre. Mesuré en rendu logiciel : 23,6 im/s avant,
-  18,2 avec des `fbm` partout, 28,1 après ce tri — à qualité visuelle identique.
-- Polices via Google Fonts, images et icônes en SVG intégré.
-- Toujours respecter `prefers-reduced-motion` : couper rideau, particules, parallaxe et
-  rotations, garder la page lisible.
-- Responsive : menu replié sous 1040px, grilles en une colonne sous 640px.
+- **Seule dépendance externe : Google Fonts** (Fraunces et Inter). Plus de GSAP : une seule
+  animation en CSS ne le justifie pas, et cela retire une dépendance CDN.
+- Toujours respecter `prefers-reduced-motion`.
+- **Le focus clavier doit rester visible partout** : contour laiton plein de 2 px, jamais
+  supprimé. Vérifié par parcours au clavier, pas à l'œil.
+- **Contrastes** : tout texte doit passer AA sur son fond réel (4,5:1, ou 3:1 au-delà de
+  24 px). À vérifier par mesure, y compris le texte secondaire `#B3A7AE` et le laiton.
+- Responsive : navigation repliée sous 620px, plateau en deux colonnes sous 940px puis en
+  une seule sous 620px.
 - Textes en français, apostrophes typographiques, pas d'emoji dans l'interface.

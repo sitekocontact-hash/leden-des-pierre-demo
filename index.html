@@ -1,1106 +1,417 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="L'Eden des Pierres — bracelets en pierres naturelles non traitées, montés à la main par Sonia.">
-<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>L'Eden des Pierres</title>
+<title>L'Eden des Pierres — bracelets en pierres naturelles, montés à la main</title>
+<meta name="description" content="Sonia monte à la main des bracelets en pierres naturelles non traitées. Chaque pierre est choisie une par une, chaque pièce est unique.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Mrs+Saint+Delafield&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Pose l'état de départ de l'animation avant le premier rendu. Sans JS, la
+     règle ne s'applique pas et la page est simplement visible : rien n'attend
+     un script pour exister. -->
+<script>document.documentElement.classList.add('js');</script>
 
 <style>
-  /* ============ Système de couleurs — pierre naturelle, jour, zen ============ */
   :root {
-    --paper: #EDE6D6;
-    --sand: #E5DCC8;
-    --sand-deep: #D9CEB4;
-    --stone: #CFC5AC;
-    --stone-deep: #A99C7C;
-    --clay: #9C8557;
-    --clay-soft: #C1AA80;
-    --clay-deep: #6C5A3A;
-    --moss: #7E8871;
-    --moss-deep: #545C48;
-    --ink: #322C24;
-    --ink-soft: #6C6353;
-    --ink-deep: #211D18;
+    /* Écrin à bijoux : le fond est le velours, le laiton est la monture. */
+    --ink:        #241F29;
+    --ink-deep:   #1C1821;
+    --panel:      #2C2632;
+    --brass:      #B98A4D;
+    --brass-lit:  #D7AD75;
+    --ivory:      #F3EDE3;
+    --muted:      #B3A7AE;
 
-    --glass: rgba(50, 44, 36, 0.035);
-    --glass-strong: rgba(50, 44, 36, 0.06);
-    --edge: rgba(156, 133, 87, 0.28);
-    --edge-soft: rgba(126, 136, 113, 0.2);
+    --rule:       rgba(243, 237, 227, 0.11);
+    --rule-brass: rgba(185, 138, 77, 0.32);
 
-    --shell: min(1280px, 100% - 3rem);
-    --r-card: 20px;
-    --r-pill: 999px;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    --shadow: 0 24px 54px -32px rgba(50, 44, 36, 0.28);
+    /* Le logo se recolore par variables : mêmes tracés, monture adaptée au fond sombre. */
+    --logo-gem:        #D7AD75;
+    --logo-leaf:       #8B9A82;
+    --logo-leaf-deep:  #5E6B57;
+
+    --measure: 64ch;
+    --gutter: clamp(1.25rem, 4vw, 3rem);
+    --shell: min(1180px, 100% - (var(--gutter) * 2));
   }
 
   * { box-sizing: border-box; }
 
+  html { -webkit-text-size-adjust: 100%; }
+
   body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: "Jost", "Avenir Next", "Segoe UI", sans-serif;
+    margin: 0;
+    background: var(--ink);
+    color: var(--ivory);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-weight: 300;
-    font-size: 16.5px;
-    line-height: 1.72;
-    overflow-x: hidden;
+    font-size: 1.0625rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3 {
-    font-family: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    font-family: "Fraunces", "Iowan Old Style", Georgia, serif;
     font-weight: 400;
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-variation-settings: "SOFT" 30, "WONK" 1;
+    line-height: 1.12;
+    letter-spacing: -0.012em;
     margin: 0;
     text-wrap: balance;
-    color: var(--ink-deep);
   }
 
   p { margin: 0; }
+  img, svg { max-width: 100%; }
+
   a { color: inherit; }
 
+  /* Le focus se voit toujours, et se voit bien : c'est du laiton plein, pas un
+     halo timide qui disparaît sur le velours. */
   :focus-visible {
-    outline: 2px solid var(--clay-deep);
-    outline-offset: 4px;
-    border-radius: 6px;
+    outline: 2px solid var(--brass-lit);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   .shell { width: var(--shell); margin-inline: auto; }
 
-  .script {
-    font-family: "Mrs Saint Delafield", "Snell Roundhand", cursive;
-    color: var(--clay-deep);
-    line-height: 0.92;
-  }
-
-  .kicker {
-    font-size: 0.7rem;
-    font-weight: 400;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--clay-deep);
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .kicker::before {
-    content: "";
-    width: 34px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--stone-deep));
-  }
-
-  .lede {
-    font-size: clamp(1.1rem, 1.7vw, 1.32rem);
-    color: var(--ink);
-    font-weight: 300;
-    max-width: 60ch;
-  }
-
-  .body-text { color: var(--ink-soft); max-width: 62ch; }
-
-  /* ============ Décor ambiant — lumière, jamais de fond vert ============ */
-
-  .backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background:
-      radial-gradient(115% 80% at 50% -8%, #F2ECDD 0%, transparent 55%),
-      radial-gradient(90% 70% at 88% 105%, #E2D6BA 0%, transparent 60%),
-      var(--paper);
-  }
-
-  /* Un dégradé radial est déjà parfaitement doux : le filter: blur(80px) qui
-     était appliqué ici n'ajoutait presque rien à l'œil et coûtait la moitié
-     de la fluidité de la page (mesuré : 17 → 61 images/s sans lui). */
-  .bloom {
-    position: fixed;
-    z-index: -1;
-    border-radius: 50%;
-    opacity: 0.75;
-    pointer-events: none;
-    will-change: transform;
-  }
-
-  .bloom-a {
-    width: 42vw; height: 42vw; left: -8vw; top: 2vh;
-    background: radial-gradient(circle, rgba(193, 170, 128, 0.3) 0%, rgba(193, 170, 128, 0.12) 42%, transparent 72%);
-    animation: driftA 40s ease-in-out infinite;
-  }
-
-  .bloom-b {
-    width: 36vw; height: 36vw; right: -6vw; top: 30vh;
-    background: radial-gradient(circle, rgba(126, 136, 113, 0.15) 0%, rgba(126, 136, 113, 0.06) 44%, transparent 72%);
-    animation: driftB 50s ease-in-out infinite;
-  }
-
-  @keyframes driftA {
-    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(5vw, -4vh, 0) scale(1.08); }
-  }
-
-  @keyframes driftB {
-    0%, 100% { transform: translate3d(0, 0, 0) scale(1.03); }
-    50% { transform: translate3d(-5vw, 5vh, 0) scale(0.94); }
-  }
-
-  #dust {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /* ============ Intro cinématographique ============ */
-
-  .cine {
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    background: #C9BC9C;
-    overflow: hidden;
-  }
-
-  .cine-scene {
+  .skip {
     position: absolute;
-    inset: -2%;
-    width: 104%;
-    height: 104%;
-    display: block;
-  }
-
-  .cine-veil {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(46% 46% at 50% 47%, rgba(24, 20, 14, 0.62) 0%, rgba(24, 20, 14, 0.22) 55%, transparent 78%),
-      linear-gradient(180deg, rgba(28, 24, 18, 0.3) 0%, rgba(28, 24, 18, 0.04) 34%, rgba(28, 24, 18, 0.38) 100%);
-  }
-
-  .cine-logo {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    opacity: 0;
-  }
-
-  .cine-logo .seal {
-    width: min(74vw, 380px);
-    font-size: clamp(11px, 2.4vw, 17px);
-  }
-
-  .cine-logo .seal > svg {
-    filter: brightness(1.42) saturate(0.62)
-            drop-shadow(0 6px 22px rgba(12, 10, 6, 0.85))
-            drop-shadow(0 0 50px rgba(12, 10, 6, 0.5));
-  }
-
-  .cine-logo .seal-word .eden,
-  .cine-logo .seal-word .sonia { color: #F6EFDD; }
-
-  .cine-logo .seal-word .pierres,
-  .cine-logo .seal-rule { color: #E4C58C; }
-
-  .cine-word {
-    position: absolute;
-    bottom: clamp(2rem, 8vh, 5rem);
-    left: 50%;
-    translate: -50% 0;
-    font-size: 0.66rem;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: #F8F1DE;
-    opacity: 0;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  /* Repli sans GSAP : si la librairie n'est pas chargée (CDN bloqué, hors ligne),
-     l'ouverture se joue quand même, en CSS pur. */
-
-  .cine.no-gsap { animation: cine-out 900ms var(--ease) 2600ms forwards; }
-
-  .cine.no-gsap .cine-logo {
-    animation: cine-logo-in 1000ms var(--ease) 1500ms forwards;
-    scale: 1.08;
-  }
-
-  .cine.no-gsap .cine-word { animation: cine-word-in 700ms var(--ease) 1800ms forwards; }
-
-  @keyframes cine-logo-in { to { opacity: 1; scale: 1; } }
-  @keyframes cine-word-in { from { opacity: 0; translate: -50% 8px; } to { opacity: 1; translate: -50% 0; } }
-  @keyframes cine-out { to { opacity: 0; scale: 1.05; visibility: hidden; } }
-
-  /* ============ Sceau / logo — géométrie inchangée, rendu affiné ============ */
-
-  .seal {
-    position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    font-size: clamp(9px, 1.15vw, 14px);
-  }
-
-  .seal > svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 2px 10px rgba(108, 90, 58, 0.25));
-  }
-
-  .seal-word {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding-top: 4.6em;
-    padding-left: 1.1em;
-  }
-
-  .seal-word .eden {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 3.05em;
-    font-weight: 500;
+    left: -9999px;
+    top: 0;
+    background: var(--brass-lit);
     color: var(--ink-deep);
-    line-height: 0.9;
-  }
-
-  .seal-word .pierres {
-    font-family: "Mrs Saint Delafield", cursive;
-    font-size: 3.5em;
-    color: var(--clay-deep);
-    line-height: 0.8;
-    margin-top: 0.1em;
-  }
-
-  .seal-rule {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    margin-top: 0.7em;
-    color: var(--clay-deep);
-  }
-
-  .seal-rule i { display: block; width: 2.4em; height: 1px; background: currentColor; }
-  .seal-rule b { width: 0.4em; height: 0.4em; background: currentColor; rotate: 45deg; }
-
-  .seal-word .sonia {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.3em;
-    letter-spacing: 0.24em;
-    color: var(--moss-deep);
-    margin-top: 0.5em;
-  }
-
-  /* ============ Navigation ============ */
-
-  .progress {
-    position: fixed;
-    top: 0; left: 0;
-    height: 2px;
-    width: 100%;
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    background: linear-gradient(90deg, var(--moss), var(--clay-deep));
+    padding: 0.7rem 1.1rem;
     z-index: 60;
   }
+  .skip:focus { left: 1rem; top: 1rem; }
+
+  /* ============================ Navigation ============================ */
 
   .topbar {
     position: sticky;
     top: 0;
     z-index: 50;
-    backdrop-filter: blur(16px);
-    background: linear-gradient(180deg, rgba(237, 230, 214, 0.92), rgba(237, 230, 214, 0.46));
-    border-bottom: 1px solid rgba(50, 44, 36, 0.07);
+    background: rgba(36, 31, 41, 0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
   }
 
-  .topbar-inner {
-    position: relative;
+  .topbar-in {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    height: 76px;
+    padding-block: 0.9rem;
   }
 
-  .brand { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
-
-  .brand-mark { width: 40px; height: 40px; flex: none; }
-
-  .brand-name {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.16rem;
-    letter-spacing: 0.06em;
-    color: var(--ink-deep);
-  }
-
-  .brand-sub {
-    display: block;
-    font-size: 0.56rem;
-    letter-spacing: 0.36em;
-    text-transform: uppercase;
-    color: var(--clay-deep);
-    margin-top: 0.22rem;
-  }
-
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2.1rem;
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-
-  .nav-links a {
-    position: relative;
-    text-decoration: none;
-    padding-block: 0.4rem;
-    transition: color 0.3s ease;
-  }
-
-  .nav-links a::after {
-    content: "";
-    position: absolute;
-    left: 0; bottom: 0;
-    height: 1px; width: 100%;
-    background: var(--clay-deep);
-    transform: scaleX(0);
-    transform-origin: 100% 50%;
-    transition: transform 0.45s var(--ease);
-  }
-
-  .nav-links a:hover { color: var(--ink-deep); }
-  .nav-links a:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
-
-  .btn {
-    position: relative;
+  .brand {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: "Jost", sans-serif;
-    font-size: 0.76rem;
-    font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    gap: 0.75rem;
     text-decoration: none;
-    padding: 0.95rem 1.9rem;
-    border-radius: var(--r-pill);
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: transform 0.25s var(--ease), border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
+    line-height: 1.15;
   }
 
-  .btn::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--ink-deep);
-    transition: transform 0.5s var(--ease);
+  .brand svg { width: 38px; height: 38px; flex: none; }
+
+  .brand-name {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.005em;
   }
 
-  .btn span { position: relative; z-index: 1; }
-
-  .btn-solid { color: var(--paper); }
-  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -22px rgba(33, 29, 24, 0.55); }
-  .btn-solid:active { transform: translateY(0); }
-
-  .btn-ghost {
-    color: var(--ink-deep);
-    border-color: var(--edge);
+  .brand-who {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
   }
 
-  .btn-ghost::before { transform: translateY(101%); }
-  .btn-ghost:hover { color: var(--paper); border-color: transparent; }
-  .btn-ghost:hover::before { transform: translateY(0); }
+  .nav { display: flex; align-items: center; gap: clamp(1.25rem, 3vw, 2.25rem); }
 
-  .btn-sm { padding: 0.7rem 1.4rem; font-size: 0.7rem; }
+  .nav a {
+    text-decoration: none;
+    font-size: 0.97rem;
+    color: var(--muted);
+    padding-block: 0.35rem;
+    border-bottom: 1px solid transparent;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
 
-  .menu-toggle {
+  .nav a:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+
+  .nav-toggle {
     display: none;
-    background: transparent;
-    border: 1px solid var(--edge);
-    border-radius: var(--r-pill);
-    padding: 0.55rem 1.1rem;
-    color: var(--ink-deep);
-    font-family: inherit;
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--ivory);
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 2px;
     cursor: pointer;
   }
 
-  /* ============ Héros ============ */
+  /* ============================== Boutons ============================== */
 
-  .hero {
-    position: relative;
-    padding-block: clamp(3rem, 7vw, 6rem) clamp(4rem, 9vw, 7rem);
-    overflow: hidden;
+  .btn {
+    display: inline-block;
+    font: inherit;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
   }
 
-  /* ---- Décor en profondeur : six plans qui glissent les uns sur les autres ---- */
-
-  .scene {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
+  .btn-brass {
+    background: var(--brass);
+    color: #211B16;
+    border: 1px solid var(--brass);
+    font-weight: 500;
   }
+  .btn-brass:hover { background: var(--brass-lit); border-color: var(--brass-lit); }
 
-  .scene-layer {
-    position: absolute;
-    inset: -6%;
-    width: 112%;
-    height: 112%;
-    will-change: transform;
+  .btn-line {
+    background: none;
+    color: var(--ivory);
+    border: 1px solid var(--rule-brass);
   }
+  .btn-line:hover { border-color: var(--brass-lit); color: var(--brass-lit); }
 
-  .scene-layer canvas { width: 100%; height: 100%; display: block; }
+  /* =============================== Hero =============================== */
 
-  /* Perspective atmosphérique et profondeur de champ.
-     Le flou est CUIT dans le canvas au moment de la peinture, jamais appliqué
-     en CSS sur un calque qui bouge : un filter: blur() recalculé à chaque image
-     sur une surface plein écran effondre la fluidité (et gèle GSAP au passage). */
-  .layer-sky      { background: linear-gradient(178deg, #F4EEE0 0%, #EAE1CD 46%, #E0D6BE 100%); }
-  .layer-water    { opacity: 1; }
-  /* La brume ne doit plus délaver la scène : elle se limite à l'écume qui monte
-     du pied de la chute, peinte sur le seul tiers bas du calque. */
-  .layer-mist     { opacity: 0.14; }
-  .layer-canopy   { opacity: 0.9; }
-  .layer-stones   { opacity: 0.78; }
-  .layer-grain    { opacity: 0.32; will-change: auto; }
+  .hero { padding-block: clamp(3.5rem, 8vw, 7rem) clamp(3rem, 7vw, 6rem); }
 
-  /* ---- Fond photographique ----
-     Une vraie photo de cascade bat toute scène calculée sur le terrain du
-     réalisme : c'est le fond voulu. Le shader WebGL n'est plus qu'un repli,
-     le temps que le fichier soit livré. Le jour où il l'est, ce plan prend la
-     main et les quatre calques calculés (eau, écume, feuillage, pierres)
-     disparaissent : la photo porte déjà sa propre végétation et sa propre
-     roche, les redoubler la salirait. */
-  .layer-photo {
-    opacity: 0;
-    background-image: url("assets/hero-cascade.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  .scene.has-photo .layer-photo { opacity: 1; }
-
-  .scene.has-photo .layer-water,
-  .scene.has-photo .layer-mist,
-  .scene.has-photo .layer-canopy,
-  .scene.has-photo .layer-stones { display: none; }
-
-  /* Appui de lisibilité, et rien d'autre. Une ellipse serrée sous la seule
-     colonne de texte : le lavis pleine largeur qu'on avait avant effaçait la
-     cascade sur toute la moitié gauche. Les arrêts sont calés sur la boîte
-     réelle du titre (x ≈ 5 %–43 %), et le contraste du texte est mesuré. */
-  /* AUCUN lavis sur la scène. La cascade est le fond d'écran du hero : on la
-     voit en entier, d'un bord à l'autre, du haut du cadre jusqu'à la vasque.
-     Il ne reste ici que le raccord du bas vers la section suivante — c'est une
-     transition entre deux sections, pas un voile posé sur l'image.
-     La lisibilité du texte est assurée sur le texte lui-même (ombre portée
-     sous .hero-copy), jamais en délavant le décor. */
-  .scene-veil {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 0%, transparent 90%, var(--sand-deep) 100%);
-  }
-
-  .hero > .shell { position: relative; z-index: 1; }
-
-  /* Le texte tient sa lisibilité tout seul, sans rien poser sur la scène :
-     une ombre claire et large, calée sur le grès du fond, épaissit le blanc
-     autour des lettres. Elle suit les glyphes, donc elle ne masque presque
-     aucun pixel de la cascade. */
-  .hero-copy {
-    text-shadow:
-      0 1px 2px rgba(247, 243, 233, 0.95),
-      0 0 12px rgba(247, 243, 233, 0.9),
-      0 0 30px rgba(247, 243, 233, 0.75);
-  }
-
-  /* Les petites capitales espacées sont le point faible : peu de matière par
-     lettre, et elles tombent sur le feuillage sombre du haut de cadre. Leur
-     halo est donc plus serré et plus dense que celui du titre. */
-  .hero-copy .kicker,
-  .hero-copy .hero-meta {
-    text-shadow:
-      0 0 4px rgba(247, 243, 233, 1),
-      0 0 9px rgba(247, 243, 233, 0.98),
-      0 0 20px rgba(247, 243, 233, 0.92);
-  }
-
-  .hero-grid {
+  .hero-in {
     display: grid;
-    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-    gap: clamp(2rem, 5vw, 4rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    gap: clamp(2rem, 6vw, 4.5rem);
     align-items: center;
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 6.4vw, 5.6rem);
-    margin-top: 1.8rem;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    max-width: 15ch;
   }
 
-  .hero h1 .line { display: block; overflow: hidden; }
-  .hero h1 .line > span { display: block; }
-
-  .hero h1 em {
-    font-style: italic;
-    font-weight: 300;
-    color: var(--clay-deep);
+  .hero-lede {
+    margin-top: 1.6rem;
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 1.12rem;
+    line-height: 1.7;
   }
 
-  .hero-sub { margin-top: 1.9rem; max-width: 34ch; color: var(--ink); font-size: 1.06rem; }
+  .hero-actions { margin-top: 2.4rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
 
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.6rem; }
+  .hero-art { position: relative; }
+  .hero-art svg { display: block; width: 100%; height: auto; }
 
-  .hero-meta {
+  /* =========================== Sections ============================== */
+
+  .band { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+  .band-deep { background: var(--ink-deep); }
+
+  .band h2 {
+    font-size: clamp(1.9rem, 3.6vw, 2.7rem);
+    max-width: 18ch;
+  }
+
+  .band-intro {
+    margin-top: 1.1rem;
+    max-width: 54ch;
+    color: var(--muted);
+  }
+
+  /* ====================== Collection : un écrin ======================
+     Pas quatre cartes flottantes avec la même ombre grise : un seul plateau,
+     divisé par des filets, comme les logements d'un écrin de bijoutier. Les
+     pièces appartiennent visiblement au même coffret. */
+
+  .tray {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .slot {
+    padding: clamp(1.1rem, 2vw, 1.5rem);
+    border-left: 1px solid var(--rule);
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin-top: 3.2rem;
-    padding-top: 1.7rem;
-    border-top: 1px solid rgba(50, 44, 36, 0.1);
+    flex-direction: column;
   }
+  .slot:first-child { border-left: 0; }
 
-  .hero-meta div { display: grid; gap: 0.15rem; }
-
-  .hero-meta b {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 400;
-    font-size: 1.5rem;
-    color: var(--clay-deep);
-  }
-
-  .hero-meta span {
-    font-size: 0.68rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink);
-  }
-
-  .hero-seal-wrap {
-    position: relative;
-    justify-self: center;
-    width: min(100%, 460px);
-    aspect-ratio: 1;
+  /* Emplacement de la photo à venir. Le dégradé reprend la pierre de la pièce,
+     assez sourd pour se lire comme une réserve et non comme une image ratée. */
+  .plate {
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--rule);
     display: grid;
     place-items: center;
+    text-align: center;
+    padding: 1rem;
   }
 
-  .halo {
-    position: absolute;
-    inset: 6%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(193, 170, 128, 0.22), transparent 62%);
+  .plate span {
+    font-size: 0.85rem;
+    color: rgba(243, 237, 227, 0.72);
+    text-shadow: 0 1px 6px rgba(24, 20, 28, 0.65);
   }
 
-  .orbit { position: absolute; inset: 0; }
+  .p-amethyste   { background: radial-gradient(120% 100% at 32% 24%, #6F4F91 0%, #4A3564 46%, #2E2340 100%); }
+  .p-tigre       { background: radial-gradient(120% 100% at 32% 24%, #A67836 0%, #74542A 46%, #43301A 100%); }
+  .p-rose        { background: radial-gradient(120% 100% at 32% 24%, #B08084 0%, #7E5A62 46%, #4B3540 100%); }
+  .p-labradorite { background: radial-gradient(120% 100% at 32% 24%, #6E8794 0%, #4B6070 46%, #2C3945 100%); }
 
-  /* ============ Bandeau défilant ============ */
+  .slot h3 { margin-top: 1.15rem; font-size: 1.3rem; }
 
-  .marquee {
-    border-block: 1px solid rgba(50, 44, 36, 0.08);
-    background: rgba(50, 44, 36, 0.012);
-    overflow: hidden;
-    padding-block: 1.1rem;
+  .slot-stone {
+    margin-top: 0.35rem;
+    font-size: 0.95rem;
+    color: var(--muted);
   }
 
-  .marquee-track { display: flex; gap: 3rem; width: max-content; }
-
-  .marquee span {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.15rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    white-space: nowrap;
+  .slot-price {
+    margin-top: auto;
+    padding-top: 1.1rem;
+    font-size: 0.95rem;
+    color: var(--brass-lit);
   }
 
-  .marquee span::after { content: ""; width: 5px; height: 5px; background: var(--clay-deep); rotate: 45deg; }
+  /* ========================== Savoir-faire ========================== */
 
-  /* ============ Sections ============ */
-
-  section { position: relative; scroll-margin-top: 92px; }
-  .pad { padding-block: clamp(4.5rem, 9vw, 8rem); overflow: hidden; }
-  .pad > .shell { position: relative; z-index: 1; }
-
-  /* ---- Décor de section : le paysage se poursuit sous le contenu ----
-     Le hero n'est pas une parenthèse : en descendant, le feuillage revient et
-     des bracelets affleurent en fond. Chaque motif est peint UNE fois, en basse
-     résolution, et son flou est cuit dans le canvas — jamais de filter: blur()
-     sur une surface qui bouge au scroll. */
-
-  .sec-decor { position: absolute; z-index: 0; pointer-events: none; }
-
-  /* L'enveloppe qui dérive (parallaxe en scrub) et celle qui apparaît (fondu)
-     sont séparées : deux tweens sur la même propriété d'un même élément se
-     marchent dessus et l'un des deux est perdu. */
-  .decor-drift { width: 100%; height: 100%; will-change: transform; }
-
-  .decor-art {
-    display: block;
-    width: 100%;
-    height: 100%;
-    /* Opacité de repos posée en CSS : sans GSAP, ou si un déclencheur ne part
-       jamais, le décor est là. Rien n'attend un scroll pour exister. */
-    opacity: var(--decor-op, 0.45);
-  }
-
-  /* Chaque ancrage est calé sur la zone creuse de SA section : le décor occupe
-     les marges que le contenu laisse libres, il ne passe jamais sous un bloc
-     de texte courant. */
-  .d-bl      { bottom: -8%;  left: -7%;  width: min(44%, 560px); aspect-ratio: 5 / 4; }
-  .d-bl-lo   { bottom: -17%; left: -11%; width: min(38%, 480px); aspect-ratio: 5 / 4; }
-  .d-br-sm   { bottom: -11%; right: -6%; width: min(30%, 400px); aspect-ratio: 5 / 4; }
-  .d-r       { top: 50%; right: -3%; translate: 0 -50%; width: min(36%, 470px); aspect-ratio: 1; }
-  .d-bl-deep { bottom: -26%; left: -13%; width: min(36%, 460px); aspect-ratio: 1; }
-
-  /* En une colonne, le contenu occupe toute la largeur : le décor recule
-     encore pour ne jamais concurrencer le texte. */
-  @media (max-width: 860px) {
-    .decor-art { opacity: calc(var(--decor-op, 0.45) * 0.55); }
-    .d-r { width: min(58%, 340px); }
-  }
-
-  /* Histoire */
-
-  .story-grid {
+  .craft-in {
     display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 0.58fr) minmax(0, 1.42fr);
     gap: clamp(2rem, 6vw, 5rem);
     align-items: start;
   }
 
-  .story-aside h2 { font-size: clamp(2.2rem, 3.8vw, 3.2rem); margin-top: 1.2rem; }
-  .story-aside .script { display: block; font-size: clamp(3rem, 5.6vw, 4.4rem); margin-top: 0.05em; }
-
-  .story-body { display: grid; gap: 1.6rem; }
-
-  .pill-row { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.8rem; }
-
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 1.1rem;
-    border: 1px solid var(--edge-soft);
-    border-radius: var(--r-pill);
-    background: var(--glass);
-    font-size: 0.76rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-
-  .pill i { width: 6px; height: 6px; background: var(--clay-deep); rotate: 45deg; display: block; }
-
-  /* Atelier interactif */
-
-  .atelier { overflow: hidden; }
-
-  .atelier-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-    gap: clamp(2.5rem, 6vw, 5rem);
-    align-items: center;
-  }
-
-  .atelier h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1.2rem; }
-  .atelier p.body-text { margin-top: 1.4rem; }
-
-  .bracelet-stage {
-    position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    width: min(100%, 470px);
-    justify-self: center;
-  }
-
-  .bracelet-stage::after {
+  /* Le titre tient seul dans sa colonne : un filet de laiton lui donne un pied
+     et évite que la colonne se lise comme un trou. */
+  .craft-in h2::after {
     content: "";
-    position: absolute;
-    inset: 12%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(193, 170, 128, 0.2), transparent 65%);
-  }
-
-  .bracelet { position: relative; width: 100%; height: auto; }
-
-  #beads circle { transform-box: fill-box; transform-origin: center; }
-
-  .bracelet-core {
-    position: absolute;
-    display: grid;
-    justify-items: center;
-    gap: 0.35rem;
-    text-align: center;
-    pointer-events: none;
-  }
-
-  .bracelet-core .name {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
-    color: var(--ink-deep);
-  }
-
-  .bracelet-core .note {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--clay-deep);
-  }
-
-  .swatches { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2.4rem; }
-
-  .swatch {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 1rem 0.5rem 0.5rem;
-    border-radius: var(--r-pill);
-    border: 1px solid rgba(50, 44, 36, 0.14);
-    background: var(--glass);
-    color: var(--ink-soft);
-    font-family: inherit;
-    font-size: 0.76rem;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s var(--ease), background 0.3s ease;
-  }
-
-  .swatch em {
-    width: 20px; height: 20px;
-    border-radius: 50%;
     display: block;
-    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.22), inset 0 3px 5px rgba(255, 255, 255, 0.4);
+    width: 3.5rem;
+    height: 2px;
+    margin-top: 1.4rem;
+    background: var(--brass);
   }
 
-  .swatch:hover { color: var(--ink-deep); border-color: var(--edge); transform: translateY(-2px); }
+  .craft-body p + p { margin-top: 1.1rem; }
+  .craft-body { max-width: var(--measure); }
 
-  .swatch[aria-pressed="true"] {
-    color: var(--paper);
-    background: var(--ink-deep);
-    border-color: transparent;
+  .craft-note {
+    margin-top: 2rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--brass);
+    color: var(--ivory);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.2rem;
+    line-height: 1.5;
   }
 
-  .atelier-note {
-    margin-top: 1.6rem;
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+  /* ============================= Contact ============================= */
+
+  .contact-in { display: grid; gap: clamp(1.8rem, 4vw, 3rem); max-width: 62ch; }
+  .contact-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+
+  .btn-ico { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .btn-ico svg { width: 19px; height: 19px; flex: none; }
+
+  /* ============================== Footer ============================= */
+
+  .foot {
+    border-top: 1px solid var(--rule);
+    padding-block: 2.25rem;
+    color: var(--muted);
+    font-size: 0.92rem;
   }
 
-  /* Sélection */
+  .foot-in { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; }
 
-  .criteria {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.2rem;
-    margin-top: clamp(2rem, 4vw, 3.2rem);
+  /* =========================== Responsive =========================== */
+
+  @media (max-width: 940px) {
+    .hero-in { grid-template-columns: 1fr; }
+    .hero-art { order: -1; max-width: 460px; }
+    .craft-in { grid-template-columns: 1fr; }
+    .tray { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .slot:nth-child(3) { border-left: 0; }
+    .slot:nth-child(n + 3) { border-top: 1px solid var(--rule); }
   }
 
-  .criterion {
-    padding: 1.7rem 1.5rem;
-    border-radius: var(--r-card);
-    border: 1px solid rgba(50, 44, 36, 0.08);
-    background: var(--glass);
-    display: grid;
-    gap: 0.7rem;
-    align-content: start;
-    transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s var(--ease);
+  @media (max-width: 620px) {
+    .nav-toggle { display: block; }
+    .nav {
+      display: none;
+      position: absolute;
+      left: 0; right: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      padding: 0.5rem var(--gutter) 1rem;
+      background: var(--ink-deep);
+      border-bottom: 1px solid var(--rule);
+    }
+    .nav.open { display: flex; }
+    .nav a { width: 100%; padding-block: 0.7rem; }
+
+    .topbar-in { position: relative; }
+
+    .tray { grid-template-columns: minmax(0, 1fr); }
+    .slot { border-left: 0; }
+    .slot + .slot { border-top: 1px solid var(--rule); }
+    .plate { aspect-ratio: 3 / 2; }
   }
 
-  .criterion:hover { border-color: var(--edge); background: var(--glass-strong); transform: translateY(-4px); }
+  /* ===================== L'unique animation de la page =====================
+     Une seule ouverture, sur le hero. Rien ailleurs : ni apparition au scroll,
+     ni effet au survol des pièces. */
 
-  .criterion b {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 400;
-    font-size: 1.45rem;
-    color: var(--clay-deep);
+  .js .lift { opacity: 0; transform: translateY(16px); }
+
+  .js .lift.ready {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .criterion span { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; }
+  .js .lift:nth-child(2).ready { transition-delay: 0.09s; }
+  .js .lift:nth-child(3).ready { transition-delay: 0.18s; }
 
-  /* Grille de pierres */
-
-  .collection-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1.6rem;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
+  .js .hero-art { opacity: 0; transform: scale(0.985); }
+  .js .hero-art.ready {
+    opacity: 1;
+    transform: none;
+    transition: opacity 1s ease 0.1s, transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
   }
-
-  .collection-head h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
-  .collection-head p { color: var(--ink-soft); max-width: 34ch; }
-
-  .stone-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.3rem; }
-
-  .stone-card {
-    position: relative;
-    grid-column: span 4;
-    padding: 1.9rem 1.7rem;
-    border-radius: var(--r-card);
-    border: 1px solid rgba(50, 44, 36, 0.08);
-    background: var(--glass);
-    display: grid;
-    gap: 1rem;
-    overflow: hidden;
-    transform-style: preserve-3d;
-    transition: border-color 0.4s ease, background 0.4s ease, transform 0.5s var(--ease);
-  }
-
-  .stone-card::before {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(156, 133, 87, 0.16), transparent 45%);
-    opacity: 0;
-    transition: opacity 0.45s ease;
-    pointer-events: none;
-  }
-
-  .stone-card:hover { border-color: var(--edge); background: var(--glass-strong); }
-  .stone-card:hover::before { opacity: 1; }
-
-  .stone-card:nth-child(1) { grid-column: span 5; }
-  .stone-card:nth-child(2) { grid-column: span 4; }
-  .stone-card:nth-child(3) { grid-column: span 3; }
-  .stone-card:nth-child(4) { grid-column: span 3; }
-  .stone-card:nth-child(5) { grid-column: span 4; }
-  .stone-card:nth-child(6) { grid-column: span 5; }
-
-  .stone-art { position: relative; display: grid; place-items: center; padding-block: 0.3rem; }
-  .stone-art svg { width: 92px; height: 92px; overflow: visible; }
-
-  .stone-card h3 { font-size: 1.55rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-
-  .stone-card h3 small {
-    font-family: "Jost", sans-serif;
-    font-size: 0.62rem;
-    font-weight: 300;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--clay-deep);
-  }
-
-  .stone-card p { color: var(--ink-soft); font-size: 0.94rem; line-height: 1.62; }
-
-  /* Déclaration — le seul temps sombre de la page, assumé et unique */
-
-  .statement {
-    position: relative;
-    padding-block: clamp(5rem, 11vw, 9rem);
-    text-align: center;
-    overflow: hidden;
-    background: var(--ink-deep);
-    color: #F4EEDF;
-  }
-
-  .statement blockquote {
-    margin: 1.4rem auto 0;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: clamp(2.1rem, 5vw, 3.9rem);
-    line-height: 1.14;
-    max-width: 18ch;
-    color: #F4EEDF;
-  }
-
-  .statement blockquote em { font-style: italic; color: var(--clay-soft); }
-
-  .statement cite {
-    display: block;
-    margin-top: 1.8rem;
-    font-style: normal;
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(244, 238, 223, 0.6);
-  }
-
-  .statement .kicker { justify-content: center; color: var(--clay-soft); }
-  .statement .kicker::before { background: linear-gradient(90deg, transparent, var(--clay-soft)); }
-
-  /* Sur mesure + contact */
-
-  .custom-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(2.5rem, 6vw, 5rem);
-    align-items: center;
-  }
-
-  .custom-copy h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 1rem; }
-  .custom-copy > p { margin-top: 1.4rem; color: var(--ink-soft); max-width: 40ch; }
-
-  .steps {
-    counter-reset: step;
-    list-style: none;
-    margin: 2.4rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: 1.5rem;
-  }
-
-  .steps li {
-    counter-increment: step;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 1.2rem;
-    align-items: start;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(50, 44, 36, 0.08);
-  }
-
-  .steps li:last-child { border-bottom: none; padding-bottom: 0; }
-
-  .steps li::before {
-    content: counter(step, decimal-leading-zero);
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 0.95rem;
-    letter-spacing: 0.1em;
-    color: var(--clay-deep);
-    padding-top: 0.3rem;
-  }
-
-  .steps strong {
-    display: block;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 400;
-    font-size: 1.35rem;
-    color: var(--ink-deep);
-  }
-
-  .steps span { color: var(--ink-soft); font-size: 0.94rem; }
-
-  .contact-card {
-    position: relative;
-    border-radius: 26px;
-    border: 1px solid var(--edge);
-    background: linear-gradient(150deg, rgba(156, 133, 87, 0.12), rgba(237, 230, 214, 0.7) 45%, var(--sand));
-    padding: clamp(2rem, 4vw, 3rem);
-    display: grid;
-    gap: 1.5rem;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-
-  .contact-card .seal { width: min(230px, 68%); justify-self: center; }
-
-  .contact-card h3 { font-size: 1.9rem; text-align: center; }
-  .contact-card > p { text-align: center; color: var(--ink-soft); max-width: 30ch; margin-inline: auto; font-size: 0.95rem; }
-
-  .contact-actions { display: grid; gap: 0.75rem; }
-  .contact-actions .btn { width: 100%; }
-
-  .contact-meta {
-    display: flex;
-    justify-content: center;
-    gap: 1.6rem;
-    border-top: 1px solid rgba(50, 44, 36, 0.1);
-    padding-top: 1.3rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-
-  /* Pied de page */
-
-  .site-foot { border-top: 1px solid rgba(50, 44, 36, 0.08); padding-block: 2.8rem 3.2rem; }
-
-  .foot-inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.6rem;
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-  }
-
-  .foot-links { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; }
-  .foot-links a { text-decoration: none; transition: color 0.3s ease; }
-  .foot-links a:hover { color: var(--clay-deep); }
-
-  .demo-flag { margin-top: 1.8rem; font-size: 0.72rem; color: var(--ink-soft); opacity: 0.8; max-width: 70ch; }
-
-  /* ============ Accessibilité mouvement ============ */
 
   @media (prefers-reduced-motion: reduce) {
-    .cine { display: none; }
-    .bloom { animation: none !important; }
-    .stone-card, .criterion, .btn, .swatch { transition: none; }
-  }
-
-  /* ============ Responsive ============ */
-
-  @media (max-width: 1040px) {
-    .nav-links { display: none; }
-    .nav-links.is-open {
-      display: grid;
-      position: absolute;
-      top: 76px; left: 0; right: 0;
-      gap: 1.1rem;
-      padding: 1.4rem 1.5rem 1.8rem;
-      background: rgba(237, 230, 214, 0.98);
-      border-bottom: 1px solid rgba(50, 44, 36, 0.1);
+    .js .lift,
+    .js .hero-art {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
-    .menu-toggle { display: inline-flex; }
-    .topbar .btn-solid { display: none; }
-
-    .hero-grid, .story-grid, .atelier-grid, .custom-grid { grid-template-columns: minmax(0, 1fr); }
-    .hero-seal-wrap { order: -1; width: min(100%, 350px); }
-    .criteria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .stone-card, .stone-card:nth-child(n) { grid-column: span 6; }
-  }
-
-  @media (max-width: 640px) {
-    :root { --shell: min(100%, 100% - 2rem); }
-    .criteria { grid-template-columns: minmax(0, 1fr); }
-    .stone-card, .stone-card:nth-child(n) { grid-column: span 12; }
-    .hero-meta { gap: 1.4rem; }
-    .contact-meta { flex-direction: column; gap: 0.5rem; text-align: center; }
-    .hero-actions .btn { flex: 1 1 100%; }
   }
 </style>
-
 </head>
 <body>
-<div class="backdrop" aria-hidden="true"></div>
-<div class="bloom bloom-a" aria-hidden="true"></div>
-<div class="bloom bloom-b" aria-hidden="true"></div>
-<canvas id="dust" aria-hidden="true"></canvas>
-<div class="progress" id="progress" aria-hidden="true"></div>
+
+<a class="skip" href="#collection">Aller à la collection</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -1111,25 +422,28 @@
       <path d="M0-10C1.4-3.2 3.2-1.4 10 0C3.2 1.4 1.4 3.2 0 10C-1.4 3.2-3.2 1.4-10 0C-3.2-1.4-1.4-3.2 0-10Z"/>
     </g>
 
-    <linearGradient id="gold-facet" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#B49560"/>
-      <stop offset="0.42" stop-color="#8A6F3E"/>
-      <stop offset="1" stop-color="#5E4C2C"/>
+    <linearGradient id="brass-facet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D7AD75"/>
+      <stop offset="0.45" stop-color="#B98A4D"/>
+      <stop offset="1" stop-color="#8A6534"/>
     </linearGradient>
 
+    <!-- Logo de la maison, repris tel quel du dessin d'origine : le cercle
+         gravé, les cristaux et la branche d'eucalyptus. Seule la monture
+         change de teinte pour tenir sur le velours sombre. -->
     <symbol id="seal-decor" viewBox="0 0 240 240">
-      <g fill="none" stroke="url(#gold-facet)" stroke-width="1.3" stroke-linecap="round">
+      <g fill="none" stroke="url(#brass-facet)" stroke-width="1.3" stroke-linecap="round">
         <path d="M11.8 149 A112 112 0 1 1 228.2 149"/>
         <path d="M16.4 110.9 A104 104 0 0 1 210.1 68" opacity="0.7"/>
         <path d="M205.8 192 A112 112 0 0 1 81.7 225.3"/>
         <path d="M192.8 192.8 A103 103 0 0 1 111 222.6" opacity="0.65"/>
       </g>
-      <g fill="var(--clay-deep)">
+      <g fill="var(--logo-gem)">
         <circle cx="223.8" cy="78" r="2.6"/><circle cx="227.6" cy="89.1" r="2.2"/>
         <circle cx="230.3" cy="100.5" r="1.9"/><circle cx="231.7" cy="112.2" r="1.5"/>
         <circle cx="231.9" cy="123.9" r="1.2"/>
       </g>
-      <g fill="none" stroke="url(#gold-facet)" stroke-width="1.25" stroke-linejoin="round">
+      <g fill="none" stroke="url(#brass-facet)" stroke-width="1.25" stroke-linejoin="round">
         <path d="M120 42 134 66 132 104 108 104 106 66Z"/>
         <path d="M106 66H134M120 42V104" opacity="0.6"/>
         <path d="M92 74 104 92 100 110 82 110 80 92Z"/>
@@ -1137,15 +451,15 @@
         <path d="M150 66 160 88 157 110 140 110 138 88Z"/>
         <path d="M138 88H160M150 66V110" opacity="0.55"/>
       </g>
-      <g fill="var(--clay-deep)">
+      <g fill="var(--logo-gem)">
         <use href="#sparkle-shape" transform="translate(170 62) scale(0.5)" opacity="0.7"/>
         <use href="#sparkle-shape" transform="translate(88 50) scale(0.32)" opacity="0.55"/>
         <use href="#sparkle-shape" transform="translate(176 98) scale(0.34)" opacity="0.6"/>
       </g>
-      <g stroke="var(--moss-deep)" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <g stroke="var(--logo-leaf-deep)" stroke-width="1.4" fill="none" stroke-linecap="round">
         <path d="M62 216C38 182 29 141 44 96C52 71 66 57 79 48"/>
       </g>
-      <g fill="var(--moss)" stroke="var(--moss-deep)" stroke-width="0.9" opacity="0.92">
+      <g fill="var(--logo-leaf)" stroke="var(--logo-leaf-deep)" stroke-width="0.9" opacity="0.92">
         <use href="#leaf-shape" transform="translate(61 206) rotate(-38)"/>
         <use href="#leaf-shape" transform="translate(58 193) rotate(-152) scale(-1 1)"/>
         <use href="#leaf-shape" transform="translate(51 179) rotate(-42) scale(1.05)"/>
@@ -1159,7 +473,7 @@
         <use href="#leaf-shape" transform="translate(66 59) rotate(-66) scale(0.9)"/>
         <use href="#leaf-shape" transform="translate(78 49) rotate(-124) scale(-0.8 0.8)"/>
       </g>
-      <g fill="var(--clay-deep)">
+      <g fill="var(--logo-gem)">
         <circle cx="67" cy="197" r="3"/><circle cx="53" cy="171" r="2.4"/>
         <circle cx="45" cy="141" r="3.2"/><circle cx="46" cy="105" r="2.3"/>
         <circle cx="61" cy="74" r="2.8"/><circle cx="82" cy="53" r="2"/>
@@ -1167,1436 +481,292 @@
     </symbol>
 
     <symbol id="mark-small" viewBox="0 0 240 240">
-      <g fill="none" stroke="url(#gold-facet)" stroke-width="5" stroke-linecap="round">
+      <g fill="none" stroke="url(#brass-facet)" stroke-width="5" stroke-linecap="round">
         <path d="M22 154 A108 108 0 1 1 218 154"/>
         <path d="M198 190 A108 108 0 0 1 88 216"/>
       </g>
-      <g fill="none" stroke="url(#gold-facet)" stroke-width="5">
+      <g fill="none" stroke="url(#brass-facet)" stroke-width="5">
         <path d="M132 48 156 88 152 168 112 168 108 88Z"/>
         <path d="M108 88H156" opacity="0.5"/>
         <path d="M92 96 106 120 103 168 78 168 76 120Z"/>
       </g>
-      <g fill="var(--moss)" stroke="var(--moss-deep)" stroke-width="2.4">
+      <g fill="var(--logo-leaf)" stroke="var(--logo-leaf-deep)" stroke-width="2.4">
         <use href="#leaf-shape" transform="translate(66 196) rotate(-46) scale(1.35)"/>
         <use href="#leaf-shape" transform="translate(52 160) rotate(-134) scale(-1.35 1.35)"/>
         <use href="#leaf-shape" transform="translate(50 122) rotate(-58) scale(1.3)"/>
       </g>
     </symbol>
-
-    <symbol id="gem" viewBox="0 0 120 120">
-      <path d="M60 8 100 40 84 108 36 108 20 40Z" fill="var(--stone-a)"/>
-      <path d="M60 8 100 40 60 40Z" fill="var(--stone-b)"/>
-      <path d="M20 40 60 40 36 108Z" fill="#000" opacity="0.16"/>
-      <path d="M60 40 100 40 84 108Z" fill="#fff" opacity="0.16"/>
-      <path d="M60 8 100 40 60 40Z" fill="#fff" opacity="0.22"/>
-      <g fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1">
-        <path d="M60 8 100 40 84 108 36 108 20 40Z"/>
-        <path d="M20 40H100M60 8V108M20 40 36 108M100 40 84 108"/>
-      </g>
-    </symbol>
   </defs>
 </svg>
 
-<div class="cine" id="cine">
-  <canvas class="cine-scene" id="cine-scene" aria-hidden="true"></canvas>
-  <div class="cine-veil" aria-hidden="true"></div>
-  <div class="cine-logo" id="cine-logo">
-    <div class="seal">
-      <svg viewBox="0 0 240 240" role="img" aria-label="L'Eden des Pierres"><use href="#seal-decor"/></svg>
-      <div class="seal-word">
-        <span class="eden">L'Eden</span>
-        <span class="pierres">des Pierres</span>
-        <span class="seal-rule"><i></i><b></b><i></i></span>
-        <span class="sonia">Sonia</span>
-      </div>
-    </div>
-  </div>
-  <p class="cine-word" id="cine-word">L'Eden des Pierres</p>
-</div>
-
 <header class="topbar">
-  <div class="shell topbar-inner">
-    <a class="brand" href="#accueil">
-      <svg class="brand-mark" viewBox="0 0 240 240" aria-hidden="true"><use href="#mark-small"/></svg>
+  <div class="shell topbar-in">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 240 240" role="img" aria-label="L'Eden des Pierres, Sonia"><use href="#mark-small"/></svg>
       <span>
         <span class="brand-name">L'Eden des Pierres</span>
-        <span class="brand-sub">Sonia</span>
+        <span class="brand-who">Sonia</span>
       </span>
     </a>
 
-    <nav class="nav-links" id="nav-links" aria-label="Navigation principale">
-      <a href="#histoire">Histoire</a>
-      <a href="#atelier">Atelier</a>
-      <a href="#selection">Sélection</a>
-      <a href="#pierres">Pierres</a>
-      <a href="#sur-mesure">Sur mesure</a>
-    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
 
-    <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
-    <a class="btn btn-solid btn-sm" href="#contact"><span>Me contacter</span></a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="#collection">Collection</a>
+      <a href="#savoir-faire">Savoir-faire</a>
+      <a href="#contact">Contact</a>
+    </nav>
   </div>
 </header>
 
-<main id="accueil">
+<main id="top">
 
   <section class="hero">
-    <div class="scene" id="scene" aria-hidden="true">
-      <div class="scene-layer layer-sky"    data-depth="0"></div>
-      <!-- Photo réelle de cascade. Dès que assets/hero-cascade.jpg existe, ce
-           plan prend la main et toute la scène calculée s'efface. -->
-      <div class="scene-layer layer-photo"  data-depth="1.5"></div>
-      <div class="scene-layer layer-water"  data-depth="1.5"><canvas id="cv-water"></canvas></div>
-      <div class="scene-layer layer-mist"   data-depth="3"><canvas id="cv-mist"></canvas></div>
-      <div class="scene-layer layer-canopy" data-depth="4.5"><canvas id="cv-canopy"></canvas></div>
-      <div class="scene-layer layer-stones" data-depth="7"><canvas id="cv-stones"></canvas></div>
-      <div class="scene-layer layer-grain"  data-depth="0"><canvas id="cv-grain"></canvas></div>
-      <div class="scene-veil"></div>
-    </div>
-
-    <div class="shell hero-grid">
+    <div class="shell hero-in">
       <div class="hero-copy">
-        <p class="kicker" id="hero-kicker">Bracelets en pierres naturelles</p>
-        <h1 id="hero-title">
-          <span class="line"><span>Ici, les pierres</span></span>
-          <span class="line"><span>ne sont pas</span></span>
-          <span class="line"><span>simplement <em>belles</em>.</span></span>
-        </h1>
-        <p class="hero-sub" id="hero-sub">Elles racontent une histoire. Peut-être bientôt la vôtre.</p>
-        <div class="hero-actions" id="hero-actions">
-          <a class="btn btn-solid" href="#atelier"><span>Composer un bracelet</span></a>
-          <a class="btn btn-ghost" href="#histoire"><span>Mon histoire</span></a>
-        </div>
-        <div class="hero-meta" id="hero-meta">
-          <div><b>100 %</b><span>Pierres naturelles</span></div>
-          <div><b>Non traitées</b><span>Teintes 100 % naturelles</span></div>
-          <div><b>À la main</b><span>Montage perle à perle</span></div>
+        <h1 class="lift">Des pierres choisies une par une, montées à la main</h1>
+        <p class="hero-lede lift">
+          Je travaille des pierres naturelles non traitées, dont la teinte n'a
+          été ni chauffée ni corrigée. Deux améthystes du même lot ne sont
+          jamais du même violet, et c'est précisément ce que je cherche.
+        </p>
+        <div class="hero-actions lift">
+          <a class="btn btn-brass" href="#collection">Voir la collection</a>
+          <a class="btn btn-line" href="#savoir-faire">Comment je travaille</a>
         </div>
       </div>
 
-      <div class="hero-seal-wrap" id="hero-seal-wrap">
-        <div class="halo" aria-hidden="true"></div>
-        <svg class="orbit" viewBox="0 0 400 400" fill="var(--clay-deep)" aria-hidden="true">
-          <circle cx="200" cy="18" r="3"/><circle cx="345" cy="105" r="2.2"/>
-          <circle cx="330" cy="300" r="2.6"/><circle cx="122" cy="378" r="1.9"/>
-          <circle cx="30" cy="180" r="2.4"/>
-        </svg>
-        <svg class="orbit" viewBox="0 0 400 400" fill="var(--moss)" aria-hidden="true">
-          <circle cx="70" cy="70" r="2"/><circle cx="360" cy="220" r="1.8"/>
-          <circle cx="200" cy="392" r="2.2"/>
-        </svg>
+      <div class="hero-art">
+        <svg viewBox="0 0 560 520" role="img" aria-label="Illustration de quatre pierres facettées : améthyste, œil-de-tigre, quartz rose et labradorite">
+          <defs>
+            <radialGradient id="glow" cx="0.46" cy="0.44" r="0.6">
+              <stop offset="0" stop-color="#B98A4D" stop-opacity="0.3"/>
+              <stop offset="0.55" stop-color="#B98A4D" stop-opacity="0.08"/>
+              <stop offset="1" stop-color="#B98A4D" stop-opacity="0"/>
+            </radialGradient>
 
-        <div class="seal">
-          <svg viewBox="0 0 240 240" aria-hidden="true"><use href="#seal-decor"/></svg>
-          <div class="seal-word">
-            <span class="eden">L'Eden</span>
-            <span class="pierres">des Pierres</span>
-            <span class="seal-rule"><i></i><b></b><i></i></span>
-            <span class="sonia">Sonia</span>
-          </div>
-        </div>
+            <radialGradient id="amethyste" cx="0.34" cy="0.24" r="0.86">
+              <stop offset="0" stop-color="#CDA9EA"/>
+              <stop offset="0.46" stop-color="#8059A8"/>
+              <stop offset="1" stop-color="#432B62"/>
+            </radialGradient>
+            <radialGradient id="tigre" cx="0.34" cy="0.24" r="0.86">
+              <stop offset="0" stop-color="#EDC57E"/>
+              <stop offset="0.46" stop-color="#B4823A"/>
+              <stop offset="1" stop-color="#63431B"/>
+            </radialGradient>
+            <radialGradient id="rose" cx="0.34" cy="0.24" r="0.86">
+              <stop offset="0" stop-color="#F2CFCF"/>
+              <stop offset="0.46" stop-color="#CE979C"/>
+              <stop offset="1" stop-color="#7E545E"/>
+            </radialGradient>
+            <radialGradient id="labradorite" cx="0.34" cy="0.24" r="0.86">
+              <stop offset="0" stop-color="#C6D8E0"/>
+              <stop offset="0.46" stop-color="#7A94A6"/>
+              <stop offset="1" stop-color="#374C5C"/>
+            </radialGradient>
+          </defs>
+
+          <ellipse cx="262" cy="252" rx="270" ry="248" fill="url(#glow)"/>
+
+          <!-- Améthyste : taille hexagonale, la pièce maîtresse -->
+          <g stroke="rgba(243,237,227,0.34)" stroke-width="1" stroke-linejoin="round">
+            <path d="M188 96 282 152 274 288 188 366 100 288 94 152Z" fill="url(#amethyste)"/>
+            <path d="M188 152 246 186 240 276 188 320 134 276 128 186Z" fill="#F3EDE3" fill-opacity="0.14"/>
+            <g stroke-opacity="0.5">
+              <path d="M188 96 188 152M282 152 246 186M274 288 240 276M188 366 188 320M100 288 134 276M94 152 128 186"/>
+            </g>
+            <path d="M94 152 128 186 134 276 100 288Z" fill="#1C1821" fill-opacity="0.26" stroke="none"/>
+            <path d="M282 152 274 288 240 276 246 186Z" fill="#F3EDE3" fill-opacity="0.07" stroke="none"/>
+          </g>
+
+          <!-- Œil-de-tigre : taille marquise, posée en biais -->
+          <g stroke="rgba(243,237,227,0.32)" stroke-width="1" stroke-linejoin="round">
+            <path d="M382 214 446 300 382 412 318 300Z" fill="url(#tigre)"/>
+            <path d="M382 258 414 302 382 362 350 302Z" fill="#F3EDE3" fill-opacity="0.15"/>
+            <g stroke-opacity="0.5">
+              <path d="M382 214 382 258M446 300 414 302M382 412 382 362M318 300 350 302"/>
+            </g>
+            <path d="M318 300 350 302 382 362 382 412Z" fill="#1C1821" fill-opacity="0.24" stroke="none"/>
+          </g>
+
+          <!-- Quartz rose : petite taille pentagonale -->
+          <g stroke="rgba(243,237,227,0.3)" stroke-width="1" stroke-linejoin="round">
+            <path d="M436 92 490 130 470 194 402 194 382 130Z" fill="url(#rose)"/>
+            <path d="M436 126 464 146 454 178 418 178 408 146Z" fill="#F3EDE3" fill-opacity="0.16"/>
+            <g stroke-opacity="0.45">
+              <path d="M436 92 436 126M490 130 464 146M470 194 454 178M402 194 418 178M382 130 408 146"/>
+            </g>
+            <path d="M382 130 408 146 418 178 402 194Z" fill="#1C1821" fill-opacity="0.28" stroke="none"/>
+            <path d="M490 130 470 194 454 178 464 146Z" fill="#F3EDE3" fill-opacity="0.09" stroke="none"/>
+            <path d="M436 92 490 130 464 146Z" fill="#F3EDE3" fill-opacity="0.12" stroke="none"/>
+          </g>
+
+          <!-- Labradorite : taille émeraude, presque à plat -->
+          <g stroke="rgba(243,237,227,0.3)" stroke-width="1" stroke-linejoin="round">
+            <path d="M198 400 312 386 330 446 220 468Z" fill="url(#labradorite)"/>
+            <path d="M222 410 296 401 308 438 238 452Z" fill="#F3EDE3" fill-opacity="0.13"/>
+            <g stroke-opacity="0.45">
+              <path d="M198 400 222 410M312 386 296 401M330 446 308 438M220 468 238 452"/>
+            </g>
+            <path d="M198 400 222 410 238 452 220 468Z" fill="#1C1821" fill-opacity="0.3" stroke="none"/>
+            <path d="M220 468 238 452 308 438 330 446Z" fill="#1C1821" fill-opacity="0.16" stroke="none"/>
+            <path d="M198 400 312 386 296 401 222 410Z" fill="#F3EDE3" fill-opacity="0.1" stroke="none"/>
+            <!-- Le reflet bleu-vert qui donne son nom à la labradorescence -->
+            <path d="M240 404 292 399 300 428 250 438Z" fill="#8FC7C0" fill-opacity="0.18" stroke="none"/>
+          </g>
+
+          <!-- Éclats de laiton, très peu nombreux -->
+          <g fill="var(--brass-lit)" opacity="0.75">
+            <use href="#sparkle-shape" transform="translate(316 128) scale(0.62)"/>
+            <use href="#sparkle-shape" transform="translate(486 262) scale(0.4)"/>
+            <use href="#sparkle-shape" transform="translate(126 402) scale(0.34)"/>
+          </g>
+        </svg>
       </div>
     </div>
   </section>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track" id="marquee-track">
-      <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
-      <span>Labradorite</span><span>Œil de tigre</span><span>Pierre de lune</span>
-      <span>Améthyste</span><span>Quartz rose</span><span>Citrine</span>
-      <span>Labradorite</span><span>Œil de tigre</span><span>Pierre de lune</span>
-    </div>
-  </div>
-
-  <section class="pad" id="histoire">
-    <div class="shell story-grid">
-      <div class="story-aside reveal">
-        <p class="kicker">L'origine</p>
-        <h2>Née d'une<span class="script">véritable passion</span></h2>
-      </div>
-
-      <div class="story-body">
-        <p class="lede reveal">
-          L'Eden des Pierres est né d'une véritable passion pour les pierres naturelles, leurs couleurs,
-          leurs nuances, leurs particularités… et de cette envie permanente d'imaginer de nouvelles associations.
-        </p>
-        <p class="body-text reveal">
-          Tout commence par une pierre que l'on repose trois fois avant de la garder. Puis par une deuxième,
-          choisie parce qu'elle répond à la première. Le bracelet vient après : il n'est que la conséquence
-          d'un accord juste entre deux matières.
-        </p>
-        <div class="pill-row reveal">
-          <span class="pill"><i></i>Pierres naturelles non traitées</span>
-          <span class="pill"><i></i>Perles de qualité supérieure</span>
-          <span class="pill"><i></i>Montage perle à perle</span>
-          <span class="pill"><i></i>Pièces uniques</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="pad atelier" id="atelier">
-    <div class="shell atelier-grid">
-      <div class="atelier-copy">
-        <p class="kicker reveal">L'atelier</p>
-        <h2 class="reveal">Changez la pierre,<br>le bracelet suit.</h2>
-        <p class="body-text reveal">
-          Chaque modèle part d'une pierre dominante, puis d'un accord : une nuance plus claire pour
-          respirer, une plus profonde pour tenir l'ensemble. Touchez une pierre pour voir le bracelet
-          se recomposer — un aperçu stylisé, pas une photo.
-        </p>
-
-        <div class="swatches reveal" id="swatches" role="group" aria-label="Choisir une pierre"></div>
-
-        <p class="atelier-note reveal">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--clay-deep)" stroke-width="1.2" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"/><path d="M12 8v9M12 6.4v.2" stroke-linecap="round"/>
-          </svg>
-          Pierres naturelles non traitées — les teintes réelles varient légèrement d'une pierre à l'autre.
-        </p>
-      </div>
-
-      <div class="bracelet-stage reveal">
-        <svg class="bracelet" viewBox="0 0 400 400" role="img" aria-labelledby="bracelet-title">
-          <title id="bracelet-title">Aperçu stylisé d'un bracelet de perles en pierres naturelles</title>
-          <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(156,133,87,0.25)" stroke-width="1"/>
-          <g id="beads"></g>
-        </svg>
-        <div class="bracelet-core">
-          <span class="name" id="stone-name">Améthyste</span>
-          <span class="note" id="stone-note">Quartz violet</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="pad" id="selection">
+  <section class="band band-deep" id="collection">
     <div class="shell">
-      <p class="kicker reveal">Au cœur de mon univers</p>
-      <h2 class="reveal" style="font-size:clamp(2.2rem,4vw,3.4rem);margin-top:1rem">L'exigence de la sélection</h2>
-      <p class="body-text reveal" style="margin-top:1.4rem">
-        Je privilégie des pierres naturelles non traitées, choisies avec soin auprès de mes fournisseurs,
-        ainsi que des perles de belle qualité — souvent de qualité supérieure — sélectionnées pour leurs
-        nuances, leur éclat, leur caractère et leur rendu une fois travaillées. Parce qu'une pierre naturelle
-        n'est jamais parfaitement identique à une autre, j'aime justement ces petites différences qui rendent
-        chaque création singulière.
+      <h2>La collection</h2>
+      <p class="band-intro">
+        Quatre modèles montés cet hiver. Les photos arrivent bientôt ; en
+        attendant, écrivez-moi pour voir les pièces disponibles et leur tour de
+        poignet.
       </p>
 
-      <div class="criteria">
-        <article class="criterion reveal">
-          <b>Teinte</b>
-          <span>Deux améthystes du même lot n'ont jamais tout à fait le même violet.</span>
+      <div class="tray">
+        <article class="slot">
+          <div class="plate p-amethyste"><span>Photo à venir</span></div>
+          <h3>Brume du soir</h3>
+          <p class="slot-stone">Améthyste et hématite mate</p>
+          <p class="slot-price">Prix sur demande</p>
         </article>
-        <article class="criterion reveal">
-          <b>Dessin</b>
-          <span>Les veines et les stries tracent un motif qui n'existera qu'une fois.</span>
+
+        <article class="slot">
+          <div class="plate p-tigre"><span>Photo à venir</span></div>
+          <h3>Éclat fauve</h3>
+          <p class="slot-stone">Œil-de-tigre et onyx</p>
+          <p class="slot-price">Prix sur demande</p>
         </article>
-        <article class="criterion reveal">
-          <b>Inclusion</b>
-          <span>Une inclusion n'est pas un défaut : c'est la signature de la pierre.</span>
+
+        <article class="slot">
+          <div class="plate p-rose"><span>Photo à venir</span></div>
+          <h3>Première heure</h3>
+          <p class="slot-stone">Quartz rose et pierre de lune</p>
+          <p class="slot-price">Prix sur demande</p>
         </article>
-        <article class="criterion reveal">
-          <b>Transparence</b>
-          <span>Du translucide au laiteux, la lumière ne traverse jamais deux pierres pareil.</span>
+
+        <article class="slot">
+          <div class="plate p-labradorite"><span>Photo à venir</span></div>
+          <h3>Nuit claire</h3>
+          <p class="slot-stone">Labradorite et perles d'argent</p>
+          <p class="slot-price">Prix sur demande</p>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="pad" id="pierres">
-    <div class="shell">
-      <div class="collection-head">
-        <div class="reveal">
-          <p class="kicker">Les pierres que je travaille</p>
-          <h2>Un vocabulaire de couleurs</h2>
-        </div>
-        <p class="reveal">Six familles qui reviennent le plus souvent dans mes bracelets — chacune apporte sa matière et son tempérament, sans jamais être traitée.</p>
-      </div>
+  <section class="band" id="savoir-faire">
+    <div class="shell craft-in">
+      <h2>Le savoir-faire</h2>
 
-      <div class="stone-grid" id="stone-grid">
-        <article class="stone-card reveal" data-tilt style="--stone-a:#9C8FB8;--stone-b:#C3B9D8">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Améthyste <small>Quartz violet</small></h3>
-          <p>Du lilas pâle au violet profond selon l'endroit où l'on coupe le cristal. Se marie sans effort avec l'argent et les perles claires.</p>
-        </article>
-
-        <article class="stone-card reveal" data-tilt style="--stone-a:#CBA9A6;--stone-b:#E3CAC7">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Quartz rose <small>Quartz laiteux</small></h3>
-          <p>Un rose poudré, rarement transparent. Sa légère brume interne est précisément ce qui le rend doux à porter.</p>
-        </article>
-
-        <article class="stone-card reveal" data-tilt style="--stone-a:#C7A25F;--stone-b:#E2C288">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Citrine <small>Quartz miel</small></h3>
-          <p>La pierre la plus solaire du panier. Elle réchauffe instantanément une composition trop sage.</p>
-        </article>
-
-        <article class="stone-card reveal" data-tilt style="--stone-a:#7E97A0;--stone-b:#AFC2C8">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Labradorite <small>Feldspath</small></h3>
-          <p>Grise au repos, elle s'allume en bleu ou en vert dès qu'on la tourne vers la lumière. Ma préférée pour les pièces discrètes.</p>
-        </article>
-
-        <article class="stone-card reveal" data-tilt style="--stone-a:#93714A;--stone-b:#BC9866">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Œil de tigre <small>Quartz chatoyant</small></h3>
-          <p>Ses bandes dorées bougent avec le poignet. Une pierre franche, qui structure les modèles plus masculins.</p>
-        </article>
-
-        <article class="stone-card reveal" data-tilt style="--stone-a:#C6C1B2;--stone-b:#E9E5D9">
-          <div class="stone-art"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#gem"/></svg></div>
-          <h3>Pierre de lune <small>Feldspath opalescent</small></h3>
-          <p>Blanche, laiteuse, traversée d'un reflet bleuté. Elle demande une monture sobre pour ne pas être écrasée.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="statement">
-    <div class="shell">
-      <p class="kicker reveal">La signature de la maison</p>
-      <blockquote class="reveal">Des pierres naturelles. Des créations qui ont leur <em>propre identité</em>.</blockquote>
-      <cite class="reveal">Sonia — L'Eden des Pierres</cite>
-    </div>
-  </section>
-
-  <section class="pad" id="sur-mesure">
-    <div class="shell custom-grid">
-      <div class="custom-copy">
-        <p class="kicker reveal">Sur mesure</p>
-        <h2 class="reveal">Votre histoire, dans une pierre</h2>
-        <p class="reveal">
-          Une teinte précise, un tour de poignet particulier, une pierre qui vous suit depuis longtemps :
-          les créations sur mesure partent toujours d'une conversation, jamais d'un catalogue.
+      <div class="craft-body">
+        <p>
+          Je choisis mes pierres une par une, chez des fournisseurs que je
+          connais, et j'écarte celles dont la teinte a été forcée. Une pierre
+          naturelle porte des inclusions, des veines, des variations de
+          transparence : ce ne sont pas des défauts à corriger, c'est ce qui
+          distingue une pierre d'une perle de verre.
+        </p>
+        <p>
+          Le montage se fait perle à perle, sur fil d'acier gainé pour les
+          pièces lourdes et sur élastique double pour celles qui doivent
+          s'enfiler sans fermoir. Les nœuds sont noyés dans une perle à écraser,
+          jamais laissés apparents, et chaque bracelet est porté quelques jours
+          avant d'être envoyé, le temps de vérifier que rien ne bouge.
         </p>
 
-        <ol class="steps">
-          <li class="reveal"><div><strong>On échange</strong><span>Vous me dites la couleur, le tour de poignet, l'occasion — ou simplement la pierre qui vous attire.</span></div></li>
-          <li class="reveal"><div><strong>Je sélectionne</strong><span>Je choisis les pierres et les perles une à une, et je vous envoie une photo de la composition avant montage.</span></div></li>
-          <li class="reveal"><div><strong>Je monte la pièce</strong><span>Assemblage à la main, finitions vérifiées, puis expédition dans son écrin.</span></div></li>
-        </ol>
-      </div>
-
-      <div class="contact-card reveal" id="contact">
-        <div class="seal">
-          <svg viewBox="0 0 240 240" aria-hidden="true"><use href="#seal-decor"/></svg>
-          <div class="seal-word">
-            <span class="eden">L'Eden</span>
-            <span class="pierres">des Pierres</span>
-            <span class="seal-rule"><i></i><b></b><i></i></span>
-            <span class="sonia">Sonia</span>
-          </div>
-        </div>
-        <h3>Parlons de votre pièce</h3>
-        <p>Une question, une idée, une pierre en tête : écrivez-moi, je réponds moi-même.</p>
-        <div class="contact-actions">
-          <a class="btn btn-solid" href="#contact"><span>Écrire à Sonia</span></a>
-          <a class="btn btn-ghost" href="#atelier"><span>Composer un bracelet</span></a>
-        </div>
-        <div class="contact-meta">
-          <span>Créations à la main</span>
-          <span>Envoi soigné</span>
-        </div>
+        <p class="craft-note">
+          Deux bracelets ne peuvent pas être identiques. C'est la raison d'être
+          de l'atelier, pas une limite.
+        </p>
       </div>
     </div>
   </section>
+
+  <section class="band band-deep" id="contact">
+    <div class="shell">
+     <div class="contact-in">
+      <div>
+        <h2>Parlons de votre pièce</h2>
+        <p class="band-intro">
+          Dites-moi la pierre qui vous attire, votre tour de poignet et
+          l'occasion, et je vous propose une composition. Je réponds
+          moi-même, en général dans la journée.
+        </p>
+      </div>
+
+      <div class="contact-actions">
+        <!-- À compléter : numéro WhatsApp au format international, sans espaces. -->
+        <a class="btn btn-brass btn-ico" href="https://wa.me/33600000000">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5 0a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.5s-.5-1.3-.7-1.7-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4 5.3 5.3 0 0 0 3.2.7 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/>
+          </svg>
+          Écrire sur WhatsApp
+        </a>
+
+        <!-- À compléter : adresse de la page Facebook de la marque. -->
+        <a class="btn btn-line btn-ico" href="https://www.facebook.com/">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9a15 15 0 0 1 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/>
+          </svg>
+          Voir la page Facebook
+        </a>
+      </div>
+     </div>
+    </div>
+  </section>
+
 </main>
 
-<footer class="site-foot">
-  <div class="shell">
-    <div class="foot-inner">
-      <a class="brand" href="#accueil">
-        <svg class="brand-mark" viewBox="0 0 240 240" aria-hidden="true"><use href="#mark-small"/></svg>
-        <span>
-          <span class="brand-name">L'Eden des Pierres</span>
-          <span class="brand-sub">Sonia</span>
-        </span>
-      </a>
-      <nav class="foot-links" aria-label="Navigation de pied de page">
-        <a href="#histoire">Histoire</a>
-        <a href="#atelier">Atelier</a>
-        <a href="#selection">Sélection</a>
-        <a href="#pierres">Pierres</a>
-        <a href="#sur-mesure">Sur mesure</a>
-      </nav>
-      <span>© L'Eden des Pierres</span>
-    </div>
-    <p class="demo-flag">
-      Maquette de démonstration — la scène d'ouverture (pierre mouillée) est générée par ordinateur,
-      aucun fichier à fournir. Les pierres du configurateur sont des illustrations stylisées à remplacer
-      par vos photos de créations. Coordonnées (email, Instagram) à renseigner.
-    </p>
+<footer class="foot">
+  <div class="shell foot-in">
+    <span>L'Eden des Pierres — bracelets montés à la main par Sonia</span>
+    <span>Pierres naturelles non traitées</span>
   </div>
 </footer>
 
 <script>
-  (function () {
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var hasGSAP = typeof gsap !== 'undefined';
-    if (hasGSAP && typeof ScrollTrigger !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+(function () {
+  /* Menu replié sur petit écran. */
+  var toggle = document.getElementById('nav-toggle');
+  var nav = document.getElementById('nav');
 
-    /* ---- Menu mobile ---- */
-    var toggle = document.getElementById('menu-toggle');
-    var links = document.getElementById('nav-links');
+  toggle.addEventListener('click', function () {
+    var open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
 
-    toggle.addEventListener('click', function () {
-      var open = links.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.textContent = open ? 'Fermer' : 'Menu';
+  nav.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  /* L'unique animation : l'ouverture du hero, jouée une fois.
+     Le déclenchement est immédiat plutôt que lié au scroll — il n'y a rien à
+     attendre, le hero est déjà à l'écran. */
+  var opening = document.querySelectorAll('.hero-copy .lift, .hero-art');
+
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      for (var i = 0; i < opening.length; i++) opening[i].classList.add('ready');
     });
-
-    links.addEventListener('click', function (e) {
-      if (e.target.tagName === 'A') {
-        links.classList.remove('is-open');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.textContent = 'Menu';
-      }
-    });
-
-    /* ================= Scène d'ouverture : pierre mouillée en WebGL ================= */
-    var cine = document.getElementById('cine');
-    var sceneCanvas = document.getElementById('cine-scene');
-    var glRaf = null;
-
-    function startStoneScene(canvas) {
-      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) return false;
-
-      var vertSrc =
-        'attribute vec2 aPos;' +
-        'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
-
-      var fragSrc =
-        'precision highp float;' +
-        'uniform vec2 uRes;' +
-        'uniform float uTime;' +
-        'float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }' +
-        'float noise(vec2 p){' +
-        '  vec2 i = floor(p); vec2 f = fract(p);' +
-        '  float a = hash(i), b = hash(i+vec2(1.0,0.0));' +
-        '  float c = hash(i+vec2(0.0,1.0)), d = hash(i+vec2(1.0,1.0));' +
-        '  vec2 u = f*f*(3.0-2.0*f);' +
-        '  return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;' +
-        '}' +
-        'mat2 rot = mat2(0.8,0.6,-0.6,0.8);' +
-        'float fbm(vec2 p){' +
-        '  float v = 0.0; float amp = 0.5;' +
-        '  for (int i = 0; i < 6; i++) { v += amp*noise(p); p = rot*p*2.0 + 10.0; amp *= 0.55; }' +
-        '  return v;' +
-        '}' +
-        'void main(){' +
-        '  vec2 uv = gl_FragCoord.xy / uRes.xy;' +
-        '  vec2 p = (gl_FragCoord.xy - 0.5*uRes.xy) / min(uRes.x,uRes.y) * 5.2;' +
-        '  p += vec2(uTime*0.02, uTime*0.035);' +
-        '  vec2 q = vec2(fbm(p), fbm(p+vec2(5.2,1.3)));' +
-        '  vec2 r = vec2(fbm(p+2.6*q+vec2(1.7,9.2)+0.12*uTime), fbm(p+2.6*q+vec2(8.3,2.8)+0.1*uTime));' +
-        '  float f = fbm(p + 2.8*r);' +
-        '  float micro = fbm(p*7.5) * 0.09;' +
-        '  vec3 stoneDeep = vec3(0.50,0.46,0.40);' +
-        '  vec3 stoneMid  = vec3(0.71,0.66,0.56);' +
-        '  vec3 stonePale = vec3(0.92,0.88,0.78);' +
-        '  vec3 col = mix(stoneDeep, stoneMid, smoothstep(0.18,0.60,f+micro));' +
-        '  col = mix(col, stonePale, smoothstep(0.54,0.90,f+0.14*r.x+micro));' +
-        '  float e = 0.0018;' +
-        '  vec2 fp = p*1.9 + vec2(0.0,-uTime*0.62) + r*0.55;' +
-        '  float wx1 = fbm(fp+vec2(e,0.0)); float wx2 = fbm(fp-vec2(e,0.0));' +
-        '  float wy1 = fbm(fp+vec2(0.0,e)); float wy2 = fbm(fp-vec2(0.0,e));' +
-        '  vec3 normal = normalize(vec3(-(wx1-wx2)*13.0, -(wy1-wy2)*13.0, 1.0));' +
-        '  vec3 lightDir = normalize(vec3(0.30,0.60,0.70));' +
-        '  float nl = max(dot(normal,lightDir), 0.0);' +
-        '  float spec = pow(nl, 38.0);' +
-        '  float glint = pow(nl, 120.0);' +
-        '  float sheen = pow(nl, 4.0) * 0.16;' +
-        '  col += vec3(1.0,0.98,0.93) * (spec*0.6 + glint*0.8 + sheen);' +
-        '  float wet = smoothstep(0.42, 0.78, fbm(fp*0.9));' +
-        '  col = mix(col, col*0.86 + vec3(0.05,0.05,0.045), wet*0.5);' +
-        '  float vig = smoothstep(1.3, 0.34, length(uv-0.5));' +
-        '  col *= mix(0.72, 1.0, vig);' +
-        '  float grain = hash(gl_FragCoord.xy + uTime*57.0);' +
-        '  col += (grain-0.5) * 0.024;' +
-        '  gl_FragColor = vec4(col, 1.0);' +
-        '}';
-
-      function compile(type, src) {
-        var s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { return null; }
-        return s;
-      }
-
-      var vs = compile(gl.VERTEX_SHADER, vertSrc);
-      var fs = compile(gl.FRAGMENT_SHADER, fragSrc);
-      if (!vs || !fs) return false;
-
-      var prog = gl.createProgram();
-      gl.attachShader(prog, vs);
-      gl.attachShader(prog, fs);
-      gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
-      gl.useProgram(prog);
-
-      var quad = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
-      var buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
-      var aPos = gl.getAttribLocation(prog, 'aPos');
-      gl.enableVertexAttribArray(aPos);
-      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-      var uRes = gl.getUniformLocation(prog, 'uRes');
-      var uTime = gl.getUniformLocation(prog, 'uTime');
-      var dpr = Math.min(window.devicePixelRatio || 1, 1.6);
-
-      function resize() {
-        var w = Math.round(canvas.clientWidth * dpr);
-        var h = Math.round(canvas.clientHeight * dpr);
-        if (canvas.width !== w || canvas.height !== h) {
-          canvas.width = w; canvas.height = h;
-          gl.viewport(0, 0, w, h);
-        }
-      }
-
-      var start = performance.now();
-      function draw() {
-        resize();
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform1f(uTime, (performance.now() - start) / 1000);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        glRaf = requestAnimationFrame(draw);
-      }
-      draw();
-      return true;
-    }
-
-    function paintStillFallback(canvas) {
-      var ctx = canvas.getContext('2d');
-      var w = canvas.clientWidth, h = canvas.clientHeight;
-      canvas.width = w; canvas.height = h;
-      var g = ctx.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, '#DED2B4');
-      g.addColorStop(0.5, '#B7AA88');
-      g.addColorStop(1, '#8F8267');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
-    }
-
-    var sceneStarted = false;
-    if (!reduce) {
-      sceneStarted = startStoneScene(sceneCanvas);
-      if (!sceneStarted) paintStillFallback(sceneCanvas);
-    } else {
-      paintStillFallback(sceneCanvas);
-    }
-
-    /* Fermeture de l'ouverture : idempotente, et c'est elle qui libère
-       la scène du hero. Appelée soit par la timeline, soit par le garde-fou. */
-    var introDone = false;
-    var onIntroEnd = [];
-
-    function endIntro() {
-      if (introDone) return;
-      introDone = true;
-      cine.style.display = 'none';
-      if (glRaf) cancelAnimationFrame(glRaf);   /* le shader s'arrête : il ne sert plus à rien */
-      while (onIntroEnd.length) onIntroEnd.shift()();
-    }
-
-    /* ---- Timeline d'ouverture (GSAP) ---- */
-    if (reduce) {
-      cine.style.display = 'none';
-    } else if (hasGSAP) {
-      gsap.set('#cine-logo', { opacity: 0, scale: 1.08 });
-      gsap.set('#cine-word', { opacity: 0, y: 8 });
-      gsap.set('#hero-title .line > span', { yPercent: 105 });
-      gsap.set(['#hero-sub', '#hero-actions', '#hero-meta'], { opacity: 0, y: 16 });
-      gsap.set('#hero-seal-wrap', { opacity: 0, scale: 0.94 });
-
-      var tl = gsap.timeline({ delay: 0.1 });
-      tl.to('#cine-logo', { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }, 1.5)
-        .to('#cine-word', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 1.8)
-        .to('#cine', { opacity: 0, scale: 1.05, duration: 0.9, ease: 'power2.inOut' }, 2.6)
-        .add(endIntro, 3.5)
-        .to('#hero-seal-wrap', { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }, 3.35)
-        .to('#hero-title .line > span', { yPercent: 0, duration: 0.85, ease: 'power3.out', stagger: 0.11 }, 3.4)
-        .to('#hero-sub', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.75)
-        .to('#hero-actions', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.88)
-        .to('#hero-meta', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 4.0);
-    } else {
-      /* GSAP absent (CDN bloqué, hors ligne, file://) : on joue quand même
-         l'ouverture en CSS plutôt que de la sauter silencieusement. */
-      cine.classList.add('no-gsap');
-      setTimeout(endIntro, 3600);
-    }
-
-    /* Garde-fou : si l'horloge de GSAP est affamée (machine lente, GPU logiciel),
-       la timeline peut ne jamais atteindre son terme. L'ouverture se ferme quand même. */
-    if (!reduce) setTimeout(endIntro, 5200);
-
-    /* ---- Révélations au défilement (GSAP ScrollTrigger) ----
-       Règle de la maison : rien ne reste invisible en attendant un scroll.
-       On ne masque donc QUE ce qui est déjà hors de l'écran au chargement,
-       et un filet de sécurité rétablit tout si un déclencheur ne part pas. */
-    if (!reduce && hasGSAP && typeof ScrollTrigger !== 'undefined') {
-      var pending = [];
-
-      gsap.utils.toArray('.reveal, .stone-card').forEach(function (el, i) {
-        var box = el.getBoundingClientRect();
-        if (box.top < window.innerHeight * 0.92) return;
-
-        var tween = gsap.fromTo(el, { opacity: 0, y: 24 }, {
-          opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
-          delay: (i % 3) * 0.07,
-          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
-        });
-        pending.push({ el: el, tween: tween });
-      });
-
-      window.addEventListener('load', function () {
-        setTimeout(function () { ScrollTrigger.refresh(); }, 200);
-      });
-
-      setTimeout(function () {
-        pending.forEach(function (p) {
-          if (p.tween.progress() === 0 && !p.tween.isActive()) {
-            gsap.set(p.el, { opacity: 1, y: 0, clearProps: 'transform' });
-          }
-        });
-      }, 8000);
-    }
-
-    /* ---- Bandeau défilant (GSAP) ---- */
-    var track = document.getElementById('marquee-track');
-    if (!reduce && hasGSAP) {
-      var loopTween = gsap.to(track, { xPercent: -50, duration: 32, ease: 'none', repeat: -1 });
-      track.parentElement.addEventListener('mouseenter', function () { loopTween.pause(); });
-      track.parentElement.addEventListener('mouseleave', function () { loopTween.play(); });
-    }
-
-    /* ---- Atelier : composition du bracelet ---- */
-    var stones = [
-      { name: 'Améthyste', note: 'Quartz violet', tones: ['#9C8FB8', '#7A6E93', '#C3B9D8', '#E4DEEF'] },
-      { name: 'Quartz rose', note: 'Quartz laiteux', tones: ['#CBA9A6', '#B08986', '#E3CAC7', '#F3E4E2'] },
-      { name: 'Citrine', note: 'Quartz miel', tones: ['#C7A25F', '#A88447', '#E2C288', '#F2E0B8'] },
-      { name: 'Labradorite', note: 'Feldspath', tones: ['#7E97A0', '#617882', '#AFC2C8', '#D6E1E4'] },
-      { name: 'Œil de tigre', note: 'Quartz chatoyant', tones: ['#93714A', '#785B39', '#BC9866', '#DABE8F'] }
-    ];
-
-    var CLAY = '#9C8557';
-    var beadsGroup = document.getElementById('beads');
-    var swatchWrap = document.getElementById('swatches');
-    var nameEl = document.getElementById('stone-name');
-    var noteEl = document.getElementById('stone-note');
-    var NS = 'http://www.w3.org/2000/svg';
-    var COUNT = 30;
-    var R = 140;
-    var beads = [];
-
-    for (var i = 0; i < COUNT; i++) {
-      var a = (i / COUNT) * Math.PI * 2 - Math.PI / 2;
-      var cx = 200 + R * Math.cos(a);
-      var cy = 200 + R * Math.sin(a);
-      var rad = i % 5 === 0 ? 12 : 15.5;
-
-      var bead = document.createElementNS(NS, 'circle');
-      bead.setAttribute('cx', cx.toFixed(2));
-      bead.setAttribute('cy', cy.toFixed(2));
-      bead.setAttribute('r', rad);
-      beadsGroup.appendChild(bead);
-
-      var shine = document.createElementNS(NS, 'circle');
-      shine.setAttribute('cx', (cx - rad * 0.3).toFixed(2));
-      shine.setAttribute('cy', (cy - rad * 0.36).toFixed(2));
-      shine.setAttribute('r', (rad * 0.3).toFixed(2));
-      shine.setAttribute('fill', 'rgba(255,255,255,0.5)');
-      beadsGroup.appendChild(shine);
-
-      var shade = document.createElementNS(NS, 'circle');
-      shade.setAttribute('cx', (cx + rad * 0.26).toFixed(2));
-      shade.setAttribute('cy', (cy + rad * 0.32).toFixed(2));
-      shade.setAttribute('r', (rad * 0.5).toFixed(2));
-      shade.setAttribute('fill', 'rgba(50,44,36,0.16)');
-      beadsGroup.insertBefore(shade, shine);
-
-      beads.push({ el: bead, index: i });
-    }
-
-    function paint(stone, animated) {
-      beads.forEach(function (b, idx) {
-        var color = idx % 7 === 3 ? CLAY : stone.tones[idx % stone.tones.length];
-        if (animated && hasGSAP && !reduce) {
-          gsap.to(b.el, {
-            duration: 0.5, ease: 'back.out(1.6)',
-            delay: Math.min(idx, COUNT - idx) * 0.018,
-            scale: 1.18,
-            onStart: function () { b.el.setAttribute('fill', color); },
-            yoyo: true, repeat: 1
-          });
-        } else {
-          b.el.setAttribute('fill', color);
-        }
-      });
-      nameEl.textContent = stone.name;
-      noteEl.textContent = stone.note;
-    }
-
-    stones.forEach(function (stone, idx) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'swatch';
-      btn.setAttribute('aria-pressed', idx === 0 ? 'true' : 'false');
-      btn.innerHTML = '<em style="background:linear-gradient(140deg,' + stone.tones[2] + ',' + stone.tones[1] + ')"></em>' + stone.name;
-      btn.addEventListener('click', function () {
-        swatchWrap.querySelectorAll('.swatch').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-        btn.setAttribute('aria-pressed', 'true');
-        paint(stone, true);
-      });
-      swatchWrap.appendChild(btn);
-    });
-
-    paint(stones[0], false);
-
-    /* ================= Décor du hero : profondeur en six plans =================
-       Chaque plan est peint une seule fois au chargement, puis glisse en CSS.
-       Ce qui fait la profondeur, ce n'est pas la vitesse : c'est la perspective
-       atmosphérique (le lointain pâlit) et la profondeur de champ (le lointain et
-       le premier plan sont flous, le plan médian est net). */
-
-    function sceneNoise(x, y) {
-      var n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-      return n - Math.floor(n);
-    }
-
-    function sceneSmooth(x, y) {
-      var xi = Math.floor(x), yi = Math.floor(y);
-      var xf = x - xi, yf = y - yi;
-      var u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
-      var a = sceneNoise(xi, yi), b = sceneNoise(xi + 1, yi);
-      var c = sceneNoise(xi, yi + 1), d = sceneNoise(xi + 1, yi + 1);
-      return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
-    }
-
-    function sceneFbm(x, y, octaves) {
-      var v = 0, amp = 0.5, fx = x, fy = y;
-      for (var o = 0; o < octaves; o++) {
-        v += amp * sceneSmooth(fx, fy);
-        fx = fx * 2.03 + 7.1; fy = fy * 2.03 + 3.7;
-        amp *= 0.52;
-      }
-      return v;
-    }
-
-    /* Cuit un flou dans le canvas lui-même. Les navigateurs sans ctx.filter
-       gardent le calque net : la basse résolution agrandie adoucit déjà beaucoup. */
-    function bakeBlur(cv, radius) {
-      var c = cv.getContext('2d');
-      if (typeof c.filter === 'undefined') return;
-      var tmp = document.createElement('canvas');
-      tmp.width = cv.width; tmp.height = cv.height;
-      tmp.getContext('2d').drawImage(cv, 0, 0);
-      c.clearRect(0, 0, cv.width, cv.height);
-      c.filter = 'blur(' + radius + 'px)';
-      c.drawImage(tmp, 0, 0);
-      c.filter = 'none';
-    }
-
-    /* Falaise et cascade : masses de roche qui pâlissent avec la distance,
-       chute d'eau ouverte au milieu du massif. */
-    /* ================= La cascade : seule chose animée en continu =================
-       Un shader plein cadre coûterait cher sur une machine modeste. Trois choix
-       tiennent la charge : demi-résolution (quatre fois moins de pixels), trois
-       octaves de bruit au lieu de six, et 30 images/seconde — à cette lenteur
-       d'écoulement, l'œil ne fait pas la différence avec 60. */
-    var waterStop = null;
-
-    function startWaterfall(canvas) {
-      var gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' })
-            || canvas.getContext('experimental-webgl');
-      if (!gl) return false;
-
-      var vertSrc = 'attribute vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
-
-      var fragSrc = [
-        'precision mediump float;',
-        'uniform vec2 uRes;',
-        'uniform float uTime;',
-        'float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
-        'float noise(vec2 p){',
-        '  vec2 i = floor(p), f = fract(p);',
-        '  float a = hash(i), b = hash(i + vec2(1.0, 0.0));',
-        '  float c = hash(i + vec2(0.0, 1.0)), d = hash(i + vec2(1.0, 1.0));',
-        '  vec2 u = f * f * (3.0 - 2.0 * f);',
-        '  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;',
-        '}',
-        'float fbm(vec2 p){',
-        '  float v = 0.0, amp = 0.5;',
-        '  for (int i = 0; i < 3; i++) { v += amp * noise(p); p = p * 2.07 + 11.0; amp *= 0.55; }',
-        '  return v;',
-        '}',
-        'void main(){',
-        '  vec2 uv = gl_FragCoord.xy / uRes.xy;',
-        '  float y = 1.0 - uv.y;',           /* y = 0 en haut, 1 en bas */
-        '  float x = uv.x;',
-        /* Lèvre de bascule : la roche mouillée d'où l'eau part. C'est le premier
-           des deux repères qui font lire « chute d'eau » plutôt que « stries ». */
-        /* Un fbm pour la grande ondulation, un simple noise pour la cassure
-           fine : deux fbm ici coûtaient trois fois plus pour un galbe
-           identique à l'œil sur une bande qui fait 12 % de la hauteur. */
-        '  float lip = 0.125 + fbm(vec2(x * 5.0, 21.0)) * 0.05 + noise(vec2(x * 13.0, 4.5)) * 0.022;',
-        '  float inWater = smoothstep(lip, lip + 0.026, y);',
-        /* Second repère : la vasque au pied, sa ligne d'eau et ses ondes
-           horizontales, qui coupent net la verticalité de la lame. */
-        '  float poolY = 0.76 + noise(vec2(x * 3.0, 60.0)) * 0.035;',
-        '  float inPool = smoothstep(poolY, poolY + 0.018, y);',
-        /* Écoulement : bruit très étiré en x, qui descend. Deux nappes à des
-           vitesses différentes donnent l'épaisseur de la lame d'eau. */
-        '  float t = uTime * 0.16;',
-        /* Déformation du domaine : sans elle, le bruit étiré en x produit des
-           barres verticales rigides — on lit un code-barres, pas de l'eau.
-           Un simple noise (pas un fbm) suffit et coûte trois fois moins cher. */
-        '  float xw = x + (noise(vec2(y * 2.4, 9.0)) - 0.5) * 0.05;',
-        '  float s1 = fbm(vec2(xw * 30.0, y * 2.5 - t * 3.2));',
-        '  float s2 = fbm(vec2(xw * 15.0 + 40.0, y * 1.6 - t * 2.1));',
-        '  float veins = fbm(vec2(xw * 58.0, y * 1.3 - t * 4.4));',
-        '  float flow = s1 * 0.66 + s2 * 0.52 + veins * 0.34;',
-        /* Bandes de turbulence qui descendent : elles interrompent les filets
-           d'eau en cours de chute, comme un vrai rideau qui se déchire. */
-        '  float band = 0.82 + (noise(vec2(x * 2.0, y * 5.0 - t * 2.8))) * 0.36;',
-        /* La lame s'affine et accélère en tombant. Contraste dosé : trop fort,
-           les creux virent au noir et la chute se fige en rayures. */
-        '  float sheet = (0.52 + (flow - 0.72) * (2.2 + y * 1.1)) * band;',
-        /* Écume : concentrée là où l'eau frappe la vasque, pas sur toute la
-           hauteur — un voile pleine hauteur délave la scène entière. */
-        '  float spray = smoothstep(0.54, 0.80, y) * (0.35 + noise(vec2(x * 7.0, y * 5.0 - t * 1.4)) * 0.65);',
-        /* Roche : strates horizontales, mates, nettement plus sombres que l eau */
-        '  float rock = fbm(vec2(x * 4.5, y * 3.4)) * 0.7 + noise(vec2(x * 1.4, y * 20.0)) * 0.3;',
-        '  float rockTone = 0.44 + (rock - 0.5) * 1.15 - y * 0.10;',
-        /* La couleur d'une scène naturelle vient de l'écart entre une lumière
-           chaude et une ombre froide, pas d'une saturation poussée. */
-        '  vec3 rockLit  = vec3(0.82, 0.72, 0.55);',
-        '  vec3 rockDark = vec3(0.22, 0.21, 0.19);',
-        '  vec3 rockCol  = mix(rockDark, rockLit, clamp(rockTone * 1.55, 0.0, 1.0));',
-        '  vec3 waterLit = vec3(0.99, 0.98, 0.93);',
-        /* Ombre de l'eau : neutre chaude, jamais noire. Un bleu franc trahirait
-           une eau « boostée » — la marque vend des teintes naturelles. */
-        '  vec3 waterDim = vec3(0.52, 0.51, 0.47);',
-        '  vec3 waterCol = mix(waterDim, waterLit, clamp(sheet * 1.25, 0.0, 1.0));',
-        '  vec3 col = mix(rockCol, waterCol, inWater);',
-        '  col = mix(col, vec3(0.98, 0.97, 0.93), spray * inWater * 0.6);',
-        /* La vasque : plus sombre que la lame, striée horizontalement, avec un
-           bourrelet clair à la ligne de choc. */
-        '  float ripple = noise(vec2(x * 5.0, (y - poolY) * 52.0 - t * 1.6));',
-        '  vec3 poolCol = mix(vec3(0.34, 0.36, 0.34), vec3(0.74, 0.75, 0.70), clamp(ripple * 1.5, 0.0, 1.0));',
-        '  poolCol = mix(poolCol, vec3(0.93, 0.93, 0.89), (1.0 - smoothstep(0.0, 0.045, y - poolY)) * 0.55);',
-        '  col = mix(col, poolCol, inPool * 0.92);',
-        /* Lumière rasante venue du haut : la scène s ouvre vers le ciel. Elle
-           porte surtout sur l'eau — en éclairant autant la lèvre, elle effaçait
-           le seul morceau de roche visible de la scène. */
-        '  col += vec3(0.13, 0.10, 0.05) * pow(1.0 - y, 2.6) * (0.32 + 0.68 * inWater);',
-        '  col *= mix(vec3(0.93, 0.94, 0.95), vec3(1.05, 1.0, 0.93), pow(1.0 - y, 1.4));',
-        /* Grain fin : sans lui, un dégradé calculé se voit tout de suite */
-        '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.022;',
-        '  gl_FragColor = vec4(col, 1.0);',
-        '}'
-      ].join('\n');
-
-      function compile(type, src) {
-        var sh = gl.createShader(type);
-        gl.shaderSource(sh, src); gl.compileShader(sh);
-        return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
-      }
-      var vs = compile(gl.VERTEX_SHADER, vertSrc), fs = compile(gl.FRAGMENT_SHADER, fragSrc);
-      if (!vs || !fs) return false;
-
-      var prog = gl.createProgram();
-      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
-      gl.useProgram(prog);
-
-      var buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
-      var aPos = gl.getAttribLocation(prog, 'aPos');
-      gl.enableVertexAttribArray(aPos);
-      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-      var uRes = gl.getUniformLocation(prog, 'uRes');
-      var uTime = gl.getUniformLocation(prog, 'uTime');
-
-      function resize() {
-        /* Demi-résolution : l'eau est douce, personne ne verra la différence. */
-        var w = Math.max(2, Math.round(canvas.clientWidth * 0.5));
-        var h = Math.max(2, Math.round(canvas.clientHeight * 0.5));
-        if (canvas.width !== w || canvas.height !== h) {
-          canvas.width = w; canvas.height = h;
-          gl.viewport(0, 0, w, h);
-        }
-      }
-
-      var start = performance.now();
-      function draw(now) {
-        resize();
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform1f(uTime, (now - start) / 1000);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-      }
-
-      if (reduce) {
-        /* Mouvement réduit : une seule image, puis plus rien. */
-        requestAnimationFrame(function () { draw(performance.now() + 4200); });
-        return true;
-      }
-
-      var raf = null, last = 0, running = false;
-      var FRAME = 1000 / 30;   /* 30 images/seconde suffisent à cette lenteur */
-
-      /* Repli automatique : si la machine n'arrive pas à tenir la cadence,
-         on fige l'eau sur sa dernière image plutôt que de servir une animation
-         saccadée. Mieux vaut une belle image fixe qu'un mouvement qui rame. */
-      var probed = 0, spent = 0, degraded = false;
-
-      function loop(now) {
-        raf = requestAnimationFrame(loop);
-        if (now - last < FRAME) return;
-        var gap = last ? now - last : FRAME;
-        last = now;
-
-        var t0 = performance.now();
-        draw(now);
-        spent += performance.now() - t0 + Math.max(0, gap - FRAME);
-
-        if (!degraded && ++probed === 45) {
-          if (spent / probed > 42) {   /* moins de ~24 images/s réelles */
-            degraded = true;
-            pause();
-          }
-        }
-      }
-
-      function play() { if (!running) { running = true; last = 0; raf = requestAnimationFrame(loop); } }
-      function pause() { if (running) { running = false; cancelAnimationFrame(raf); } }
-
-      /* L'eau ne tourne que si le hero est à l'écran et l'onglet visible. */
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (entries) {
-          entries[0].isIntersecting ? play() : pause();
-        }, { threshold: 0.01 }).observe(canvas);
-      } else { play(); }
-
-      document.addEventListener('visibilitychange', function () {
-        document.hidden ? pause() : play();
-      });
-
-      waterStop = pause;
-      play();
-      return true;
-    }
-
-    /* Repli sans WebGL : une image fixe, peinte une fois. */
-    function paintWaterStill(cv) {
-      var W = 420, H = 260;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      var g = c.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, '#D8CDB2'); g.addColorStop(1, '#BCAF92');
-      c.fillStyle = g; c.fillRect(0, 0, W, H);
-      var w = c.createLinearGradient(W * 0.16, 0, W * 0.84, 0);
-      w.addColorStop(0, 'rgba(120,110,90,0.55)');
-      w.addColorStop(0.16, 'rgba(246,242,232,0.94)');
-      w.addColorStop(0.84, 'rgba(246,242,232,0.94)');
-      w.addColorStop(1, 'rgba(120,110,90,0.55)');
-      c.fillStyle = w; c.fillRect(0, 0, W, H);
-      for (var i = 0; i < 90; i++) {
-        var x = W * (0.17 + Math.random() * 0.66);
-        c.fillStyle = 'rgba(255,255,255,' + (0.05 + Math.random() * 0.16).toFixed(3) + ')';
-        c.fillRect(x, Math.random() * H, 1 + Math.random() * 2, 30 + Math.random() * 90);
-      }
-    }
-
-    /* Brume : bandes horizontales molles qui traversent la vallée */
-    /* Écume : elle monte du pied de la chute, elle ne flotte pas devant elle.
-       Les bandes restent sous 55 % de hauteur — au-dessus, la lame doit rester
-       nette, sinon toute la scène redevient un voile blanc. */
-    function paintMist(cv) {
-      var W = 420, H = 240;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      c.clearRect(0, 0, W, H);
-      for (var i = 0; i < 6; i++) {
-        var y = H * (0.6 + i * 0.075) + sceneSmooth(i * 3.1, 1.7) * 18;
-        var h = 16 + sceneSmooth(i * 1.3, 5.2) * 32;
-        var g = c.createLinearGradient(0, y - h, 0, y + h);
-        g.addColorStop(0, 'rgba(250,246,236,0)');
-        g.addColorStop(0.5, 'rgba(250,246,236,' + (0.34 + i * 0.05).toFixed(3) + ')');
-        g.addColorStop(1, 'rgba(250,246,236,0)');
-        c.fillStyle = g;
-        c.fillRect(0, y - h, W, h * 2);
-      }
-    }
-
-    /* Feuillage : des taches molles, comme un feuillage hors mise au point.
-       C'est exactement ce qu'est un bokeh de végétation — pas des feuilles dessinées. */
-    function paintCanopy(cv) {
-      var W = 520, H = 300;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      c.clearRect(0, 0, W, H);
-
-      var clusters = [
-        { x: 0.04, y: 0.02, r: 0.30, n: 90 },
-        { x: 0.28, y: -0.06, r: 0.22, n: 60 },
-        { x: 0.97, y: 0.05, r: 0.28, n: 80 },
-        { x: 0.78, y: -0.04, r: 0.20, n: 50 }
-      ];
-
-      for (var k = 0; k < clusters.length; k++) {
-        var cl = clusters[k];
-        for (var i = 0; i < cl.n; i++) {
-          var a = sceneNoise(k * 13 + i, 2.7) * Math.PI * 2;
-          var rad = Math.pow(sceneNoise(k * 7 + i, 9.1), 0.6) * cl.r;
-          var px = (cl.x + Math.cos(a) * rad * 0.9) * W;
-          var py = (cl.y + Math.sin(a) * rad * 1.15) * H;
-          var size = (7 + sceneNoise(i, k * 3.3) * 20);
-          var shade = sceneNoise(i * 1.7, k);
-          /* Gris-vert de lichen, très désaturé — jamais un vert de feuillage
-             saturé. Assombri par rapport aux taupes du fond : sans cet écart,
-             le feuillage se confond avec la roche et ne se lit plus. */
-          var r = 78 + shade * 40, g = 98 + shade * 38, b = 66 + shade * 28;
-          var g2 = c.createRadialGradient(px, py, 0, px, py, size);
-          g2.addColorStop(0, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + (0.62 + shade * 0.3).toFixed(2) + ')');
-          g2.addColorStop(1, 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',0)');
-          c.fillStyle = g2;
-          c.beginPath();
-          c.ellipse(px, py, size, size * 0.78, a, 0, Math.PI * 2);
-          c.fill();
-        }
-      }
-    }
-
-    /* Pierres au premier plan : masses sombres en bas de cadre, très floutées */
-    function paintStones(cv) {
-      var W = 520, H = 300;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      c.clearRect(0, 0, W, H);
-
-      var rocks = [
-        { x: 0.06, y: 1.04, rx: 0.30, ry: 0.20 },
-        { x: 0.34, y: 1.10, rx: 0.26, ry: 0.17 },
-        { x: 0.66, y: 1.06, rx: 0.28, ry: 0.19 },
-        { x: 0.94, y: 1.12, rx: 0.32, ry: 0.22 }
-      ];
-
-      for (var i = 0; i < rocks.length; i++) {
-        var rk = rocks[i];
-        var px = rk.x * W, py = rk.y * H;
-        var g = c.createRadialGradient(px, py - rk.ry * H * 0.5, 0, px, py, rk.rx * W);
-        var t = sceneNoise(i * 5.5, 3.3);
-        /* Masses franchement sombres : ce sont elles qui donnent l'échelle du
-           premier plan. Trop claires, elles disparaissent dans l'écume. */
-        var base = 58 + t * 28;
-        g.addColorStop(0, 'rgba(' + ((base + 34) | 0) + ',' + ((base + 22) | 0) + ',' + ((base + 2) | 0) + ',0.92)');
-        g.addColorStop(1, 'rgba(' + (base | 0) + ',' + ((base - 6) | 0) + ',' + ((base - 18) | 0) + ',0)');
-        c.fillStyle = g;
-        c.beginPath();
-        c.ellipse(px, py, rk.rx * W, rk.ry * H, 0, 0, Math.PI * 2);
-        c.fill();
-      }
-    }
-
-    /* Grain d'objectif : immobile. Un grain qui bouge avec la scène trahit le numérique. */
-    function paintGrain(cv) {
-      var W = 260, H = 150;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      var img = c.createImageData(W, H);
-      var d = img.data;
-      for (var i = 0; i < d.length; i += 4) {
-        var n = 118 + (Math.random() - 0.5) * 46;
-        d[i] = d[i + 1] = d[i + 2] = n;
-        d[i + 3] = 30;
-      }
-      c.putImageData(img, 0, 0);
-    }
-
-    var sceneEl = document.getElementById('scene');
-    if (sceneEl) {
-      /* Peinture différée, un calque par image : pendant l'ouverture, le fil
-         principal doit rester libre, sinon la timeline GSAP se fige. */
-      var paintJobs = [
-        function () { var c = document.getElementById('cv-water'); if (!startWaterfall(c)) paintWaterStill(c); },
-        function () { var c = document.getElementById('cv-mist'); paintMist(c); bakeBlur(c, 5); },
-        function () { var c = document.getElementById('cv-canopy'); paintCanopy(c); bakeBlur(c, 1.4); },
-        function () { var c = document.getElementById('cv-stones'); paintStones(c); bakeBlur(c, 3); },
-        function () { paintGrain(document.getElementById('cv-grain')); }
-      ];
-      /* Le grain reste dans tous les cas : c'est lui qui empêche un aplat
-         numérique, photo ou pas. Les quatre autres ne servent qu'au repli. */
-      var grainJob = paintJobs[paintJobs.length - 1];
-      var photoWins = false;
-
-      /* Y a-t-il une vraie photo à afficher ? On la précharge avant de peindre
-         quoi que ce soit : si elle répond, rien d'autre n'a besoin d'exister,
-         et le shader WebGL — de loin le poste le plus cher de la page — n'est
-         même jamais démarré. */
-      var probe = new Image();
-      probe.onload = function () {
-        photoWins = true;
-        sceneEl.classList.add('has-photo');
-        if (waterStop) waterStop();
-        paintJobs.length = 0;
-        paintJobs.push(grainJob);
-      };
-      probe.src = 'assets/hero-cascade.jpg';
-
-      function runNextPaint() {
-        var job = paintJobs.shift();
-        if (!job) return;
-        job();
-        requestAnimationFrame(runNextPaint);
-      }
-      /* On laisse au préchargement une chance de trancher avant de lancer le
-         shader pour rien ; passé ce délai, le repli démarre sans plus attendre
-         (une photo qui arrive après se contentera de le remplacer). */
-      function startPainting() {
-        if (photoWins || probe.complete) { requestAnimationFrame(runNextPaint); return; }
-        setTimeout(function () { requestAnimationFrame(runNextPaint); }, 220);
-      }
-      if (reduce) { startPainting(); }
-      else { onIntroEnd.push(startPainting); }
-
-      var sceneLayers = Array.prototype.slice.call(sceneEl.querySelectorAll('.scene-layer'));
-
-      if (reduce) {
-        /* Mouvement coupé : la scène reste, figée et centrée. */
-      } else {
-        var pointer = { x: 0, y: 0 };   /* cible, entre -1 et 1 */
-        var eased = { x: 0, y: 0 };     /* position lissée */
-        var sceneRaf = null;
-        var sceneIdle = 0;
-        var pointerSeen = false;
-
-        window.addEventListener('pointermove', function (e) {
-          pointerSeen = true;
-          pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-          pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
-        }, { passive: true });
-
-        function sceneFrame() {
-          /* Tant qu'aucune souris ne s'est manifestée (mobile, tablette),
-             la scène dérive doucement toute seule. */
-          if (!pointerSeen) {
-            sceneIdle += 0.0035;
-            pointer.x = Math.sin(sceneIdle) * 0.8;
-            pointer.y = Math.sin(sceneIdle * 0.6) * 0.5;
-          }
-
-          /* Inertie de caméra lourde : on rejoint la cible à 6 % par image */
-          var prevX = eased.x, prevY = eased.y;
-          eased.x += (pointer.x - eased.x) * 0.06;
-          eased.y += (pointer.y - eased.y) * 0.06;
-
-          if (Math.abs(eased.x - prevX) < 0.0004 && Math.abs(eased.y - prevY) < 0.0004) {
-            sceneRaf = requestAnimationFrame(sceneFrame);
-            return;
-          }
-
-          for (var i = 0; i < sceneLayers.length; i++) {
-            var el = sceneLayers[i];
-            var depth = parseFloat(el.dataset.depth || '0');
-            if (depth === 0) continue;
-            /* Les plans avant partent à l'inverse des plans arrière : c'est ça, le signal de profondeur */
-            var dir = depth >= 4 ? -1 : 1;
-            var tx = -eased.x * depth * 1.5 * dir;
-            var ty = -eased.y * depth * 0.9 * dir;
-            el.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px,0)';
-          }
-          sceneRaf = requestAnimationFrame(sceneFrame);
-        }
-        /* On attend la fin de l'ouverture : faire tourner le shader WebGL et
-           six calques en parallaxe en même temps affame les deux. */
-        if (introDone) sceneFrame(); else onIntroEnd.push(sceneFrame);
-
-        document.addEventListener('visibilitychange', function () {
-          if (document.hidden) { cancelAnimationFrame(sceneRaf); }
-          else if (introDone) { sceneRaf = requestAnimationFrame(sceneFrame); }
-        });
-      }
-    }
-
-    /* ================= Décor de section : le paysage continue =================
-       Une branche d'eucalyptus (celle du logo) et le cercle de perles du
-       bracelet reviennent en fond au fil de la descente. Peinture différée,
-       un motif par image, exactement comme les plans du hero. */
-
-    /* Feuillage : tiges courbes et feuilles ovales par paires. Gris-vert de
-       lichen, jamais un vert saturé — la palette du site tient à ça. */
-    function paintLeaves(cv, seed) {
-      var W = 440, H = 352;
-      cv.width = W; cv.height = H;
-      var c = cv.getContext('2d');
-      c.clearRect(0, 0, W, H);
-
-      for (var b = 0; b < 3; b++) {
-        var s = seed + b * 6.7;
-        var x0 = W * (0.10 + sceneNoise(s, 1.1) * 0.34);
-        var y0 = -H * 0.06;
-        var ang = 1.15 + (sceneNoise(s, 2.2) - 0.5) * 0.7;
-        var len = H * (0.78 + sceneNoise(s, 3.3) * 0.34);
-        var bend = (sceneNoise(s, 4.4) - 0.5) * 0.85;
-        var steps = 24, pts = [], i;
-
-        for (i = 0; i <= steps; i++) {
-          var t = i / steps, a = ang + bend * t;
-          pts.push([x0 + Math.cos(a) * len * t * 0.6, y0 + Math.sin(a) * len * t]);
-        }
-
-        c.beginPath();
-        c.moveTo(pts[0][0], pts[0][1]);
-        for (i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
-        c.strokeStyle = 'rgba(84, 92, 72, 0.45)';
-        c.lineWidth = 1.5;
-        c.stroke();
-
-        for (i = 3; i < pts.length; i += 2) {
-          var p = pts[i], q = pts[i - 1];
-          var dir = Math.atan2(p[1] - q[1], p[0] - q[0]);
-          var rr = (10 + sceneNoise(s + i, 5.5) * 13) * (0.55 + (i / steps) * 0.8);
-          for (var side = -1; side <= 1; side += 2) {
-            var la = dir + side * (0.72 + sceneNoise(s + i, side + 6) * 0.45);
-            var lx = p[0] + Math.cos(la) * rr * 0.85;
-            var ly = p[1] + Math.sin(la) * rr * 0.85;
-            var sh = sceneNoise(i * 1.9, s + side);
-            var cr = (86 + sh * 42) | 0, cg = (104 + sh * 40) | 0, cb = (74 + sh * 32) | 0;
-            var grad = c.createRadialGradient(lx, ly, 0, lx, ly, rr);
-            grad.addColorStop(0, 'rgba(' + cr + ',' + cg + ',' + cb + ',0.62)');
-            grad.addColorStop(1, 'rgba(' + cr + ',' + cg + ',' + cb + ',0.05)');
-            c.fillStyle = grad;
-            c.beginPath();
-            c.ellipse(lx, ly, rr, rr * 0.64, la, 0, Math.PI * 2);
-            c.fill();
-          }
-        }
-      }
-    }
-
-    /* Bracelet fantôme : la même géométrie que le cercle de perles de l'atelier.
-       En SVG plutôt qu'en canvas — il reste net à toute taille et se colore
-       avec les variables de la palette. */
-    function buildGhostBracelet(host) {
-      var svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('viewBox', '0 0 400 400');
-      svg.setAttribute('class', 'decor-art');
-      svg.setAttribute('aria-hidden', 'true');
-      var n = 34, R = 150;
-      for (var i = 0; i < n; i++) {
-        var a = (i / n) * Math.PI * 2 - Math.PI / 2;
-        var accent = i % 6 === 0;
-        var cir = document.createElementNS(NS, 'circle');
-        cir.setAttribute('cx', (200 + Math.cos(a) * R).toFixed(1));
-        cir.setAttribute('cy', (200 + Math.sin(a) * R).toFixed(1));
-        cir.setAttribute('r', accent ? 15 : 11.5);
-        cir.setAttribute('fill', accent ? 'var(--clay-soft)' : 'var(--stone-deep)');
-        cir.setAttribute('opacity', accent ? 0.55 : 0.36);
-        svg.appendChild(cir);
-      }
-      host.appendChild(svg);
-      return svg;
-    }
-
-    var decorPlan = [
-      { sel: '#histoire',   kind: 'leaves',   pos: 'd-bl',      op: 0.5,  seed: 1.7 },
-      { sel: '#atelier',    kind: 'leaves',   pos: 'd-bl-lo',   op: 0.4,  seed: 5.1 },
-      { sel: '#selection',  kind: 'bracelet', pos: 'd-r',       op: 0.5 },
-      { sel: '#pierres',    kind: 'leaves',   pos: 'd-br-sm',   op: 0.34, seed: 9.4 },
-      { sel: '#sur-mesure', kind: 'bracelet', pos: 'd-bl-deep', op: 0.44 }
-    ];
-
-    var decorItems = [];
-    var decorPaint = [];
-
-    decorPlan.forEach(function (plan) {
-      var section = document.querySelector(plan.sel);
-      if (!section) return;
-
-      var box = document.createElement('div');
-      box.className = 'sec-decor ' + plan.pos;
-      box.setAttribute('aria-hidden', 'true');
-
-      var drift = document.createElement('div');
-      drift.className = 'decor-drift';
-      box.appendChild(drift);
-
-      var art;
-      if (plan.kind === 'bracelet') {
-        art = buildGhostBracelet(drift);
-      } else {
-        art = document.createElement('canvas');
-        art.className = 'decor-art';
-        drift.appendChild(art);
-        decorPaint.push(function () { paintLeaves(art, plan.seed); bakeBlur(art, 1.6); });
-      }
-      art.style.setProperty('--decor-op', plan.op);
-
-      section.insertBefore(box, section.firstChild);
-      decorItems.push({ section: section, drift: drift, art: art, op: plan.op });
-    });
-
-    function runNextDecorPaint() {
-      var job = decorPaint.shift();
-      if (!job) return;
-      job();
-      requestAnimationFrame(runNextDecorPaint);
-    }
-    /* Comme les plans du hero : jamais pendant l'ouverture, le fil principal
-       doit rester libre pour la timeline GSAP. */
-    if (introDone || reduce) requestAnimationFrame(runNextDecorPaint);
-    else onIntroEnd.push(function () { requestAnimationFrame(runNextDecorPaint); });
-
-    if (!reduce && hasGSAP && typeof ScrollTrigger !== 'undefined') {
-      decorItems.forEach(function (d) {
-        /* Dérive lente : le décor descend un peu moins vite que la page. */
-        gsap.fromTo(d.drift, { yPercent: -5 }, {
-          yPercent: 5, ease: 'none',
-          scrollTrigger: {
-            trigger: d.section, start: 'top bottom', end: 'bottom top',
-            scrub: 1.2, invalidateOnRefresh: true
-          }
-        });
-
-        /* Même règle que les révélations de contenu : on ne part de zéro que
-           pour ce qui est déjà hors écran au chargement. */
-        if (d.section.getBoundingClientRect().top < window.innerHeight * 0.92) return;
-
-        gsap.fromTo(d.art, { opacity: 0 }, {
-          opacity: d.op, duration: 1.7, ease: 'power2.out',
-          scrollTrigger: { trigger: d.section, start: 'top 80%', toggleActions: 'play none none none' }
-        });
-        d.guarded = true;
-      });
-
-      /* Filet de sécurité. Un simple délai ne convient pas ici : à huit
-         secondes, le visiteur est encore souvent dans le hero, et rétablir le
-         décor à ce moment-là supprimerait justement le fondu qu'on veut. Le
-         filet ne se déclenche donc que si la section est réellement à l'écran
-         et que le décor y est toujours invisible — et il reste valable à tout
-         moment de la visite, pas seulement au chargement. */
-      if ('IntersectionObserver' in window) {
-        var decorGuard = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            var item = null;
-            for (var i = 0; i < decorItems.length; i++) {
-              if (decorItems[i].section === entry.target) { item = decorItems[i]; break; }
-            }
-            if (!item) return;
-            setTimeout(function () {
-              if (parseFloat(getComputedStyle(item.art).opacity) < item.op * 0.5) {
-                gsap.set(item.art, { opacity: item.op });
-              }
-            }, 2400);
-          });
-        }, { threshold: 0.2 });
-
-        decorItems.forEach(function (d) { if (d.guarded) decorGuard.observe(d.section); });
-      }
-    }
-
-    /* ---- Poussière lumineuse, discrète ---- */
-    var canvas = document.getElementById('dust');
-    var ctx = canvas.getContext('2d');
-    var motes = [];
-    var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    function sizeCanvas() {
-      w = window.innerWidth; h = window.innerHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      var target = w < 700 ? 14 : 30;
-      motes = [];
-      for (var i = 0; i < target; i++) {
-        motes.push({
-          x: Math.random() * w, y: Math.random() * h,
-          r: Math.random() * 1.5 + 0.4,
-          sp: Math.random() * 0.14 + 0.04,
-          sway: Math.random() * 0.4 + 0.15,
-          ph: Math.random() * Math.PI * 2
-        });
-      }
-    }
-
-    var t = 0;
-    var dustSkip = 0;
-    function frame() {
-      dRaf = requestAnimationFrame(frame);
-      if ((dustSkip = (dustSkip + 1) % 2) !== 0) return;   /* une image sur deux suffit à cette lenteur */
-      t += 0.01;
-      ctx.clearRect(0, 0, w, h);
-      for (var i = 0; i < motes.length; i++) {
-        var m = motes[i];
-        m.y -= m.sp;
-        if (m.y < -10) { m.y = h + 10; m.x = Math.random() * w; }
-        var x = m.x + Math.sin(t * 1.2 + m.ph) * (m.sway * 18);
-        var alpha = 0.08 + Math.abs(Math.sin(t * 0.9 + m.ph)) * 0.16;
-        ctx.beginPath();
-        ctx.arc(x, m.y, m.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(156,133,87,' + alpha.toFixed(3) + ')';
-        ctx.fill();
-      }
-    }
-
-    var dRaf = null;
-    if (!reduce) {
-      sizeCanvas();
-      window.addEventListener('resize', sizeCanvas);
-      frame();
-      document.addEventListener('visibilitychange', function () {
-        if (document.hidden) { cancelAnimationFrame(dRaf); }
-        else { dRaf = requestAnimationFrame(frame); }
-      });
-    } else {
-      canvas.style.display = 'none';
-    }
-
-    /* ---- Barre de progression ---- */
-    var bar = document.getElementById('progress');
-    var ticking = false;
-
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        var max = document.documentElement.scrollHeight - window.innerHeight;
-        var p = max > 0 ? window.scrollY / max : 0;
-        bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
-        ticking = false;
-      });
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    /* ---- Inclinaison 3D des cartes ---- */
-    if (!reduce && window.matchMedia('(pointer: fine)').matches) {
-      document.querySelectorAll('[data-tilt]').forEach(function (card) {
-        card.addEventListener('pointermove', function (e) {
-          var r = card.getBoundingClientRect();
-          var px = (e.clientX - r.left) / r.width;
-          var py = (e.clientY - r.top) / r.height;
-          card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
-          card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-          card.style.transform =
-            'perspective(900px) rotateY(' + ((px - 0.5) * 6).toFixed(2) + 'deg) rotateX(' +
-            ((0.5 - py) * 6).toFixed(2) + 'deg) translateY(-4px)';
-        });
-        card.addEventListener('pointerleave', function () {
-          card.style.transform = '';
-        });
-      });
-    }
-  })();
+  });
+})();
 </script>
 
 </body>
