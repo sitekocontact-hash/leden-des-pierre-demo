@@ -20,17 +20,17 @@ Il sert de mémoire : plus besoin de réexpliquer la direction à chaque fois.
 Améthyste (quartz violet) · Quartz rose (laiteux) · Citrine (quartz miel) ·
 Labradorite (feldspath chatoyant) · Œil de tigre · Pierre de lune (feldspath opalescent).
 
-## Direction artistique — la cascade tient la page
+## Direction artistique — la mer tient la page
 
-**Cette direction remplace les précédentes** (claire et zen ; puis écrin aubergine sur fond
-plat). Demandée explicitement par la cliente : elle veut un fond cinématique, une eau qui
-descend en continu, et que **le fond domine le contenu** — « limite qu'on voit plus
-l'arrière-image que l'image tout court ». Les versions antérieures restent dans l'historique
-git et sur `claude/website-design-creation-yodgt1`.
+**Cette direction remplace les précédentes** (claire et zen ; écrin aubergine sur fond
+plat ; puis cascade nocturne). Demandée par la cliente : un fond cinématique, une eau
+animée en continu, et **le fond qui domine le contenu** — « limite qu'on voit plus
+l'arrière-image que l'image tout court ». Les états antérieurs restent dans l'historique
+git : la cascade est le commit juste avant celui de la mer, récupérable d'un `git revert`.
 
 - **Le fond est le site.** Un canvas WebGL fixe, en `position: fixed` sur tout le viewport,
-  derrière l'intégralité de la page. Ce n'est pas un décor de hero : l'eau continue de
-  descendre derrière la collection, le savoir-faire et le contact.
+  derrière l'intégralité de la page. Ce n'est pas un décor de hero : la mer respire derrière
+  la collection, le savoir-faire et le contact.
 - **Un seul écran, un seul fichier** : `index.html` contient le HTML, le CSS et le JS.
   Aucun framework, aucune étape de build, aucune dépendance externe hors polices.
 
@@ -52,32 +52,38 @@ définitivement le problème du voile clair, rejeté à plusieurs reprises.
 - Titres : **Fraunces** (serif chaleureux, axes `SOFT` et `WONK` utilisés)
 - Texte courant : **Inter**, graisse légère (300–500)
 
-## La cascade : ce qui la fait lire comme de l'eau
+## La mer : ce qui la fait lire comme de l'eau
 
-Une première version avait été rejetée — « on dirait que c'est peint par un peintre ».
-Le défaut n'était pas le manque de détail mais la **forme du bruit**. Trois principes, à ne
-pas défaire :
+Une cascade avait d'abord été tentée, puis rejetée — « peinte par un peintre ». La leçon
+vaut pour toute eau calculée : **ce n'est pas la quantité de bruit qui fait le réalisme,
+c'est la géométrie et la lumière.** Trois principes, à ne pas défaire :
 
-1. **Bruit *ridged*** (`1 - |2n-1|`) et non un fbm ordinaire. Un fbm étiré donne des bandes
-   molles ; le ridged donne des crêtes nettes, qui est la forme d'une lame d'eau qui se
-   déchire.
-2. **Forte anisotropie.** Une cellule de bruit doit être une vingtaine de fois plus haute
-   que large (`sx` ≈ 13–40 contre `sy` ≈ 1–2,5). C'est le rapport `sx/sy` qui fait la chute.
-   Des cellules presque carrées donnent de la fumée marbrée, pas une cascade.
-3. **Une lumière.** L'eau ne se reconnaît pas à sa texture mais à ses reflets : lumière
-   chaude rasante venue de la droite, éclats spéculaires calculés en puissance sur les
-   crêtes, et côté gauche laissé dans l'ombre. Cette ombre à gauche **est** ce qui porte le
-   texte du hero — c'est l'éclairage de la scène, pas un voile posé dessus.
+1. **La perspective.** Chaque pixel sous l'horizon est reprojeté sur un plan d'eau
+   (`z = 0.30 / (profondeur + 0.010)`). La distance explose près de l'horizon, donc la houle
+   s'y écrase d'elle-même. Sans cette reprojection, les vagues gardent la même taille
+   partout et la mer devient un papier peint.
+2. **L'allée de lumière.** C'est la signature d'une mer éclairée : large et diffuse près de
+   l'horizon, resserrée et piquée d'éclats au premier plan. Elle se calcule sur la **pente**
+   de la houle (différence finie), jamais sur sa hauteur.
+3. **L'extinction des rides au loin.** Les fréquences fines sont éteintes avec la distance
+   (`fade`), sinon elles moirent près de l'horizon — le défaut qui trahit immédiatement une
+   mer calculée.
 
-S'y ajoutent trois nappes à des vitesses différentes (le glissement entre elles donne
-l'épaisseur du rideau) et une enveloppe lente sur `x` pour que certaines colonnes portent
-plus d'eau que d'autres.
+Le soleil est à droite : **la gauche du cadre reste dans son ombre, et c'est cette ombre qui
+porte le texte du hero.** L'éclairage de la scène, pas un voile posé dessus.
 
-**Garde-fous obligatoires** : demi-résolution, 3 octaves, 30 images/seconde, arrêt quand
-l'onglet passe en arrière-plan, et **repli en deux temps** — d'abord la résolution baisse,
-et seulement si cela ne suffit pas l'image se fige. Une eau immobile derrière tout un site
-se voit beaucoup plus qu'une eau un peu moins fine. En `prefers-reduced-motion`, une seule
-image est peinte puis plus rien. Sans WebGL, le dégradé CSS du canvas prend le relais.
+**Adaptation au format, obligatoire.** En portrait le texte occupe toute la largeur : il n'y
+a plus de flanc sombre où le loger. Le shader lit donc le rapport d'aspect et, en portrait,
+sort le soleil du cadre (`SUN` 0,84 → 1,06) et bride les éclats spéculaires (`sparkle` à
+0,22). Mesuré : sans ce bridage, le sous-titre tombe à 1,5:1. C'est bien l'éclat spéculaire
+qu'il faut réduire, pas la luminosité d'ensemble — assombrir toute la scène rendait l'image
+terne sans régler le contraste.
+
+**Garde-fous obligatoires** : demi-résolution, 30 images/seconde, arrêt quand l'onglet passe
+en arrière-plan, et **repli en deux temps** — d'abord la résolution baisse, et seulement si
+cela ne suffit pas l'image se fige. Une eau immobile derrière tout un site se voit beaucoup
+plus qu'une eau un peu moins fine. En `prefers-reduced-motion`, une seule image est peinte
+puis plus rien. Sans WebGL, le dégradé CSS du canvas prend le relais.
 
 ## Tics de page générée — à ne jamais réintroduire
 
@@ -92,11 +98,11 @@ La cliente a rejeté ces réflexes nommément. Ils sont interdits sur ce projet 
 
 **La collection ne se fait pas en cartes.** Elle est un **plateau unique** (`.tray`), divisé
 par des filets, comme les logements d'un écrin de bijoutier. Posé sur l'eau sombre, il se
-lit comme un coffret ouvert au-dessus de la chute.
+lit comme un coffret ouvert au-dessus de la mer.
 
 ## Animation
 
-L'eau ne s'arrête jamais : c'est le fond, pas un effet. **La seule animation d'interface**
+La mer ne s'arrête jamais : c'est le fond, pas un effet. **La seule animation d'interface**
 est l'ouverture du texte du hero, jouée une fois au chargement. Rien d'autre — ni apparition
 au défilement, ni effet au survol des pièces.
 
@@ -116,7 +122,7 @@ colorent via le dégradé `#brass-facet`.
 
 ## Emplacements des pierres
 
-Le hero ne montre plus d'illustration : il est tenu par l'eau et le titre seuls. Les quatre
+Le hero ne montre plus d'illustration : il est tenu par la mer et le titre seuls. Les quatre
 pierres restent dans le plateau de la collection, sous forme de dégradés radiaux aux teintes
 de chaque pierre, marqués « Photo à venir » en attendant les vraies photos.
 

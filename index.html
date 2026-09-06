@@ -80,12 +80,12 @@
   }
   .skip:focus { left: 1rem; top: 1rem; }
 
-  /* ===================== La cascade, fond de tout le site =====================
+  /* ======================= La mer, fond de tout le site =======================
      Le canvas est fixe et couvre le viewport : ce n'est pas un décor de hero,
-     c'est le sol de la page. Le contenu passe dessus, et l'eau continue de
-     descendre derrière lui du haut jusqu'au pied du site. */
+     c'est le sol de la page. Le contenu passe dessus, et la mer respire
+     derrière lui du haut jusqu'au pied du site. */
 
-  #falls {
+  #sea {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -94,10 +94,10 @@
     display: block;
     /* Tant que le shader n'a pas peint sa première image, on regarde déjà de
        l'eau profonde plutôt qu'un rectangle vide. */
-    background: linear-gradient(180deg, #070B0D 0%, #101A1E 45%, #16232A 100%);
+    background: linear-gradient(180deg, #0A0E16 0%, #1D1A1B 38%, #2A2523 40%, #12161A 44%, #070B0E 100%);
   }
 
-  /* Assise sombre sous le contenu long : l'eau reste visible, mais elle cesse
+  /* Assise sombre sous le contenu long : la mer reste visible, mais elle cesse
      de scintiller juste derrière un paragraphe. */
   .scrim {
     position: fixed;
@@ -219,7 +219,7 @@
 
   .hero-actions { margin-top: 2.6rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
 
-  /* Repère de défilement : l'eau descend, la page aussi. */
+  /* Repère de défilement, discret. */
   .scroll-cue {
     position: absolute;
     left: var(--gutter);
@@ -383,7 +383,7 @@
   }
 
   /* ===================== L'unique animation d'interface =====================
-     L'eau, elle, ne s'arrête jamais : c'est le fond, pas un effet. Cette
+     La mer, elle, ne s'arrête jamais : c'est le fond, pas un effet. Cette
      ouverture-ci concerne le seul texte du hero, et ne joue qu'une fois. */
 
   .js .lift { opacity: 0; transform: translateY(18px); }
@@ -406,7 +406,7 @@
 
 <a class="skip" href="#collection">Aller à la collection</a>
 
-<canvas id="falls" aria-hidden="true"></canvas>
+<canvas id="sea" aria-hidden="true"></canvas>
 <div class="scrim" id="scrim" aria-hidden="true"></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -475,7 +475,7 @@
           <a class="btn btn-line" href="#savoir-faire">Comment je travaille</a>
         </div>
       </div>
-      <p class="scroll-cue">L'eau descend, la collection suit</p>
+      <p class="scroll-cue">La collection commence plus bas</p>
     </div>
   </section>
 
@@ -622,24 +622,29 @@
     });
   });
 
-  /* =========================== La cascade ===========================
-     Ce qui fait lire « eau » plutôt que « rayures », c'est trois choses, et
-     aucune n'est la quantité de bruit :
+  /* ============================ La mer, à l'aube ============================
+     Une surface d'eau vue en perspective rasante, et une allée de lumière
+     chaude qui descend du point du soleil jusqu'au premier plan.
 
-     1. du bruit RIDGED (1 - |2n-1|) plutôt qu'un fbm ordinaire. Un fbm étiré
-        donne des bandes molles ; le ridged donne des filaments à crête nette,
-        qui est exactement la forme d'une lame d'eau qui se déchire.
-     2. TROIS nappes à des échelles et des vitesses différentes. Une seule
-        nappe, si détaillée soit-elle, reste un plan : c'est le glissement
-        entre les nappes qui donne l'épaisseur du rideau.
-     3. une LUMIÈRE. L'eau ne se lit pas à sa texture mais à ses reflets :
-        une lumière chaude rasante venue de la droite, et des éclats
-        spéculaires calculés en puissance sur les crêtes.
-  ================================================================== */
+     Trois choses font lire « la mer » plutôt qu'« un dégradé bleu » :
 
-  var canvas = document.getElementById('falls');
+     1. LA PERSPECTIVE. Chaque pixel sous l'horizon est reprojeté sur un plan
+        d'eau. La distance explose près de l'horizon, donc la houle s'y écrase
+        d'elle-même. Sans cette reprojection, les vagues gardent la même taille
+        partout et la mer devient un papier peint.
+     2. L'ALLÉE DE LUMIÈRE. C'est la signature d'une mer éclairée : large et
+        diffuse près de l'horizon, resserrée et piquée d'éclats au premier plan.
+     3. L'EXTINCTION DES RIDES AU LOIN. Les fréquences fines sont éteintes avec
+        la distance, sinon elles moirent — le défaut qui trahit immédiatement
+        une mer calculée.
 
-  function startFalls() {
+     Le soleil est à droite : la gauche du cadre reste dans son ombre, et c'est
+     elle qui porte le texte du hero. L'éclairage de la scène, pas un voile.
+  ====================================================================== */
+
+  var canvas = document.getElementById('sea');
+
+  function startSea() {
     var gl = canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' })
           || canvas.getContext('experimental-webgl');
     if (!gl) return false;
@@ -665,92 +670,83 @@
       '             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);',
       '}',
 
-      /* Crête nette au lieu d'une bosse molle : c'est ce profil qui donne le
-         filament d'eau. */
-      'float ridge(vec2 p){ return 1.0 - abs(noise(p) * 2.0 - 1.0); }',
+      'const float HOR = 0.60;',
 
-      'float ridgeFbm(vec2 p){',
-      '  float v = 0.0, a = 0.55, w = 0.0;',
-      '  for (int i = 0; i < 3; i++) {',
-      '    v += a * ridge(p);',
-      '    w += a;',
-      '    p = p * 2.17 + 9.1;',
-      '    a *= 0.5;',
-      '  }',
-      '  return v / w;',
-      '}',
-
-      /* Une nappe qui tombe. sx/sy : l'échelle, donc l'éloignement. spd : la
-         vitesse de chute. sharp : la finesse des filets, qui augmente quand on
-         se rapproche. */
-      'float sheet(vec2 p, float sx, float sy, float spd, float sharp, float seed){',
-      '  vec2 q = vec2(p.x * sx + seed, p.y * sy - uTime * spd - uScroll * spd * 2.2);',
-      /* Sans cette ondulation, les filets tombent parfaitement droits et on
-         relit un code-barres. */
-      '  q.x += sin(q.y * 0.30 + uTime * 0.35 + seed) * 0.45;',
-      '  q.x += (noise(vec2(q.y * 0.5, seed)) - 0.5) * 1.1;',
-      /* Une chute n'est pas d'épaisseur constante : certaines colonnes portent
-         plus d'eau que d'autres, et ce dessin dérive très lentement. Sans cette
-         enveloppe, le rideau est régulier comme un tissu imprimé. */
-      '  float envelope = 0.45 + 0.55 * noise(vec2(p.x * 1.7 + seed, uTime * 0.045));',
-      '  return pow(clamp(ridgeFbm(q), 0.0, 1.0), sharp) * envelope;',
+      /* Hauteur de houle en coordonnées monde. « fade » éteint les rides fines
+         au loin : c'est ce qui évite le moirage près de l'horizon. */
+      'float swell(vec2 w, float t, float fade){',
+      '  float h = 0.0;',
+      '  h += sin(w.y * 7.5 + t * 1.15 + noise(w * 0.9) * 3.0) * 0.55;',
+      '  h += sin(w.y * 15.0 - t * 1.85 + w.x * 1.8) * 0.30;',
+      '  h += (noise(w * vec2(2.4, 5.5) + vec2(0.0, -t * 1.1)) - 0.5) * 1.00 * fade;',
+      '  h += (noise(w * vec2(8.5, 16.0) + vec2(0.0, -t * 2.2)) - 0.5) * 0.50 * fade * fade;',
+      '  return h;',
       '}',
 
       'void main(){',
       '  vec2 uv = gl_FragCoord.xy / uRes;',
       '  float asp = uRes.x / uRes.y;',
-      '  vec2 p = vec2(uv.x * asp, uv.y);',
-      '  float y = 1.0 - uv.y;',
+      '  float t = uTime * 0.5 + uScroll * 6.0;',
+      /* En portrait, le texte occupe toute la largeur : le soleil sort
+         presque du cadre pour que son allée cesse de traverser les lignes.
+         Seule sa lueur reste, ce qui suffit à situer l'heure. */
+      '  float SUN = mix(1.06, 0.84, smoothstep(0.62, 1.35, asp));',
 
-      /* La lame accélère en tombant : les nappes sont étirées vers le bas. */
-      '  float fall = 1.0 - y * 0.35;',
+      '  vec3 skyTop = vec3(0.045, 0.062, 0.095);',
+      '  vec3 skyLow = vec3(0.235, 0.205, 0.200);',
+      '  vec3 warm   = vec3(1.00, 0.70, 0.36);',
+      '  vec3 col;',
 
-      /* L'anisotropie est TOUT : une cellule de bruit doit être vingt fois plus
-         haute que large, sinon on obtient de la fumée marbrée et pas une lame
-         d'eau. C'est le rapport sx/sy qui fait la chute, pas le nombre
-         d'octaves. */
-      '  float far  = sheet(p, 40.0, 2.4 * fall, 0.55, 1.7, 0.0);',
-      '  float mid  = sheet(p, 24.0, 1.7 * fall, 1.00, 2.4, 17.3);',
-      '  float near = sheet(p, 13.0, 1.1 * fall, 1.70, 3.4, 41.7);',
+      '  if (uv.y > HOR) {',
+      '    float k = (uv.y - HOR) / (1.0 - HOR);',
+      '    col = mix(skyLow, skyTop, pow(k, 0.62));',
+      /* Le point de lumière, juste au-dessus de la ligne d'eau : un halo large
+         et un cœur serré. */
+      '    float d = length(vec2((uv.x - SUN) * asp, (uv.y - HOR) * 1.8));',
+      '    col += warm * exp(-d * 4.2) * 0.62;',
+      '    col += warm * exp(-d * 14.0) * 0.75;',
+      '  } else {',
+      '    float depth = HOR - uv.y;',
+      '    float z = 0.30 / (depth + 0.010);',
+      '    vec2 w = vec2((uv.x - 0.5) * asp * z * 1.25, z);',
+      '    float fade = smoothstep(0.0, 0.16, depth);',
+      '    float h  = swell(w, t, fade);',
+      /* Pente approchée par différence finie : une normale bon marché, et
+         c'est la pente — pas la hauteur — qui décide des reflets. */
+      '    float h2 = swell(w + vec2(0.0, 0.022), t, fade);',
+      '    float slope = clamp((h2 - h) * 6.0 * 0.5 + 0.5, 0.0, 1.0);',
 
-      '  vec3 abyss = vec3(0.030, 0.048, 0.056);',
-      '  vec3 wFar  = vec3(0.115, 0.170, 0.185);',
-      '  vec3 wMid  = vec3(0.300, 0.375, 0.395);',
-      '  vec3 wNear = vec3(0.720, 0.780, 0.780);',
+      '    vec3 deepC = vec3(0.030, 0.045, 0.058);',
+      '    vec3 farC  = vec3(0.105, 0.125, 0.140);',
+      '    col = mix(farC, deepC, clamp(depth * 2.6, 0.0, 1.0));',
 
-      '  vec3 col = abyss;',
-      '  col = mix(col, wFar,  far  * 0.72);',
-      '  col = mix(col, wMid,  mid  * 0.68);',
-      '  col = mix(col, wNear, near * 0.60);',
+      /* L'allée de lumière : large au loin, resserrée au premier plan. */
+      '    float path = exp(-pow((uv.x - SUN) * (3.6 + depth * 14.0), 2.0));',
+      '    float spec = pow(slope, 9.0);',
+      /* Ce sont les éclats, pas la luminosité d'ensemble, qui écrasent le
+         texte en portrait : on les bride là plutôt que de noyer la scène. */
+      '    float sparkle = mix(0.22, 1.0, smoothstep(0.62, 1.35, asp));',
+      '    col += warm * spec * path * 2.2 * sparkle;',
+      '    col += warm * pow(spec, 3.0) * path * 1.6 * sparkle;',
 
-      /* Lumière chaude rasante venue de la droite. Les éclats se calculent en
-         puissance sur les crêtes : c'est le reflet, pas la texture, qui fait
-         reconnaître de l'eau. */
-      '  float lit = smoothstep(0.05, 0.95, uv.x);',
-      '  float glint = pow(near, 6.0) * 2.1 + pow(mid, 8.0) * 0.95;',
-      '  col += vec3(0.80, 0.60, 0.33) * glint * lit;',
+      /* Hors de l'allée, la mer n'est pas noire : les crêtes prennent le ciel. */
+      '    col += vec3(0.16, 0.20, 0.23) * pow(slope, 6.0) * 0.5;',
 
-      /* Un souffle plus froid du côté opposé, pour que la scène ne vire pas
-         monochrome dorée. */
-      '  col += vec3(0.16, 0.26, 0.30) * pow(mid, 5.0) * (1.0 - lit) * 0.5;',
+      /* Brume d'horizon : elle fait reculer le fond et referme la perspective. */
+      '    col = mix(vec3(0.135, 0.130, 0.130), col, clamp(depth * 6.5, 0.0, 1.0));',
+      '  }',
 
-      /* Embruns : ils montent du pied de la chute, ils ne flottent pas devant. */
-      '  float mist = smoothstep(0.58, 1.0, y) * (0.45 + 0.55 * noise(vec2(p.x * 2.2, y * 3.4 - uTime * 0.22)));',
-      '  col = mix(col, vec3(0.245, 0.300, 0.315), mist * 0.6);',
+      /* Le soleil est à droite, donc la gauche est dans son ombre. C'est cette
+         ombre qui porte le texte du hero. */
+      '  float shade = mix(0.16, 0.22, smoothstep(0.62, 1.35, asp));',
+      '  col *= mix(shade, 1.0, smoothstep(0.02, 0.74, uv.x));',
+      /* En portrait le texte couvre toute la largeur : il n'y a plus de flanc
+         sombre où le loger, donc c'est toute la scène qui baisse d'un cran. */
+      '  col *= mix(0.52, 1.0, smoothstep(0.62, 1.35, asp));',
 
-      /* La lumière vient de la droite, donc le côté gauche du rideau est dans
-         son ombre. C'est ce qui porte le texte du hero : pas un voile posé sur
-         l'image, mais l'éclairage de la scène elle-même. */
-      '  col *= mix(0.52, 1.0, smoothstep(0.0, 0.58, uv.x));',
-
-      /* La lèvre du haut reste dans l'ombre : la chute vient de quelque part. */
-      '  col *= mix(0.30, 1.0, smoothstep(0.0, 0.30, y));',
-
-      /* Vignette : elle referme le cadre et pousse l'œil vers le texte. */
-      '  float vig = 1.0 - 0.44 * pow(clamp(length(uv - 0.5) * 1.25, 0.0, 1.0), 2.0);',
+      '  float vig = 1.0 - 0.42 * pow(clamp(length(uv - 0.5) * 1.28, 0.0, 1.0), 2.0);',
       '  col *= vig;',
-
-      '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.018;',
+      '  col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.016;',
       '  gl_FragColor = vec4(col, 1.0);',
       '}'
     ].join('\n');
@@ -813,7 +809,7 @@
     }
 
     if (reduce) {
-      /* Mouvement réduit : une seule image, choisie à un instant où la lame
+      /* Mouvement réduit : une seule image, choisie à un instant où la houle
          est déjà formée, puis plus rien ne bouge. */
       requestAnimationFrame(function () { draw(performance.now() + 6000); });
       return true;
@@ -863,9 +859,9 @@
     return true;
   }
 
-  if (!startFalls()) {
-    /* Sans WebGL, le dégradé CSS du canvas reste : on regarde de l'eau
-       profonde immobile plutôt qu'un trou noir. */
+  if (!startSea()) {
+    /* Sans WebGL, le dégradé CSS du canvas reste : on regarde un horizon
+       d'aube immobile plutôt qu'un trou noir. */
     canvas.style.display = 'block';
   }
 
